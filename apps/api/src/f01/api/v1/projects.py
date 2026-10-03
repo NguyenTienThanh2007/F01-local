@@ -58,7 +58,7 @@ def metadata_headers(response: Response, project: ProjectSummary) -> None:
 @router.get("/session", response_model=SessionView)
 def session(request: Request, principal: PrincipalDependency, settings: SettingsDependency) -> SessionView:
     auth_session = getattr(request.state, "auth_session", None)
-    return SessionView(principal=principal, capabilities=Capabilities(simulation_runner=settings.simulation_runner_enabled), expires_at=auth_session.expires_at if auth_session else None)
+    return SessionView(principal=principal, capabilities=Capabilities(simulation_runner=settings.simulation_runner_enabled, execution_mode=settings.execution_mode, real_generation=settings.real_execution_enabled, source_artifacts=settings.real_execution_enabled), expires_at=auth_session.expires_at if auth_session else None)
 
 
 @router.post("/projects", response_model=ProjectCreated, status_code=201)
@@ -72,7 +72,7 @@ def create_project(
         str, Header(min_length=1, max_length=200, pattern=r"^[A-Za-z0-9._:-]+$")
     ],
 ) -> ProjectCreated:
-    result = service.create_project(database, principal, body, idempotency_key, schedule=settings.simulation_runner_enabled)
+    result = service.create_project(database, principal, body, idempotency_key, schedule=settings.simulation_runner_enabled, real=settings.real_execution_enabled)
     response.headers["Location"] = f"/v1/projects/{result.project.id}"
     # A replay's metadata is the saved creation snapshot; read Location for current state.
     metadata_headers(response, result.project)
@@ -173,7 +173,7 @@ def ready(database: DatabaseDependency) -> dict[str, str]:
         versions = connection.scalars(
             text("SELECT version_num FROM alembic_version")
         ).all()
-        if versions != ["0002_phase2a"]:
+        if versions != ["0003_phase2b"]:
             raise ApplicationError("DATABASE_NOT_READY")
     return {"status": "ready"}
 

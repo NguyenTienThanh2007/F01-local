@@ -21,6 +21,16 @@ class ErrorEnvelope(BaseModel):
     error: ErrorDetail
 
 
+APPLICATION_EXECUTION_ERRORS = {
+    "EXECUTION_UNAVAILABLE": (503, "Real execution is unavailable until the trusted Docker runtime is configured and verified."),
+    "PLAN_REVIEW_REQUIRED": (409, "Review the current plan before starting a real build."),
+    "SOURCE_BASE_UNAVAILABLE": (409, "This version has no generated source. Create a new project for real execution."),
+    "SOURCE_SECRET_REJECTED": (422, "Source or context contains a forbidden credential."),
+    "REAL_BUILD_COMMAND_REQUIRED": (409, "Use real build controls for generated source versions."),
+    "CLEANUP_PENDING": (409, "The previous sandbox is awaiting cleanup."),
+    "VERIFICATION_REQUIRED": (409, "Required verification evidence is missing."),
+}
+
 PROVIDER_ERRORS: dict[ProviderErrorCode, tuple[int, str]] = {
     ProviderErrorCode.NOT_CONFIGURED: (
         503,
@@ -85,6 +95,7 @@ async def _provider_error_handler(_request: Request, exc: Exception) -> JSONResp
 
 
 APPLICATION_ERRORS: dict[str, tuple[int, str]] = {
+    **APPLICATION_EXECUTION_ERRORS,
     "AUTHENTICATION_REQUIRED": (401, "A valid authenticated session is required."),
     "IDENTITY_LINK_CONFLICT": (409, "Identity linking requires operator review; existing ownership was not changed."),
     "AUTH_RATE_LIMITED": (429, "Sign-in attempts are temporarily limited. Try again later."),

@@ -61,8 +61,8 @@ class ProjectCreated(Contract):
     project_url: str
     request_id: UUID
     brain_revision_id: UUID
-    run_id: UUID
-    execution_mode: Literal["simulated"] = "simulated"
+    run_id: UUID | None
+    execution_mode: Literal["simulated", "real"] = "simulated"
 
 
 class RequestRecord(Contract):
@@ -98,7 +98,7 @@ class BrainRevisionSummary(Contract):
     schema_version: int = Field(gt=0)
     source_request_id: UUID
     source_run_id: UUID | None
-    created_at: datetime
+    created_at: UtcDateTime
 
 
 class BrainRevisionRecord(BrainRevisionSummary):
@@ -113,18 +113,18 @@ class RunRecord(Contract):
     base_version_id: UUID | None
     retry_of_run_id: UUID | None
     attempt: int = Field(gt=0, le=MAX_COUNTER)
-    mode: Literal["simulated"]
+    mode: Literal["simulated", "real"]
     status: RunStatus
     phase: Phase | None
     scenario_id: str
     scenario_version: int
     step_cursor: int
-    next_step_at: datetime | None
-    last_heartbeat_at: datetime | None
+    next_step_at: UtcDateTime | None
+    last_heartbeat_at: UtcDateTime | None
     error_code: str | None
-    created_at: datetime
-    started_at: datetime | None
-    finished_at: datetime | None
+    created_at: UtcDateTime
+    started_at: UtcDateTime | None
+    finished_at: UtcDateTime | None
 
 
 class EventPayload(Contract):
@@ -136,6 +136,11 @@ class EventPayload(Contract):
     recoverable: bool | None = None
     step_cursor: int | None = Field(default=None, ge=0)
     event_index: int | None = Field(default=None, ge=0)
+    execution_phase: str | None = None
+    candidate_id: UUID | None = None
+    evidence_id: UUID | None = None
+    source_digest: str | None = None
+    provenance: str | None = None
 
 
 class EventRecord(Contract):
@@ -147,10 +152,10 @@ class EventRecord(Contract):
     type: str
     phase: Phase | None
     severity: Literal["info", "warning", "error"]
-    mode: Literal["simulated"] | None
+    mode: Literal["simulated", "real"] | None
     message: str
     payload: EventPayload
-    occurred_at: datetime
+    occurred_at: UtcDateTime
 
 
 class PreviewDescriptor(Contract):
@@ -159,16 +164,24 @@ class PreviewDescriptor(Contract):
     fixture_revision: int | None = Field(default=None, gt=0)
 
 
+class RealPreviewDescriptor(Contract):
+    kind: Literal["isolated"]
+    preview_id: UUID
+    url: str
+    source_digest: str
+    expires_at: UtcDateTime
+
+
 class VersionRecord(Contract):
     id: UUID
     project_id: UUID
     number: int
     run_id: UUID
     brain_revision_id: UUID
-    mode: Literal["simulated"]
+    mode: Literal["simulated", "real"]
     summary: str
-    preview_descriptor: PreviewDescriptor
-    created_at: datetime
+    preview_descriptor: PreviewDescriptor | RealPreviewDescriptor
+    created_at: UtcDateTime
 
 
 class DeploymentRecordView(Contract):
@@ -176,12 +189,12 @@ class DeploymentRecordView(Contract):
     project_id: UUID
     version_id: UUID
     run_id: UUID
-    mode: Literal["simulated"]
+    mode: Literal["simulated", "real"]
     target: Literal["internal_fixture"]
     status: Literal["pending", "succeeded", "failed"]
     external_url: None
-    created_at: datetime
-    completed_at: datetime | None
+    created_at: UtcDateTime
+    completed_at: UtcDateTime | None
 
 
 class CanonicalContext(Contract):
@@ -198,7 +211,7 @@ class BrainView(Contract):
 
 class PreviewState(Contract):
     status: Literal["pending", "available"]
-    descriptor: PreviewDescriptor | None
+    descriptor: PreviewDescriptor | RealPreviewDescriptor | None
     message: str
 
 
@@ -220,17 +233,17 @@ class Principal(Contract):
 
 
 class Capabilities(Contract):
-    execution_mode: Literal["simulated"] = "simulated"
-    real_generation: Literal[False] = False
+    execution_mode: Literal["simulated", "real"] = "simulated"
+    real_generation: bool = False
     external_deployment: Literal[False] = False
-    source_artifacts: Literal[False] = False
+    source_artifacts: bool = False
     simulation_runner: bool = False
 
 
 class SessionView(Contract):
     principal: Principal
     capabilities: Capabilities = Field(default_factory=Capabilities)
-    expires_at: datetime | None = None
+    expires_at: UtcDateTime | None = None
 
 
 class ProjectList(Contract):

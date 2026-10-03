@@ -6,7 +6,7 @@ export const phases = ['understanding', 'planning', 'building', 'verifying', 'de
 export function eventRecord(value: unknown, project: string): value is BuildEvent {
   if (!value || typeof value !== 'object') return false;
   const v = value as BuildEvent;
-  return typeof v.id === 'string' && uuid.test(v.id) && v.project_id === project && Number.isInteger(v.sequence) && v.sequence > 0 && v.sequence <= 2147483647 && typeof v.type === 'string' && typeof v.message === 'string' && v.message.length <= 1000 && (v.mode === null || v.mode === 'simulated') && (v.phase === null || phases.includes(v.phase)) && ['info','warning','error'].includes(v.severity) && typeof v.payload === 'object' && v.payload !== null && v.payload.schema_version === 1;
+  return typeof v.id === 'string' && uuid.test(v.id) && v.project_id === project && Number.isInteger(v.sequence) && v.sequence > 0 && v.sequence <= 2147483647 && typeof v.type === 'string' && typeof v.message === 'string' && v.message.length <= 1000 && (v.mode === null || v.mode === 'simulated' || v.mode === 'real') && (v.phase === null || phases.includes(v.phase)) && ['info','warning','error'].includes(v.severity) && typeof v.payload === 'object' && v.payload !== null && v.payload.schema_version === 1;
 }
 /** Later events remain pending until every missing project sequence is recovered. */
 export function acceptEvents(state: TraceState, incoming: BuildEvent[]): { state: TraceState; gap: boolean; applied: BuildEvent[] } {

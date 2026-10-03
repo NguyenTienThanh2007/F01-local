@@ -22,7 +22,7 @@ test('out-of-order batches recover in project sequence and issue repairs stay ru
 });
 test('transport validation rejects foreign, unsafe or invalid records; reconnect is bounded',() => {
  assert.equal(eventRecord(event(1),id),true);
- for (const invalid of [event(0),event(1,{project_id:run}),event(1,{mode:'real'}),event(1,{phase:'fake'}),event(1,{payload:{schema_version:2}})]) assert.equal(eventRecord(invalid,id),false);
+ for (const invalid of [event(0),event(1,{project_id:run}),event(1,{mode:'invented'}),event(1,{phase:'fake'}),event(1,{payload:{schema_version:2}})]) assert.equal(eventRecord(invalid,id),false);
  assert.equal(reconnectDelay(0,()=>0),1000); assert.equal(reconnectDelay(10,()=>1),15000);
 });
 test('unresolved run receipts preserve exact start/retry/cancel context across reload',() => {

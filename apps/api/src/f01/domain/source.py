@@ -136,7 +136,7 @@ class GenerationContext(SourceModel):
             raise ValueError("Generation context exceeds its limit.")
         if self.base_source is not None and self.base_source.lineage.project_id != self.lineage.project_id:
             raise ValueError("Source context belongs to another project.")
-        if (self.lineage.version_id is None) != (self.base_source is None):
+        if (self.lineage.version_id is None) != (self.base_source is None) and not (self.repair_evidence and self.base_source and self.base_source.lineage == self.lineage):
             raise ValueError("Existing-version context must pin a source artifact.")
         return self
 

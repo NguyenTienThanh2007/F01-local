@@ -39,12 +39,10 @@
         "additionalProperties": false,
         "properties": {
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
           "deadline_at": {
-            "format": "date-time",
             "title": "Deadline At",
             "type": "string"
           },
@@ -294,7 +292,6 @@
             "$ref": "#/components/schemas/BrainContent"
           },
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -354,7 +351,6 @@
         "additionalProperties": false,
         "properties": {
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -426,6 +422,67 @@
         "title": "BrainView",
         "type": "object"
       },
+      "BuildDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "cancel_requested": {
+            "title": "Cancel Requested",
+            "type": "boolean"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/CandidateMetadata"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/CommandEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "phase": {
+            "title": "Phase",
+            "type": "string"
+          },
+          "repair_attempts": {
+            "title": "Repair Attempts",
+            "type": "integer"
+          },
+          "run": {
+            "$ref": "#/components/schemas/RunRecord"
+          }
+        },
+        "required": [
+          "run",
+          "phase",
+          "cancel_requested",
+          "repair_attempts",
+          "candidates",
+          "evidence"
+        ],
+        "title": "BuildDetail",
+        "type": "object"
+      },
+      "BuildList": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BuildDetail"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "BuildList",
+        "type": "object"
+      },
       "Callback": {
         "additionalProperties": false,
         "properties": {
@@ -454,6 +511,66 @@
           "code"
         ],
         "title": "Callback",
+        "type": "object"
+      },
+      "CandidateMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "attempt": {
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "digest": {
+            "title": "Digest",
+            "type": "string"
+          },
+          "files": {
+            "items": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "parent_digest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Digest"
+          }
+        },
+        "required": [
+          "id",
+          "attempt",
+          "digest",
+          "parent_digest",
+          "files",
+          "created_at"
+        ],
+        "title": "CandidateMetadata",
         "type": "object"
       },
       "CanonicalContext": {
@@ -501,8 +618,11 @@
         "additionalProperties": false,
         "properties": {
           "execution_mode": {
-            "const": "simulated",
             "default": "simulated",
+            "enum": [
+              "simulated",
+              "real"
+            ],
             "title": "Execution Mode",
             "type": "string"
           },
@@ -513,7 +633,6 @@
             "type": "boolean"
           },
           "real_generation": {
-            "const": false,
             "default": false,
             "title": "Real Generation",
             "type": "boolean"
@@ -524,13 +643,72 @@
             "type": "boolean"
           },
           "source_artifacts": {
-            "const": false,
             "default": false,
             "title": "Source Artifacts",
             "type": "boolean"
           }
         },
         "title": "Capabilities",
+        "type": "object"
+      },
+      "CommandEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "argv": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 24,
+            "title": "Argv",
+            "type": "array"
+          },
+          "diagnostics": {
+            "items": {
+              "$ref": "#/components/schemas/Diagnostic"
+            },
+            "maxItems": 16,
+            "title": "Diagnostics",
+            "type": "array"
+          },
+          "duration_ms": {
+            "maximum": 1200000.0,
+            "minimum": 0.0,
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "exit_code": {
+            "maximum": 255.0,
+            "minimum": 0.0,
+            "title": "Exit Code",
+            "type": "integer"
+          },
+          "image_id": {
+            "pattern": "^sha256:[a-f0-9]{64}$",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "phase": {
+            "enum": [
+              "materialization",
+              "install",
+              "typecheck",
+              "build",
+              "test",
+              "verification"
+            ],
+            "title": "Phase",
+            "type": "string"
+          }
+        },
+        "required": [
+          "phase",
+          "argv",
+          "exit_code",
+          "duration_ms",
+          "diagnostics",
+          "image_id"
+        ],
+        "title": "CommandEvidence",
         "type": "object"
       },
       "ContextPlan": {
@@ -745,7 +923,6 @@
           "completed_at": {
             "anyOf": [
               {
-                "format": "date-time",
                 "type": "string"
               },
               {
@@ -755,7 +932,6 @@
             "title": "Completed At"
           },
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -769,7 +945,10 @@
             "type": "string"
           },
           "mode": {
-            "const": "simulated",
+            "enum": [
+              "simulated",
+              "real"
+            ],
             "title": "Mode",
             "type": "string"
           },
@@ -857,6 +1036,46 @@
         "title": "DesignDecision",
         "type": "object"
       },
+      "Diagnostic": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "pattern": "^[A-Z][A-Z0-9_]{0,79}$",
+            "title": "Code",
+            "type": "string"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "maximum": 100000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "maxLength": 240,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "Diagnostic",
+        "type": "object"
+      },
       "ErrorDetail": {
         "properties": {
           "code": {
@@ -942,6 +1161,18 @@
             ],
             "title": "Actor User Id"
           },
+          "candidate_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Id"
+          },
           "event_index": {
             "anyOf": [
               {
@@ -953,6 +1184,29 @@
               }
             ],
             "title": "Event Index"
+          },
+          "evidence_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Id"
+          },
+          "execution_phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Phase"
           },
           "issue_id": {
             "anyOf": [
@@ -966,6 +1220,17 @@
               }
             ],
             "title": "Issue Id"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provenance"
           },
           "recoverable": {
             "anyOf": [
@@ -1009,6 +1274,17 @@
             "title": "Schema Version",
             "type": "integer"
           },
+          "source_digest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Digest"
+          },
           "step_cursor": {
             "anyOf": [
               {
@@ -1040,7 +1316,10 @@
           "mode": {
             "anyOf": [
               {
-                "const": "simulated",
+                "enum": [
+                  "simulated",
+                  "real"
+                ],
                 "type": "string"
               },
               {
@@ -1050,7 +1329,6 @@
             "title": "Mode"
           },
           "occurred_at": {
-            "format": "date-time",
             "title": "Occurred At",
             "type": "string"
           },
@@ -1390,9 +1668,13 @@
                 "$ref": "#/components/schemas/PreviewDescriptor"
               },
               {
+                "$ref": "#/components/schemas/RealPreviewDescriptor"
+              },
+              {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Descriptor"
           },
           "message": {
             "title": "Message",
@@ -1476,8 +1758,11 @@
             "type": "string"
           },
           "execution_mode": {
-            "const": "simulated",
             "default": "simulated",
+            "enum": [
+              "simulated",
+              "real"
+            ],
             "title": "Execution Mode",
             "type": "string"
           },
@@ -1494,9 +1779,16 @@
             "type": "string"
           },
           "run_id": {
-            "format": "uuid",
-            "title": "Run Id",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
           }
         },
         "required": [
@@ -1603,7 +1895,6 @@
           "archived_at": {
             "anyOf": [
               {
-                "format": "date-time",
                 "type": "string"
               },
               {
@@ -1613,7 +1904,6 @@
             "title": "Archived At"
           },
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -1646,7 +1936,6 @@
             "type": "string"
           },
           "last_activity_at": {
-            "format": "date-time",
             "title": "Last Activity At",
             "type": "string"
           },
@@ -1686,7 +1975,6 @@
             "type": "string"
           },
           "updated_at": {
-            "format": "date-time",
             "title": "Updated At",
             "type": "string"
           }
@@ -1748,7 +2036,6 @@
             "type": "object"
           },
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -1826,6 +2113,18 @@
       "Provenance": {
         "additionalProperties": false,
         "properties": {
+          "candidate_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Id"
+          },
           "event_sequence": {
             "anyOf": [
               {
@@ -1850,6 +2149,18 @@
               }
             ],
             "title": "Fixture Ref"
+          },
+          "plan_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Id"
           },
           "request_id": {
             "anyOf": [
@@ -1879,16 +2190,68 @@
             "enum": [
               "user_request",
               "template",
-              "simulation"
+              "simulation",
+              "model_proposed",
+              "generated",
+              "verified",
+              "published"
             ],
             "title": "Source",
             "type": "string"
+          },
+          "source_digest": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Digest"
           }
         },
         "required": [
           "source"
         ],
         "title": "Provenance",
+        "type": "object"
+      },
+      "RealPreviewDescriptor": {
+        "additionalProperties": false,
+        "properties": {
+          "expires_at": {
+            "title": "Expires At",
+            "type": "string"
+          },
+          "kind": {
+            "const": "isolated",
+            "title": "Kind",
+            "type": "string"
+          },
+          "preview_id": {
+            "format": "uuid",
+            "title": "Preview Id",
+            "type": "string"
+          },
+          "source_digest": {
+            "title": "Source Digest",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "preview_id",
+          "url",
+          "source_digest",
+          "expires_at"
+        ],
+        "title": "RealPreviewDescriptor",
         "type": "object"
       },
       "RecommendedStack": {
@@ -2020,7 +2383,6 @@
             "title": "Base Version Id"
           },
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -2174,7 +2536,6 @@
             "title": "Base Version Id"
           },
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -2192,7 +2553,6 @@
           "finished_at": {
             "anyOf": [
               {
-                "format": "date-time",
                 "type": "string"
               },
               {
@@ -2214,7 +2574,6 @@
           "last_heartbeat_at": {
             "anyOf": [
               {
-                "format": "date-time",
                 "type": "string"
               },
               {
@@ -2224,14 +2583,16 @@
             "title": "Last Heartbeat At"
           },
           "mode": {
-            "const": "simulated",
+            "enum": [
+              "simulated",
+              "real"
+            ],
             "title": "Mode",
             "type": "string"
           },
           "next_step_at": {
             "anyOf": [
               {
-                "format": "date-time",
                 "type": "string"
               },
               {
@@ -2291,7 +2652,6 @@
           "started_at": {
             "anyOf": [
               {
-                "format": "date-time",
                 "type": "string"
               },
               {
@@ -2372,7 +2732,6 @@
           "expires_at": {
             "anyOf": [
               {
-                "format": "date-time",
                 "type": "string"
               },
               {
@@ -2389,6 +2748,132 @@
           "principal"
         ],
         "title": "SessionView",
+        "type": "object"
+      },
+      "SourceArtifact": {
+        "additionalProperties": false,
+        "description": "Immutable in-memory value, not a persisted or verified application version.",
+        "properties": {
+          "digest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Digest",
+            "type": "string"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/SourceFile"
+            },
+            "maxItems": 128,
+            "minItems": 1,
+            "title": "Files",
+            "type": "array"
+          },
+          "lineage": {
+            "$ref": "#/components/schemas/SourceLineage"
+          },
+          "parent_digest": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Digest"
+          },
+          "recipe": {
+            "const": "next-web-v1",
+            "title": "Recipe",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "schema_version",
+          "recipe",
+          "lineage",
+          "parent_digest",
+          "digest",
+          "files"
+        ],
+        "title": "SourceArtifact",
+        "type": "object"
+      },
+      "SourceFile": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "content",
+          "sha256"
+        ],
+        "title": "SourceFile",
+        "type": "object"
+      },
+      "SourceLineage": {
+        "additionalProperties": false,
+        "properties": {
+          "brain_revision_id": {
+            "format": "uuid",
+            "title": "Brain Revision Id",
+            "type": "string"
+          },
+          "plan_id": {
+            "format": "uuid",
+            "title": "Plan Id",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "version_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version Id"
+          }
+        },
+        "required": [
+          "project_id",
+          "request_id",
+          "brain_revision_id",
+          "plan_id",
+          "version_id"
+        ],
+        "title": "SourceLineage",
         "type": "object"
       },
       "Stack": {
@@ -2414,6 +2899,21 @@
           "rationale"
         ],
         "title": "Stack",
+        "type": "object"
+      },
+      "StartBuild": {
+        "additionalProperties": false,
+        "properties": {
+          "proposal_id": {
+            "format": "uuid",
+            "title": "Proposal Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "proposal_id"
+        ],
+        "title": "StartBuild",
         "type": "object"
       },
       "StartRun": {
@@ -2516,7 +3016,6 @@
             "type": "integer"
           },
           "resets_at": {
-            "format": "date-time",
             "title": "Resets At",
             "type": "string"
           },
@@ -2616,7 +3115,6 @@
             "type": "string"
           },
           "created_at": {
-            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -2626,7 +3124,10 @@
             "type": "string"
           },
           "mode": {
-            "const": "simulated",
+            "enum": [
+              "simulated",
+              "real"
+            ],
             "title": "Mode",
             "type": "string"
           },
@@ -2635,7 +3136,15 @@
             "type": "integer"
           },
           "preview_descriptor": {
-            "$ref": "#/components/schemas/PreviewDescriptor"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PreviewDescriptor"
+              },
+              {
+                "$ref": "#/components/schemas/RealPreviewDescriptor"
+              }
+            ],
+            "title": "Preview Descriptor"
           },
           "project_id": {
             "format": "uuid",
@@ -4050,6 +4559,558 @@
         "summary": "Revisions",
         "tags": [
           "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/builds": {
+      "get": {
+        "operationId": "builds_v1_projects__project_id__builds_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Builds",
+        "tags": [
+          "Real builds"
+        ]
+      },
+      "post": {
+        "operationId": "start_v1_projects__project_id__builds_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9._:-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartBuild"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Start",
+        "tags": [
+          "Real builds"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/builds/{run_id}": {
+      "get": {
+        "operationId": "build_v1_projects__project_id__builds__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Build",
+        "tags": [
+          "Real builds"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/builds/{run_id}/cancel": {
+      "post": {
+        "operationId": "cancel_v1_projects__project_id__builds__run_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Cancel",
+        "tags": [
+          "Real builds"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/builds/{run_id}/retry": {
+      "post": {
+        "operationId": "retry_v1_projects__project_id__builds__run_id__retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9._:-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Retry",
+        "tags": [
+          "Real builds"
         ]
       }
     },
@@ -6359,6 +7420,114 @@
         "summary": "Version",
         "tags": [
           "Projects"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/versions/{version_id}/source": {
+      "get": {
+        "operationId": "source_v1_projects__project_id__versions__version_id__source_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceArtifact"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Source",
+        "tags": [
+          "Real builds"
         ]
       }
     },

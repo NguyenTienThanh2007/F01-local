@@ -7,8 +7,8 @@ export function validateEnvironment(env) {
   if (!['development','oidc'].includes(authMode)) throw new Error('AUTH_MODE is invalid.');
   if (appEnvironment === 'production' && authMode === 'development') throw new Error('Development identity cannot run in production.');
   if (authMode === 'oidc' && (env.AUTH_GATEWAY_TOKEN ?? '').length < 32) throw new Error('Configure the private authentication gateway credential.');
-  if (env.EXECUTION_MODE && env.EXECUTION_MODE !== 'simulated') {
-    throw new Error('This phase supports simulated execution only.');
+  if (env.EXECUTION_MODE && !['simulated','real'].includes(env.EXECUTION_MODE)) {
+    throw new Error('EXECUTION_MODE is invalid.');
   }
   return { appEnvironment, authMode };
 }

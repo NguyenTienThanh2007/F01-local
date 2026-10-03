@@ -8,8 +8,9 @@ import { join } from 'node:path';
 test('development identity cannot run in production', () => {
   assert.throws(() => validateEnvironment({ APP_ENV: 'production' }), /cannot run in production/);
 });
-test('real execution cannot be enabled by configuration', () => {
-  assert.throws(() => validateEnvironment({ EXECUTION_MODE: 'real' }), /simulated execution only/);
+test('known execution modes do not grant backend execution capabilities', () => {
+  assert.deepEqual(validateEnvironment({ EXECUTION_MODE: 'real' }), {appEnvironment:'development',authMode:'development'});
+  assert.throws(() => validateEnvironment({ EXECUTION_MODE: 'untrusted' }), /invalid/);
 });
 test('root configuration loads only selected web settings and preserves process overrides', () => {
   const dir = mkdtempSync(join(tmpdir(), 'f01-config-'));

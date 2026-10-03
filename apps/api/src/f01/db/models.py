@@ -165,7 +165,7 @@ class BuildRun(Base):
         scoped_fk("input_brain_revision_id", "brain_revisions"),
         scoped_fk("base_version_id", "project_versions"),
         scoped_fk("retry_of_run_id", "build_runs"),
-        CheckConstraint("mode = 'simulated'", name="mode"),
+        CheckConstraint("mode IN ('simulated','real')", name="mode"),
         CheckConstraint(
             "status IN ('queued','running','succeeded','failed','canceled')",
             name="status",
@@ -222,7 +222,7 @@ class BuildEvent(Base):
             "sequence > 0 AND jsonb_typeof(payload) = 'object'", name="payload"
         ),
         CheckConstraint("severity IN ('info','warning','error')", name="severity"),
-        CheckConstraint("mode IS NULL OR mode = 'simulated'", name="mode"),
+        CheckConstraint("mode IS NULL OR mode IN ('simulated','real')", name="mode"),
         CheckConstraint(
             "phase IS NULL OR phase IN ('understanding','planning','building','verifying','deploying')",
             name="phase",
@@ -253,7 +253,7 @@ class ProjectVersion(Base):
         scoped_fk("run_id", "build_runs"),
         scoped_fk("brain_revision_id", "brain_revisions"),
         CheckConstraint(
-            "number > 0 AND mode = 'simulated' AND jsonb_typeof(preview_descriptor) = 'object'",
+            "number > 0 AND mode IN ('simulated','real') AND jsonb_typeof(preview_descriptor) = 'object'",
             name="output",
         ),
     )
@@ -405,4 +405,86 @@ class PlanReview(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True)
     proposal_id: Mapped[UUID] = mapped_column(ForeignKey("planning_proposals.id"))
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ExecutionJob(Base):
+    __tablename__ = "execution_jobs"
+    __table_args__ = (
+        UniqueConstraint("run_id"), UniqueConstraint("project_id", "id"),
+        scoped_fk("run_id", "build_runs"), scoped_fk("plan_id", "planning_proposals"),
+        ForeignKeyConstraint(["project_id", "user_id"], ["projects.id", "projects.owner_user_id"], name="fk_execution_owner"),
+        CheckConstraint("state IN ('queued','leased','done') AND epoch >= 0 AND repairs >= 0 AND reserved_tokens >= 0", name="state"),
+        Index("ix_execution_queue", "state", "lease_until", "created_at"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    run_id: Mapped[UUID]
+    plan_id: Mapped[UUID]
+    auth_session_id: Mapped[UUID | None] = mapped_column(ForeignKey("auth_sessions.id"))
+    state: Mapped[str] = mapped_column(String(20))
+    phase: Mapped[str] = mapped_column(String(40))
+    context: Mapped[dict[str, object]] = mapped_column(JSONB)
+    bases: Mapped[dict[str, object]] = mapped_column(JSONB)
+    epoch: Mapped[int] = mapped_column(Integer)
+    lease_token: Mapped[UUID | None]
+    lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cancel_requested: Mapped[bool]
+    repairs: Mapped[int] = mapped_column(Integer)
+    reserved_tokens: Mapped[int] = mapped_column(Integer)
+    preview_id: Mapped[UUID | None]
+    preview_key: Mapped[str | None] = mapped_column(String(100))
+    container_name: Mapped[str | None] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class SourceCandidate(Base):
+    __tablename__ = "source_candidates"
+    __table_args__ = (
+        UniqueConstraint("project_id", "id"), UniqueConstraint("job_id", "attempt"),
+        scoped_fk("job_id", "execution_jobs"),
+        CheckConstraint("attempt >= 0 AND length(digest) = 64 AND octet_length(source::text) <= 1048576", name="bounds"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id"))
+    job_id: Mapped[UUID]
+    attempt: Mapped[int] = mapped_column(Integer)
+    digest: Mapped[str] = mapped_column(String(64))
+    parent_digest: Mapped[str | None] = mapped_column(String(64))
+    source: Mapped[dict[str, object]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class VerificationEvidence(Base):
+    __tablename__ = "verification_evidence"
+    __table_args__ = (
+        UniqueConstraint("project_id", "id"), UniqueConstraint("candidate_id", "phase"),
+        scoped_fk("candidate_id", "source_candidates"),
+        CheckConstraint("octet_length(content::text) <= 8192", name="bounds"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id"))
+    candidate_id: Mapped[UUID]
+    phase: Mapped[str] = mapped_column(String(40))
+    content: Mapped[dict[str, object]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class IsolatedPreview(Base):
+    __tablename__ = "isolated_previews"
+    __table_args__ = (
+        UniqueConstraint("project_id", "id"), UniqueConstraint("version_id"), UniqueConstraint("container_name"),
+        scoped_fk("candidate_id", "source_candidates"), scoped_fk("version_id", "project_versions"),
+        CheckConstraint("state IN ('ready','expired','cleanup_pending','removed')", name="state"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id"))
+    candidate_id: Mapped[UUID]
+    version_id: Mapped[UUID]
+    container_name: Mapped[str] = mapped_column(String(100))
+    capability_hash: Mapped[str] = mapped_column(String(64))
+    state: Mapped[str] = mapped_column(String(20))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

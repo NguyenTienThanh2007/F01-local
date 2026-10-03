@@ -1,4 +1,6 @@
-# Phase 2B foundation — blocked before real execution
+# Phase 2B foundation — historical checkpoint
+
+This document records the foundation at `167c023`. For the subsequent execution implementation and current acceptance gates, see [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md).
 
 Phase 2B is **not complete or stable**. Phase 2A remains the latest completed stage. Phase 2C has not begun. This checkpoint adds independent, inactive contracts without exposing a misleading real-build action or running generated code on the factory host.
 

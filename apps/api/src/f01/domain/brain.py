@@ -13,7 +13,10 @@ class BrainModel(BaseModel):
 
 
 class Provenance(BrainModel):
-    source: Literal["user_request", "template", "simulation"]
+    source: Literal["user_request", "template", "simulation", "model_proposed", "generated", "verified", "published"]
+    candidate_id: UUID | None = None
+    source_digest: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    plan_id: UUID | None = None
     request_id: UUID | None = None
     fixture_ref: str | None = Field(default=None, max_length=100)
     run_id: UUID | None = None
@@ -29,6 +32,8 @@ class Provenance(BrainModel):
             self.run_id is None or self.event_sequence is None
         ):
             raise ValueError("Simulation provenance requires run and event references.")
+        if self.source in ("generated", "verified", "published") and (self.run_id is None or self.candidate_id is None or self.source_digest is None):
+            raise ValueError("Execution provenance needs candidate, run and source references.")
         return self
 
 

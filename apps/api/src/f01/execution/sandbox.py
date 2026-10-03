@@ -1,7 +1,7 @@
-"""Fail-closed Docker policy and prerequisite probe, not an operational executor.
+"""Fail-closed Docker policy and read-only prerequisite probe.
 
-There is deliberately no create/start/exec method: real isolation, cleanup,
-cancellation and preview tests require a Docker-capable environment first.
+The private execution adapter uses this policy. Prerequisites alone never
+certify isolation: enablement also requires exact-image Docker acceptance.
 """
 import asyncio
 import re
@@ -38,7 +38,7 @@ def command_policy(phase: CommandPhase, test_paths: tuple[str, ...] = ()) -> Com
     if phase != CommandPhase.TEST and test_paths:
         raise ValueError("Unexpected command input.")
     if phase == CommandPhase.INSTALL:
-        return CommandPolicy(("/usr/local/bin/pnpm", "install", "--offline", "--frozen-lockfile", "--ignore-scripts"), "/work", 90)
+        return CommandPolicy(("/usr/local/bin/pnpm", "install", "--offline", "--frozen-lockfile", "--ignore-scripts", "--prod=false"), "/work", 90)
     if phase == CommandPhase.TYPECHECK:
         return CommandPolicy(("/usr/local/bin/node", "/opt/f01/node_modules/typescript/bin/tsc", "--noEmit"), "/work", 60)
     if phase == CommandPhase.BUILD:

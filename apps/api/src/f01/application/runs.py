@@ -96,6 +96,10 @@ def start_run(database: Database, owner: UUID, project_id: UUID, body: StartRun,
             return replay
         assert receipt is not None
         project = owned_project(session, owner, project_id, lock=True)
+        if project.current_version_id:
+            from f01.db.models import ProjectVersion
+            version = session.get(ProjectVersion, project.current_version_id)
+            if version and version.mode == "real": raise ApplicationError("REAL_BUILD_COMMAND_REQUIRED")
         request = session.scalar(select(ProjectRequest).where(ProjectRequest.project_id == project_id, ProjectRequest.id == body.request_id))
         if request is None:
             raise ApplicationError("NOT_FOUND")
@@ -123,6 +127,8 @@ def retry_run(database: Database, owner: UUID, project_id: UUID, run_id: UUID, k
         assert receipt is not None
         project = owned_project(session, owner, project_id, lock=True)
         prior = owned_run(session, project_id, run_id, lock=True)
+        if prior.mode != "simulated":
+            raise ApplicationError("REAL_BUILD_COMMAND_REQUIRED")
         if prior.status != "failed":
             raise ApplicationError("RUN_NOT_RETRYABLE")
         available(session, project, prior.input_brain_revision_id, prior.base_version_id)
@@ -135,6 +141,8 @@ def cancel_run(database: Database, owner: UUID, project_id: UUID, run_id: UUID, 
     with database.session() as session, session.begin():
         project = owned_project(session, owner, project_id, lock=True)
         run = owned_run(session, project_id, run_id, lock=True)
+        if run.mode == "real":
+            raise ApplicationError("REAL_BUILD_COMMAND_REQUIRED")
         if run.status in ACTIVE_STATUSES:
             run.status = transition_status(run.status, "canceled")  # type: ignore[arg-type]
             run.finished_at = run.last_heartbeat_at = now

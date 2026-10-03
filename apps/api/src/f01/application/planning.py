@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from f01.application.identity import digest
 from f01.application.projects import owned_project, append_event
 from f01.config import Settings
-from f01.db.models import AuthSession, BrainRevision, BuildEvent, PlanningAttempt, PlanningProposal, PlanReview, Project, ProjectRequest, ProjectVersion, User
+from f01.db.models import AuthSession, BrainRevision, BuildEvent, PlanningAttempt, PlanningProposal, PlanReview, Project, ProjectRequest, ProjectVersion, User, IsolatedPreview, SourceCandidate
 from f01.db.session import Database
 from f01.domain.brain import BrainContent, Statement
 from f01.domain.context_planning import PlanInput, ProposalRecord, AttemptRecord, PlanningResult, ContextPlan, UsageView
@@ -79,6 +79,14 @@ def assemble(session: Session, project: Project, body: PlanInput, settings: Sett
         "source": {"available": False, "reason": "No generated source exists in Phase 2A."},
         "execution": "All existing execution/version evidence is Simulation. Planning is proposed work.",
         "selection": {"requirements_total": len(content.product.requirements), "requirements_included": len(requirements), "history_limit": 5, "context_truncated": False}}
+    if version and version.mode == "real":
+        preview = session.scalar(select(IsolatedPreview).where(IsolatedPreview.project_id == project.id, IsolatedPreview.version_id == version.id))
+        candidate = session.get(SourceCandidate, preview.candidate_id) if preview else None
+        if candidate:
+            from f01.domain.source import SourceArtifact
+            source = SourceArtifact.model_validate_json(encode(candidate.source))
+            context["source"] = {"available": True, "digest": source.digest, "recipe": source.recipe, "files": [{"path": f.path, "sha256": f.sha256} for f in source.files]}
+            context["execution"] = "Current version has real recipe verification evidence. Prior Simulation records remain distinct. Planning proposes work only."
     selection = context["selection"]
     assert isinstance(selection, dict)
     selection["context_truncated"] = has_clipping(context) or len(content.product.requirements) > 8 or any(len(items) > 4 for items in (content.plan, content.constraints, content.open_questions, content.design_decisions))
@@ -93,8 +101,9 @@ def assemble(session: Session, project: Project, body: PlanInput, settings: Sett
 
 def proposal_record(session: Session, project: Project, row: PlanningProposal) -> ProposalRecord:
     original = row.context.get("original_brief")
+    source_manifest = row.context.get("source")
     manifest = {"bases": row.context.get("bases"), "brain_revision": row.context.get("brain_revision"), "selection": row.context.get("selection"),
-        "context_sha256": digest(encode(row.context)), "source_available": False,
+        "context_sha256": digest(encode(row.context)), "source_available": bool(isinstance(source_manifest, dict) and source_manifest.get("available")),
         "sources": {"original_request_id": original.get("request_id") if isinstance(original, dict) else None,
             "request_id": str(row.request_id), "brain_revision_id": str(row.brain_revision_id), "version_id": str(row.version_id) if row.version_id else None}}
     return ProposalRecord(id=row.id, attempt_id=row.attempt_id, project_id=row.project_id, request_id=row.request_id, brain_revision_id=row.brain_revision_id,

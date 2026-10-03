@@ -18,7 +18,19 @@ class Settings(BaseSettings):
     )
     app_env: Literal["development", "test", "preview", "production"] = "development"
     auth_mode: Literal["development", "oidc"] = "development"
-    execution_mode: Literal["simulated"] = "simulated"
+    execution_mode: Literal["simulated", "real"] = "simulated"
+    real_execution_enabled: bool = False
+    sandbox_image_id: str = ""
+    sandbox_acceptance_report: str = ""
+    sandbox_socket: str = "/var/run/docker.sock"
+    preview_origin: str = "http://127.0.0.1:3031"
+    factory_origin: str = "http://localhost:3000"
+    build_concurrency: int = Field(default=1, ge=1, le=4)
+    build_timeout_seconds: int = Field(default=600, ge=60, le=1200)
+    repair_attempts: int = Field(default=2, ge=0, le=3)
+    source_output_tokens: int = Field(default=8000, ge=1000, le=16000)
+    source_run_token_budget: int = Field(default=350000, ge=10000, le=1000000)
+    preview_ttl_seconds: int = Field(default=3600, ge=60, le=86400)
     database_url: str
     dev_api_token: SecretStr = Field(default=SecretStr(""))
     auth_gateway_token: SecretStr = SecretStr("")
@@ -54,6 +66,24 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def private_identity_only(self) -> Self:
+        if self.real_execution_enabled:
+            import re
+            if not re.fullmatch(r"sha256:[a-f0-9]{64}", self.sandbox_image_id):
+                raise ValueError("An exact sandbox image ID is required.")
+            preview, factory = urlsplit(self.preview_origin), urlsplit(self.factory_origin)
+            # Separate sites, not just ports: browser cookies are not port scoped.
+            if preview.hostname == factory.hostname or preview.netloc == factory.netloc:
+                raise ValueError("Preview and factory must use distinct cookie hosts.")
+            for endpoint in (preview, factory):
+                local = self.app_env in ("development", "test") and endpoint.hostname in ("localhost", "127.0.0.1")
+                if endpoint.username or endpoint.password or endpoint.query or endpoint.fragment or endpoint.path not in ("", "/") or not (endpoint.scheme == "https" or local and endpoint.scheme == "http"):
+                    raise ValueError("Fixed isolated preview/factory origins are required.")
+            import json
+            try:
+                report=json.loads(Path(self.sandbox_acceptance_report).read_text())
+                accepted=report.get("image_id")==self.sandbox_image_id and report.get("docker_containment")=="passed" and report.get("docker_journey")=="passed"
+            except (OSError, ValueError): accepted=False
+            if not accepted: raise ValueError("A passing Docker acceptance report for this exact image is required before enabling real execution.")
         if self.app_env == "production" and self.auth_mode == "development":
             raise ValueError("Development identity cannot run in production.")
         if self.auth_mode == "development" and len(self.dev_api_token.get_secret_value()) < 32:

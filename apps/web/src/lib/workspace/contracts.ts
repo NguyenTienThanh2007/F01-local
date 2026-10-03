@@ -15,7 +15,7 @@ export type Versions = components['schemas']['VersionList'];
 export type Version = components['schemas']['VersionRecord'];
 export type Provenance = components['schemas']['Provenance'];
 export type Statement = components['schemas']['Statement'];
-export type Descriptor = components['schemas']['PreviewDescriptor'];
+export type Descriptor = components['schemas']['PreviewDescriptor'] | components['schemas']['RealPreviewDescriptor'];
 export const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export function changeInput(text: string, brain: string, version: string | null): ChangeInput | null {
   const value = text.trim();

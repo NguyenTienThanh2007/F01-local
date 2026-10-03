@@ -1,5 +1,5 @@
 """Planning proposals are typed intent; they carry no executable operations."""
-from datetime import datetime
+from f01.domain.types import UtcDateTime
 from typing import Literal
 from uuid import UUID
 from pydantic import Field
@@ -31,7 +31,7 @@ class ProposalRecord(Contract):
     context: dict[str, object]
     provider: str
     model: str
-    created_at: datetime
+    created_at: UtcDateTime
     current_context: bool
     reviewed: bool
 
@@ -43,8 +43,8 @@ class AttemptRecord(Contract):
     input_tokens: int | None
     output_tokens: int | None
     error_code: str | None
-    created_at: datetime
-    deadline_at: datetime
+    created_at: UtcDateTime
+    deadline_at: UtcDateTime
     proposal: ProposalRecord | None = None
 
 class ProposalList(Contract):
@@ -63,4 +63,4 @@ class UsageView(Contract):
     daily_token_budget: int
     input_token_limit: int
     output_token_limit: int
-    resets_at: datetime
+    resets_at: UtcDateTime

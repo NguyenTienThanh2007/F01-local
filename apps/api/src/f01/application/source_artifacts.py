@@ -47,7 +47,7 @@ def validate_artifact(artifact: SourceArtifact) -> None:
 
 def apply_proposal(
     proposal: SourceProposal, lineage: SourceLineage, *,
-    base: SourceArtifact | None = None, forbidden_secrets: tuple[str, ...] = (),
+    base: SourceArtifact | None = None, forbidden_secrets: tuple[str, ...] = (), candidate_base: bool = False,
 ) -> SourceArtifact:
     """Compare-and-apply patch. Ownership/freshness must also be checked in the future transaction."""
     try:
@@ -59,8 +59,10 @@ def apply_proposal(
         validate_artifact(base)
     if proposal.base_digest != (base.digest if base else None):
         raise SourceRejected("Stale source base.")
-    if base is not None and (base.lineage.project_id != lineage.project_id or lineage.version_id is None):
+    if base is not None and (base.lineage.project_id != lineage.project_id or (lineage.version_id is None and not candidate_base)):
         raise SourceRejected("Source lineage conflict.")
+    if candidate_base and (base is None or base.lineage != lineage):
+        raise SourceRejected("Candidate repair lineage conflict.")
     if base is None and lineage.version_id is not None:
         raise SourceRejected("Missing version source.")
     files = {f.path: f for f in base.files} if base else {}

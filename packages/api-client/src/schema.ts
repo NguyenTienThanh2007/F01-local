@@ -209,6 +209,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projects/{project_id}/builds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Builds */
+        get: operations["builds_v1_projects__project_id__builds_get"];
+        put?: never;
+        /** Start */
+        post: operations["start_v1_projects__project_id__builds_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/builds/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Build */
+        get: operations["build_v1_projects__project_id__builds__run_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/builds/{run_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_v1_projects__project_id__builds__run_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/builds/{run_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry */
+        post: operations["retry_v1_projects__project_id__builds__run_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projects/{project_id}/deployments": {
         parameters: {
             query?: never;
@@ -466,6 +535,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projects/{project_id}/versions/{version_id}/source": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Source */
+        get: operations["source_v1_projects__project_id__versions__version_id__source_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projects/{project_id}/workspace": {
         parameters: {
             query?: never;
@@ -518,15 +604,9 @@ export interface components {
         };
         /** AttemptRecord */
         AttemptRecord: {
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
-            /**
-             * Deadline At
-             * Format: date-time
-             */
+            /** Deadline At */
             deadline_at: string;
             /** Error Code */
             error_code: string | null;
@@ -593,10 +673,7 @@ export interface components {
         /** BrainRevisionRecord */
         BrainRevisionRecord: {
             content: components["schemas"]["BrainContent"];
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
             /**
              * Id
@@ -622,10 +699,7 @@ export interface components {
         };
         /** BrainRevisionSummary */
         BrainRevisionSummary: {
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
             /**
              * Id
@@ -654,6 +728,25 @@ export interface components {
             context: components["schemas"]["CanonicalContext"];
             revision: components["schemas"]["BrainRevisionRecord"];
         };
+        /** BuildDetail */
+        BuildDetail: {
+            /** Cancel Requested */
+            cancel_requested: boolean;
+            /** Candidates */
+            candidates: components["schemas"]["CandidateMetadata"][];
+            /** Evidence */
+            evidence: components["schemas"]["CommandEvidence"][];
+            /** Phase */
+            phase: string;
+            /** Repair Attempts */
+            repair_attempts: number;
+            run: components["schemas"]["RunRecord"];
+        };
+        /** BuildList */
+        BuildList: {
+            /** Items */
+            items: components["schemas"]["BuildDetail"][];
+        };
         /** Callback */
         Callback: {
             /** Binding */
@@ -662,6 +755,26 @@ export interface components {
             code: string;
             /** State */
             state: string;
+        };
+        /** CandidateMetadata */
+        CandidateMetadata: {
+            /** Attempt */
+            attempt: number;
+            /** Created At */
+            created_at: string;
+            /** Digest */
+            digest: string;
+            /** Files */
+            files: {
+                [key: string]: string | number;
+            }[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Parent Digest */
+            parent_digest: string | null;
         };
         /** CanonicalContext */
         CanonicalContext: {
@@ -679,9 +792,9 @@ export interface components {
             /**
              * Execution Mode
              * @default simulated
-             * @constant
+             * @enum {string}
              */
-            execution_mode: "simulated";
+            execution_mode: "simulated" | "real";
             /**
              * External Deployment
              * @default false
@@ -691,9 +804,8 @@ export interface components {
             /**
              * Real Generation
              * @default false
-             * @constant
              */
-            real_generation: false;
+            real_generation: boolean;
             /**
              * Simulation Runner
              * @default false
@@ -702,9 +814,26 @@ export interface components {
             /**
              * Source Artifacts
              * @default false
-             * @constant
              */
-            source_artifacts: false;
+            source_artifacts: boolean;
+        };
+        /** CommandEvidence */
+        CommandEvidence: {
+            /** Argv */
+            argv: string[];
+            /** Diagnostics */
+            diagnostics: components["schemas"]["Diagnostic"][];
+            /** Duration Ms */
+            duration_ms: number;
+            /** Exit Code */
+            exit_code: number;
+            /** Image Id */
+            image_id: string;
+            /**
+             * Phase
+             * @enum {string}
+             */
+            phase: "materialization" | "install" | "typecheck" | "build" | "test" | "verification";
         };
         /** ContextPlan */
         ContextPlan: {
@@ -762,10 +891,7 @@ export interface components {
         DeploymentRecordView: {
             /** Completed At */
             completed_at: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
             /** External Url */
             external_url: null;
@@ -776,9 +902,9 @@ export interface components {
             id: string;
             /**
              * Mode
-             * @constant
+             * @enum {string}
              */
-            mode: "simulated";
+            mode: "simulated" | "real";
             /**
              * Project Id
              * Format: uuid
@@ -817,6 +943,15 @@ export interface components {
             /** Supersedes Decision Id */
             supersedes_decision_id?: string | null;
         };
+        /** Diagnostic */
+        Diagnostic: {
+            /** Code */
+            code: string;
+            /** Line */
+            line?: number | null;
+            /** Path */
+            path?: string | null;
+        };
         /** ErrorDetail */
         ErrorDetail: {
             /** Code */
@@ -848,10 +983,18 @@ export interface components {
         EventPayload: {
             /** Actor User Id */
             actor_user_id?: string | null;
+            /** Candidate Id */
+            candidate_id?: string | null;
             /** Event Index */
             event_index?: number | null;
+            /** Evidence Id */
+            evidence_id?: string | null;
+            /** Execution Phase */
+            execution_phase?: string | null;
             /** Issue Id */
             issue_id?: string | null;
+            /** Provenance */
+            provenance?: string | null;
             /** Recoverable */
             recoverable?: boolean | null;
             /** Resolves Issue Id */
@@ -864,6 +1007,8 @@ export interface components {
              * @constant
              */
             schema_version: 1;
+            /** Source Digest */
+            source_digest?: string | null;
             /** Step Cursor */
             step_cursor?: number | null;
         };
@@ -877,11 +1022,8 @@ export interface components {
             /** Message */
             message: string;
             /** Mode */
-            mode: "simulated" | null;
-            /**
-             * Occurred At
-             * Format: date-time
-             */
+            mode: ("simulated" | "real") | null;
+            /** Occurred At */
             occurred_at: string;
             payload: components["schemas"]["EventPayload"];
             /** Phase */
@@ -997,7 +1139,8 @@ export interface components {
         };
         /** PreviewState */
         PreviewState: {
-            descriptor: components["schemas"]["PreviewDescriptor"] | null;
+            /** Descriptor */
+            descriptor: components["schemas"]["PreviewDescriptor"] | components["schemas"]["RealPreviewDescriptor"] | null;
             /** Message */
             message: string;
             /**
@@ -1038,9 +1181,9 @@ export interface components {
             /**
              * Execution Mode
              * @default simulated
-             * @constant
+             * @enum {string}
              */
-            execution_mode: "simulated";
+            execution_mode: "simulated" | "real";
             project: components["schemas"]["ProjectSummary"];
             /** Project Url */
             project_url: string;
@@ -1049,11 +1192,8 @@ export interface components {
              * Format: uuid
              */
             request_id: string;
-            /**
-             * Run Id
-             * Format: uuid
-             */
-            run_id: string;
+            /** Run Id */
+            run_id: string | null;
         };
         /** ProjectList */
         ProjectList: {
@@ -1080,10 +1220,7 @@ export interface components {
         ProjectSummary: {
             /** Archived At */
             archived_at: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
             /**
              * Current Brain Revision Id
@@ -1099,10 +1236,7 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            /**
-             * Last Activity At
-             * Format: date-time
-             */
+            /** Last Activity At */
             last_activity_at: string;
             /**
              * Lifecycle
@@ -1120,10 +1254,7 @@ export interface components {
             status_event_sequence: number;
             /** Title */
             title: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
+            /** Updated At */
             updated_at: string;
         };
         /** ProposalList */
@@ -1148,10 +1279,7 @@ export interface components {
             context: {
                 [key: string]: unknown;
             };
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
             /** Current Context */
             current_context: boolean;
@@ -1186,10 +1314,14 @@ export interface components {
         };
         /** Provenance */
         Provenance: {
+            /** Candidate Id */
+            candidate_id?: string | null;
             /** Event Sequence */
             event_sequence?: number | null;
             /** Fixture Ref */
             fixture_ref?: string | null;
+            /** Plan Id */
+            plan_id?: string | null;
             /** Request Id */
             request_id?: string | null;
             /** Run Id */
@@ -1198,7 +1330,28 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "user_request" | "template" | "simulation";
+            source: "user_request" | "template" | "simulation" | "model_proposed" | "generated" | "verified" | "published";
+            /** Source Digest */
+            source_digest?: string | null;
+        };
+        /** RealPreviewDescriptor */
+        RealPreviewDescriptor: {
+            /** Expires At */
+            expires_at: string;
+            /**
+             * Kind
+             * @constant
+             */
+            kind: "isolated";
+            /**
+             * Preview Id
+             * Format: uuid
+             */
+            preview_id: string;
+            /** Source Digest */
+            source_digest: string;
+            /** Url */
+            url: string;
         };
         /** RecommendedStack */
         RecommendedStack: {
@@ -1236,10 +1389,7 @@ export interface components {
             base_brain_revision_id: string | null;
             /** Base Version Id */
             base_version_id: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
             /**
              * Created By
@@ -1296,10 +1446,7 @@ export interface components {
             attempt: number;
             /** Base Version Id */
             base_version_id: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
             /** Error Code */
             error_code: string | null;
@@ -1319,9 +1466,9 @@ export interface components {
             last_heartbeat_at: string | null;
             /**
              * Mode
-             * @constant
+             * @enum {string}
              */
-            mode: "simulated";
+            mode: "simulated" | "real";
             /** Next Step At */
             next_step_at: string | null;
             /** Phase */
@@ -1366,12 +1513,77 @@ export interface components {
             expires_at?: string | null;
             principal: components["schemas"]["Principal"];
         };
+        /**
+         * SourceArtifact
+         * @description Immutable in-memory value, not a persisted or verified application version.
+         */
+        SourceArtifact: {
+            /** Digest */
+            digest: string;
+            /** Files */
+            files: components["schemas"]["SourceFile"][];
+            lineage: components["schemas"]["SourceLineage"];
+            /** Parent Digest */
+            parent_digest: string | null;
+            /**
+             * Recipe
+             * @constant
+             */
+            recipe: "next-web-v1";
+            /**
+             * Schema Version
+             * @constant
+             */
+            schema_version: 1;
+        };
+        /** SourceFile */
+        SourceFile: {
+            /** Content */
+            content: string;
+            /** Path */
+            path: string;
+            /** Sha256 */
+            sha256: string;
+        };
+        /** SourceLineage */
+        SourceLineage: {
+            /**
+             * Brain Revision Id
+             * Format: uuid
+             */
+            brain_revision_id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Version Id */
+            version_id: string | null;
+        };
         /** Stack */
         Stack: {
             backend: components["schemas"]["Statement"];
             database: components["schemas"]["Statement"];
             frontend: components["schemas"]["Statement"];
             rationale: components["schemas"]["Statement"];
+        };
+        /** StartBuild */
+        StartBuild: {
+            /**
+             * Proposal Id
+             * Format: uuid
+             */
+            proposal_id: string;
         };
         /** StartRun */
         StartRun: {
@@ -1413,10 +1625,7 @@ export interface components {
             requests_per_minute: number;
             /** Requests Used */
             requests_used: number;
-            /**
-             * Resets At
-             * Format: date-time
-             */
+            /** Resets At */
             resets_at: string;
             /** Tokens Reserved */
             tokens_reserved: number;
@@ -1448,10 +1657,7 @@ export interface components {
              * Format: uuid
              */
             brain_revision_id: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
+            /** Created At */
             created_at: string;
             /**
              * Id
@@ -1460,12 +1666,13 @@ export interface components {
             id: string;
             /**
              * Mode
-             * @constant
+             * @enum {string}
              */
-            mode: "simulated";
+            mode: "simulated" | "real";
             /** Number */
             number: number;
-            preview_descriptor: components["schemas"]["PreviewDescriptor"];
+            /** Preview Descriptor */
+            preview_descriptor: components["schemas"]["PreviewDescriptor"] | components["schemas"]["RealPreviewDescriptor"];
             /**
              * Project Id
              * Format: uuid
@@ -2416,6 +2623,397 @@ export interface operations {
             };
             /** @description Internal Server Error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    builds_v1_projects__project_id__builds_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BuildList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    start_v1_projects__project_id__builds_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartBuild"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunRecord"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    build_v1_projects__project_id__builds__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BuildDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    cancel_v1_projects__project_id__builds__run_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunRecord"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    retry_v1_projects__project_id__builds__run_id__retry_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunRecord"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4024,6 +4622,83 @@ export interface operations {
             };
             /** @description Internal Server Error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    source_v1_projects__project_id__versions__version_id__source_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceArtifact"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };

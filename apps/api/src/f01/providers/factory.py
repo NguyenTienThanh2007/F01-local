@@ -1,3 +1,4 @@
+from f01.providers.source import SourceGenerationProvider
 from collections.abc import AsyncIterator
 from typing import Annotated
 
@@ -37,3 +38,8 @@ def get_planning_provider(
 def get_context_provider(settings: Annotated[Settings, Depends(get_settings)], client: Annotated[httpx.AsyncClient, Depends(get_provider_client)]) -> ContextPlanningProvider:
     return OpenAIPlanningProvider(client=client, api_key=settings.openai_api_key, model=settings.openai_model,
         timeout_seconds=settings.planning_timeout_seconds, maximum_output_tokens=settings.planning_output_tokens)
+
+
+def source_provider(settings: Settings, client: httpx.AsyncClient) -> 'SourceGenerationProvider':
+    from f01.providers.openai_source import OpenAISourceGenerationProvider
+    return OpenAISourceGenerationProvider(client=client, api_key=settings.openai_api_key, model=settings.openai_model, timeout_seconds=settings.planning_timeout_seconds)

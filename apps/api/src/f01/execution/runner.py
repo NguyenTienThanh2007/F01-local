@@ -31,7 +31,7 @@ class SimulationRunner:
     def tick(self) -> int:
         now = self.clock()
         with self.database.session() as session:
-            due = session.scalars(select(BuildRun.id).where(BuildRun.status.in_(ACTIVE_STATUSES),
+            due = session.scalars(select(BuildRun.id).where(BuildRun.mode == "simulated", BuildRun.status.in_(ACTIVE_STATUSES),
                 (BuildRun.next_step_at.is_(None)) | (BuildRun.next_step_at <= now))
                 .order_by(BuildRun.next_step_at.asc().nullsfirst(), BuildRun.created_at, BuildRun.id).limit(100)).all()
         return sum(self.advance(run_id, now=now) for run_id in due)
@@ -47,7 +47,7 @@ class SimulationRunner:
             assert project is not None
             run = session.scalar(select(BuildRun).where(BuildRun.id == run_id).with_for_update())
             assert run is not None
-            if run.status not in ACTIVE_STATUSES or (run.next_step_at is not None and run.next_step_at > now):
+            if run.mode != "simulated" or run.status not in ACTIVE_STATUSES or (run.next_step_at is not None and run.next_step_at > now):
                 return False
             definition = scenario(run.scenario_id, run.scenario_version)
             index = 0

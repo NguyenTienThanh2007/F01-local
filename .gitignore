@@ -13,3 +13,6 @@ test-results/
 .runtime/
 *.tsbuildinfo
 dist/
+
+# Local Docker verification receipts and reports
+phase2b-acceptance-report.json

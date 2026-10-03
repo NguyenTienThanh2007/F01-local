@@ -129,7 +129,7 @@ def append_event(
 
 
 def create_project(
-    database: Database, principal: Principal, body: CreateProject, key: str, *, schedule: bool = False
+    database: Database, principal: Principal, body: CreateProject, key: str, *, schedule: bool = False, real: bool = False
 ) -> ProjectCreated:
     now = datetime.now(UTC)
     request_hash = hashlib.sha256(
@@ -179,7 +179,7 @@ def create_project(
             if record.response_status == 0:
                 raise ApplicationError("IDEMPOTENCY_IN_PROGRESS")
             return ProjectCreated.model_validate(record.response_body)
-        result = _create_records(session, principal.id, body, now, schedule=True) if schedule else _create_records(session, principal.id, body, now)
+        result = _create_records(session, principal.id, body, now, schedule=schedule, real=real) if real else (_create_records(session, principal.id, body, now, schedule=True) if schedule else _create_records(session, principal.id, body, now))
         reservation = session.get(IdempotencyKey, reservation_id)
         assert reservation is not None
         reservation.response_status = 201
@@ -188,7 +188,7 @@ def create_project(
 
 
 def _create_records(
-    session: Session, owner: UUID, body: CreateProject, now: datetime, *, schedule: bool = False
+    session: Session, owner: UUID, body: CreateProject, now: datetime, *, schedule: bool = False, real: bool = False
 ) -> ProjectCreated:
     project_id, request_id, brain_id, run_id = (uuid4() for _ in range(4))
     project = Project(
@@ -231,6 +231,12 @@ def _create_records(
         )
     )
     session.flush()
+    if real:
+        project.lifecycle = "idle"
+        append_event(session, project, type="project.created", message="Project saved. Review a plan before starting real execution.", actor=owner, request_id=request_id)
+        project.status_event_sequence = project.event_sequence
+        session.flush()
+        return ProjectCreated(project=ProjectSummary.model_validate(project), project_url=f"/projects/{project_id}", request_id=request_id, brain_revision_id=brain_id, run_id=None, execution_mode="real")
     scenario = "crm-success" if "crm" in body.brief.casefold() else "generic-success"
     session.add(
         BuildRun(
@@ -575,7 +581,7 @@ def workspace(database: Database, owner: UUID, project_id: UUID) -> WorkspaceSna
                 descriptor=current_version.preview_descriptor
                 if current_version
                 else None,
-                message="Internal demonstration fixture."
+                message="Verified isolated preview. Runtime availability is bounded by its expiry." if current_version and current_version.mode == "real" else "Internal demonstration fixture."
                 if current_version
                 else "Preview pending; no successful simulation version has been published.",
             ),

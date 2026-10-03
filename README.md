@@ -1,7 +1,7 @@
 # F01 — local project handoff
 
 This is the completed **Phase 1 through M6 and Phase 2A identity/context planning**, not the completed software factory.
-This checkpoint also includes an **inactive Phase 2B foundation**. Real generation/execution/repair/preview is unavailable; Phase 2B is not complete. See [PHASE2B_FOUNDATION.md](PHASE2B_FOUNDATION.md) for the implemented contracts, verification and environment blocker.
+The remaining Phase 2B execution path is implemented and gated on exact-image Docker acceptance. It is disabled by default and is not yet accepted: this Work environment cannot run Docker. See [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md) for current verification, provisioning, isolated worker/gateway setup and remaining gates. PHASE2B_FOUNDATION.md is the historical foundation checkpoint.
 The ZIP includes the source, dependency lockfiles, environment templates and the
 four planning documents. Secrets, installed dependencies and generated builds are
 excluded. Dependencies are installed on your Mac, so no Linux virtual environment
@@ -575,3 +575,7 @@ apps/api/.venv/bin/python scripts/test-m5.py --phase2a
 That harness creates disposable PostgreSQL, a test-only RSA OIDC provider and controlled model transport, and stops its processes afterward. The test fixture refuses non-test or non-disposable database configuration. Workspace PostgreSQL/Chromium binaries are not shipped in the ZIP. No live provider login or paid model call was configured or verified in this handoff. Configure and validate your intended provider before relying on it operationally.
 
 Phase 2A is complete at the implementation boundary. Generated application execution/deployment is not yet implemented. Phase 2B has only inactive source/provider/policy foundations: no generated source persistence/file materialization, operational sandbox/worker, real builds/tests/fixes, real preview, deployment, billing, teams, connectors, visual editing or outcome engine. Phase 1 execution remains Simulation and preview isolation remains intact. See PHASE2A_IMPLEMENTATION.md for the completed stage and PHASE2B_FOUNDATION.md for the partial checkpoint.
+
+## Phase 2B execution checkpoint
+
+The previous foundation-only statements above describe earlier milestones. Real runs, immutable source candidates/evidence, fenced workers, bounded repair and isolated preview now have an implementation. They stay disabled until real Docker containment and the acceptance journey pass for the configured exact image ID. Production deployment is not implemented. Follow [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md); do not run generated code on the factory host.
