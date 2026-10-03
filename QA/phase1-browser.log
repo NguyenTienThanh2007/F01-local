@@ -1,0 +1,20 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+$ node --test tests/phase1.e2e.test.mjs
+▶ M6 final Phase 1 acceptance and product quality
+  ✔ one persisted journey covers lifecycle, Brain, history, cancel and metadata (17410.694338ms)
+  ✔ long content, all workspace surfaces and compact navigation remain accessible (79372.800136ms)
+  ✔ keyboard focus, 200% reflow and reduced motion keep every control reachable (18585.559826ms)
+  ✔ offline content, explicit reconnect and historical selection recover coherently (730.4214ms)
+  ✔ foreign and unauthenticated project access returns no project data (750.739728ms)
+✔ M6 final Phase 1 acceptance and product quality (117413.966074ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 117813.367901

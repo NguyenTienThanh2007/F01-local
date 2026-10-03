@@ -1,0 +1,4 @@
+import { notFound } from 'next/navigation';
+import { ProjectPulse, type PulseState } from '@/features/project-pulse/project-pulse';
+import { Button } from '@/components/ui/button';
+export default function DesignSystemPage() { if (process.env.APP_ENV === 'production') notFound(); const states: PulseState[] = ['idle','thinking','building','verifying','shipping','live','error','understanding','planning','deploying']; return <div className="page"><span className="page-eyebrow">DEVELOPMENT / DESIGN SYSTEM</span><h1>Project signals</h1><div className="pulse-showcase">{states.map(state => <div key={state}><ProjectPulse state={state} animate /><code>{state}</code></div>)}</div><section className="detail-section"><h2>Actions</h2><div className="action-row"><Button>Primary action</Button><Button variant="secondary">Secondary action</Button><Button variant="quiet">Quiet action</Button><Button pending>Saving</Button></div></section></div>; }

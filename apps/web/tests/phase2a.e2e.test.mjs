@@ -1,0 +1,49 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+import {mkdir,readFile} from 'node:fs/promises';
+import {setTimeout as delay} from 'node:timers/promises';
+import {chromium} from 'playwright';
+const webRoot=fileURLToPath(new URL('../',import.meta.url)),api=process.env.M5_API_URL,gateway=process.env.AUTH_GATEWAY_TOKEN;
+async function until(check){for(let i=0;i<250;i++){if(await check().catch(()=>false))return;await delay(100);}throw new Error('Expected Phase 2A state not reached');}
+test('Phase 2A verified sign-in and persisted contextual planning',{timeout:240000},async t=>{
+ assert.ok(api&&gateway&&process.env.P2A_WEB_PORT,'Use scripts/test-m5.py --phase2a with disposable storage.');
+ const port=process.env.P2A_WEB_PORT,base=`http://127.0.0.1:${port}`,env={...process.env,APP_ENV:'test',AUTH_MODE:'oidc',AUTH_GATEWAY_TOKEN:gateway,API_INTERNAL_URL:api,NEXT_PUBLIC_APP_URL:base};delete env.OPENAI_API_KEY;
+ const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',port],{cwd:webRoot,env,stdio:'ignore'});
+ let browser,page,id,original,version,brain;
+ const errors=[],evidence=`${webRoot}/test-results/phase2a`;await mkdir(evidence,{recursive:true});
+ async function browserRead(path){return page.evaluate(async path=>{const response=await fetch(`/api/v1${path}`,{cache:'no-store'});return {status:response.status,data:await response.json()};},path);}
+ async function mode(value){const response=await fetch(`${api}/test/planning-mode`,{method:'POST',headers:{Authorization:`Bearer ${gateway}`,'Content-Type':'application/json'},body:JSON.stringify({mode:value})});assert.equal(response.ok,true);}
+ async function count(){return (await (await fetch(`${api}/test/planning-state`,{headers:{Authorization:`Bearer ${gateway}`}})).json()).calls;}
+ async function signIn(owner='A'){await page.goto(`${base}/sign-in`);await page.getByRole('button',{name:'Sign in securely'}).click();await page.getByRole('heading',{name:'Test identity provider'}).waitFor();await page.getByRole('button',{name:`Sign in as test owner ${owner}`}).click();await page.waitForURL(`${base}/projects`);await page.getByRole('link',{name:`Test owner ${owner} · Authenticated owner`}).first().waitFor();}
+ async function scan(label){assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,label);if(process.env.M5_AXE_SCRIPT){await page.addScriptTag({content:await readFile(process.env.M5_AXE_SCRIPT,'utf8')});const violations=await page.evaluate(async()=> (await axe.run(document,{iframes:false,runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}})).violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)})));assert.deepEqual(violations,[],label);}}
+ async function scenario(name,fn){let failed;await t.test(name,async()=>{try{await fn();}catch(e){failed=e;await page?.screenshot({path:`${evidence}/failure.png`,fullPage:true});throw e;}});if(failed)throw failed;}
+ try{
+  await until(async()=> (await fetch(base)).ok);browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});page.on('pageerror',e=>errors.push(e.message));
+  await scenario('sign in → create → plan → reopen → context-aware change plan',async()=>{
+   await signIn();assert.equal(await page.evaluate(()=>document.cookie.includes('f01-local-session')),false);
+   const cookies=await page.context().cookies();for(const name of ['f01-local-session','f01-local-csrf'])assert.equal(cookies.find(c=>c.name===name).httpOnly,true);
+   await page.getByRole('link',{name:'New project'}).click();await page.getByRole('textbox',{name:/Project title/}).fill('Signed-in CRM');original='Build a CRM with property leads, pipeline stages and private notes.';await page.getByRole('textbox',{name:'Product brief'}).fill(original);await page.getByRole('button',{name:'Create demo project'}).click();await page.waitForURL(/\/projects\/[0-9a-f-]{36}$/);id=new URL(page.url()).pathname.split('/').at(-1);await page.getByRole('heading',{name:'Demo version 1',exact:true}).waitFor();
+   const before=(await browserRead(`/projects/${id}/workspace`)).data;brain=before.current_brain.id;version=before.current_version.id;
+   await page.getByRole('navigation',{name:'Project navigation'}).getByRole('link',{name:'Planning',exact:true}).click();await page.getByRole('button',{name:'Plan from original brief'}).click();await page.getByRole('heading',{name:'Contextual CRM proposal',exact:true}).waitFor();await page.getByRole('button',{name:'Mark proposal reviewed'}).click();await page.getByText('Reviewed proposal · no execution started.',{exact:true}).waitFor();
+   await page.goto(`${base}/projects`);await page.getByRole('link',{name:/Signed-in CRM/}).click();await page.getByRole('heading',{name:'Demo version 1',exact:true}).waitFor();await page.getByRole('navigation',{name:'Project navigation'}).getByRole('link',{name:'Planning',exact:true}).click();
+   await page.getByRole('textbox',{name:'Change planning request'}).fill('Add a priority view for existing CRM leads without replacing the current project.');await page.getByRole('button',{name:'Record request and plan'}).click();await page.getByRole('heading',{name:'Priority change proposal',exact:true}).waitFor();
+   const records=(await browserRead(`/projects/${id}/planning/proposals`)).data.items;assert.equal(records.length,2);assert.equal(records[0].kind,'change');assert.equal(records[0].brain_revision_id,brain);assert.equal(records[0].version_id,version);assert.equal(records[0].context.source_available,false);assert.equal(records[1].current_context,false);
+   const after=(await browserRead(`/projects/${id}/workspace`)).data;assert.equal(after.current_brain.id,brain);assert.equal(after.current_version.id,version);assert.equal(after.project.lifecycle,'live');assert.equal((await browserRead(`/projects/${id}/requests`)).data.items.find(r=>r.kind==='initial').text,original);
+   for(const width of [375,768,1280,1440]){await page.setViewportSize({width,height:1000});await scan(`${width}px contextual planning`);await page.screenshot({path:`${evidence}/planning-${width}.png`,fullPage:true});}
+  });
+  await scenario('provider failure, cancellation and lost-response recovery preserve intent',async()=>{
+   await page.setViewportSize({width:1440,height:1000});await mode('quota');await page.getByRole('button',{name:'Plan from original brief'}).click();await page.getByRole('alert').filter({hasText:/credits|usage allowance/}).waitFor();assert.equal((await browserRead(`/projects/${id}/planning/proposals`)).data.items.length,2);assert.equal((await browserRead(`/projects/${id}/workspace`)).data.current_version.id,version);
+   await mode('slow');await page.getByRole('button',{name:'Plan from original brief'}).click();await page.getByRole('button',{name:'Cancel planning'}).waitFor();await page.getByRole('button',{name:'Cancel planning'}).click();await page.getByRole('alert').filter({hasText:/canceled/}).waitFor();await delay(4500);assert.equal((await browserRead(`/projects/${id}/planning/proposals`)).data.items.length,2);
+   await mode('success');const before=await count();let lost=false;const route='**/api/v1/projects/*/planning/attempts';await page.route(route,async r=>{if(!lost&&r.request().method()==='POST'){lost=true;await r.fetch();await r.abort('failed');}else await r.continue();});
+   await page.getByRole('button',{name:'Plan from original brief'}).click();await page.getByRole('button',{name:'Resolve saved planning command'}).waitFor();await page.unroute(route);await page.reload();await page.getByRole('button',{name:'Resolve saved planning command'}).click();await until(async()=> (await browserRead(`/projects/${id}/planning/proposals`)).data.items.length===3);await until(async()=> !(await page.getByRole('button',{name:'Resolve saved planning command'}).isVisible()));assert.equal(await count(),before+1);
+  });
+  await scenario('sign out and a second signed-in owner cannot access the first project',async()=>{
+   await page.goto(`${base}/account`);await page.getByRole('heading',{name:'Test owner A'}).waitFor();await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL(/\/sign-in\?signed_out=1$/);assert.equal((await browserRead(`/projects/${id}`)).status,401);
+   await signIn('B');assert.equal((await browserRead(`/projects/${id}/workspace`)).status,404);assert.equal((await browserRead(`/projects/${id}/planning/proposals`)).status,404);await page.goto(`${base}/projects/${id}`);await page.getByRole('heading',{name:'This project is unavailable.'}).waitFor();assert.equal(await page.getByText('Signed-in CRM',{exact:true}).count(),0);
+   await page.goto(`${base}/account`);await page.getByRole('button',{name:'Sign out',exact:true}).click();await signIn();await page.getByRole('link',{name:/Signed-in CRM/}).click();await page.getByRole('heading',{name:'Demo version 1',exact:true}).waitFor();assert.equal((await browserRead(`/projects/${id}/workspace`)).data.current_brain.id,brain);
+  });
+  assert.deepEqual(errors,[]);
+ }finally{await browser?.close();server.kill('SIGTERM');await new Promise(resolve=>{if(server.exitCode!==null)resolve();else server.once('exit',resolve);});}
+});

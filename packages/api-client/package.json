@@ -1,0 +1,24 @@
+{
+  "name": "@f01/api-client",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/server.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "check": "node scripts/generate.mjs --check",
+    "typecheck": "tsc --noEmit",
+    "test": "node --conditions=react-server --test tests/server.test.mjs"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3",
+    "@types/node": "^24.10.0"
+  }
+}

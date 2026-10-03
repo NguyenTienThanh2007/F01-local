@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.env
+OpenAI_backend.env
+.env.*
+!.env.example
+test-results/
+*.zip
+.runtime/
+*.tsbuildinfo
+dist/

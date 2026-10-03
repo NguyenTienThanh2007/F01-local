@@ -1,0 +1,15 @@
+{
+  "name": "f01",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "dev": "pnpm --filter @f01/web dev",
+    "build": "pnpm --filter @f01/web build",
+    "typecheck": "pnpm --filter @f01/api-client typecheck && pnpm --filter @f01/web typecheck",
+    "api:generate": "cd apps/api && uv run --locked python scripts/export_openapi.py && cd ../.. && pnpm --filter @f01/api-client generate",
+    "api:check": "cd apps/api && uv run --locked python scripts/export_openapi.py --check && cd ../.. && pnpm --filter @f01/api-client check",
+    "test:client": "pnpm --filter @f01/api-client test",
+    "test:web": "pnpm --filter @f01/web test",
+    "test:e2e": "pnpm --filter @f01/web test:e2e"
+  }
+}

@@ -1,0 +1,56 @@
+/* M3 adds saved records to the existing editorial workspace. */
+.project-filters { flex-wrap: wrap; gap: 12px; }
+.project-filters .workspace-search { flex: 1; min-width: 190px; }
+.project-filters select { max-width: 190px; }
+.project-list-state { padding: 18px 0; color: var(--muted); font-size: 13px; }
+.project-register { border-bottom: 1px solid var(--line); }
+.saved-project { border-top: 1px solid var(--line); transition: background 120ms var(--ease); }
+.saved-project:hover { background: var(--surface-muted); }
+.selected-project { box-shadow: inset 2px 0 var(--accent); background: var(--surface-muted); }
+.saved-project-row { display: grid; grid-template-columns: 28px minmax(150px,1fr) 150px 150px auto; align-items: center; gap: 20px; padding: 24px 16px; }
+.project-identity { min-width: 0; display: grid; gap: 8px; }
+.saved-project-title { font-size: 20px; font-weight: 500; line-height: 1.35; overflow-wrap: anywhere; display: flex; gap: 12px; }
+.saved-project-title span { color: var(--muted); font-size: 14px; }
+.project-time { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+.project-time time { color: var(--ink); }
+.project-settings { border-top: 1px solid var(--line); padding: 24px; background: var(--surface); }
+.project-settings label { display: block; font-size: 13px; margin-bottom: 8px; }
+.rename-line { display: flex; gap: 12px; }
+.rename-line input { flex: 1; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 2px; background: var(--surface); color: var(--ink); }
+.archive-line { display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid var(--line); margin-top: 24px; padding-top: 20px; }
+.archive-line p { color: var(--muted); font-size: 13px; line-height: 1.6; max-width: 540px; }
+.archive-line .button { flex-shrink: 0; }
+.settings-notice { margin: 16px 0 0; font-size: 14px; }
+.metadata-review { margin-top: 16px; }
+.project-pagination { display: flex; align-items: center; gap: 20px; padding-top: 24px; font-size: 13px; }
+.project-skeletons > div { padding: 28px 16px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; }
+.project-skeletons span { width: 45%; height: 20px; background: var(--surface-muted); }
+.project-skeletons i { width: 20%; height: 16px; background: var(--surface-muted); }
+.project-connection-error { padding: 16px 0 32px; }
+.creation-modes { display: flex; border-bottom: 1px solid var(--line); margin: 32px 0; gap: 24px; }
+.creation-modes button { border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); padding: 12px 0; min-height: 44px; }
+.creation-modes .active-mode { color: var(--ink); border-bottom-color: var(--accent); }
+.saved-project-form > .create-title-label { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 24px; font-size: 14px; }
+.create-title-label span { color: var(--muted); font-size: 12px; }
+.saved-project-form > input { width: 100%; margin: 10px 0 24px; font-size: 20px; border-radius: 2px; }
+.saved-project-form textarea { min-height: 280px; }
+.unresolved-creation { border-left: 2px solid var(--accent); padding: 12px 16px; margin: 20px 0; font-size: 14px; line-height: 1.6; background: var(--surface-muted); }
+.project-record h1 { overflow-wrap: anywhere; }
+.project-record-facts { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 24px; padding: 24px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.project-record-facts dt { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+.project-record-facts dd { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.record-boundary { padding: 32px 0; max-width: 760px; }
+.record-boundary h2 { margin: 16px 0 12px; font-size: 28px; }
+.record-boundary p { color: var(--muted); line-height: 1.7; }
+.settings-heading { font-size: 22px; margin-bottom: 20px; }
+@media(max-width:1279px) { .saved-project-row { grid-template-columns: 24px minmax(150px,1fr) 140px auto; gap: 16px; } .project-time { grid-column: 2; grid-row: 2; } }
+@media(max-width:767px) {
+ .project-filters .workspace-tab { width: 100%; } .project-filters select { flex: 1; max-width: none; min-width: 120px; }
+ .project-filters .workspace-search { width: 100%; flex-basis: 100%; } .project-filters .button { width: 100%; }
+ .saved-project-row { grid-template-columns: 20px minmax(0,1fr); gap: 12px; padding: 20px 4px; }
+ .saved-project-row .project-pulse { grid-column: 2; } .saved-project-row .project-time { grid-column: 2; grid-row: auto; } .saved-project-row > button { grid-column: 2; justify-self: start; }
+ .saved-project-title { font-size: 22px; } .project-settings { padding: 20px 12px; }
+ .rename-line, .archive-line { flex-direction: column; align-items: stretch; } .rename-line .button { align-self: flex-start; } .archive-line .button { align-self: flex-start; }
+ .creation-modes { gap: 20px; font-size: 13px; } .create-title-label { flex-direction: column; gap: 4px; }
+ .project-record-facts { grid-template-columns: 1fr; gap: 20px; } .project-pagination { flex-direction: column; align-items: flex-start; }
+}
