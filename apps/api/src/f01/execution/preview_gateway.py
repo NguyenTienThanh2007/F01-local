@@ -43,7 +43,8 @@ def create_gateway(settings:Settings|None=None)->FastAPI:
             with database.session() as session:
                 saved=session.get(IsolatedPreview,preview_id)
                 return saved is not None and saved.state=='ready' and saved.expires_at>now()
-        target=f'/p/{preview_id}/{capability}/{path}'
+        base=f'/p/{preview_id}/{capability}'
+        target=f'{base}/{path}' if path else base
         if request.url.query:target+='?'+request.url.query
         try:
             async with request.app.state.capacity:

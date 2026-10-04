@@ -38,7 +38,7 @@ def command_policy(phase: CommandPhase, test_paths: tuple[str, ...] = ()) -> Com
     if phase != CommandPhase.TEST and test_paths:
         raise ValueError("Unexpected command input.")
     if phase == CommandPhase.INSTALL:
-        return CommandPolicy(("/usr/local/bin/pnpm", "install", "--offline", "--frozen-lockfile", "--ignore-scripts", "--prod=false"), "/work", 90)
+        return CommandPolicy(("/usr/local/bin/node", "/opt/f01/dependency-check.mjs"), "/work", 15)
     if phase == CommandPhase.TYPECHECK:
         return CommandPolicy(("/usr/local/bin/node", "/opt/f01/node_modules/typescript/bin/tsc", "--noEmit"), "/work", 60)
     if phase == CommandPhase.BUILD:
@@ -98,7 +98,14 @@ def container_policy(image: str, project_id: UUID, run_id: UUID, limits: Sandbox
             "Binds": [], "Mounts": [], "Devices": [], "DeviceRequests": [], "PortBindings": {},
             "PublishAllPorts": False, "RestartPolicy": {"Name": "no"}, "AutoRemove": False,
             "Ulimits": [{"Name": "nofile", "Soft": 1024, "Hard": 1024}, {"Name": "core", "Soft": 0, "Hard": 0}],
-            "LogConfig": {"Type": "local", "Config": {"max-size": "1m", "max-file": "1"}},
+            "LogConfig": {
+    "Type": "local",
+    "Config": {
+        "max-size": "1m",
+        "max-file": "1",
+        "compress": "false",
+    },
+},
         },
     }
 

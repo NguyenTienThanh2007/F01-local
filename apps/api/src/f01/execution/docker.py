@@ -122,7 +122,7 @@ class DockerSandbox:
         for _ in range(40):
             if not await alive(): raise SandboxError("BUILD_CANCELED_OR_LEASE_LOST")
             try:
-                response = await self.fetch(name, preview_path+"/", alive)
+                response = await self.fetch(name, preview_path, alive)
                 if response[0] == 200: return result
             except SandboxError: pass
             await asyncio.sleep(0.25)

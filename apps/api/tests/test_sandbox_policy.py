@@ -48,8 +48,9 @@ def test_resource_limits_cannot_be_unbounded(change: dict[str, int]) -> None:
 
 def test_commands_are_owned_and_tests_use_explicit_validated_paths() -> None:
     install = command_policy(CommandPhase.INSTALL)
-    assert "--ignore-scripts" in install.argv and "--offline" in install.argv and "--frozen-lockfile" in install.argv
-    assert "--prod=false" in install.argv  # NODE_ENV=production must retain trusted type dependencies.
+    assert install.argv == ("/usr/local/bin/node", "/opt/f01/dependency-check.mjs")
+    assert install.working_directory == "/work"
+    assert install.timeout_seconds == 15
     for phase in (CommandPhase.TYPECHECK, CommandPhase.BUILD):
         command = command_policy(phase)
         assert command.working_directory == "/work" and 0 < command.timeout_seconds <= 120

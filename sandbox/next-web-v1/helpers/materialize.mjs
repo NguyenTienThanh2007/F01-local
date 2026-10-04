@@ -3,9 +3,18 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 const source=JSON.parse(Buffer.from(process.argv[2], 'base64').toString('utf8'));
 if(source.files.length>128)throw Error('SOURCE_BOUNDS');
-// Dependencies are installed afresh from the immutable offline store. Copying
-// read-only image node_modules would leave pnpm unable to update its workspace.
-await fs.cp('/opt/f01/scaffold','/work',{recursive:true,errorOnExist:true,force:false,filter:entry=>!entry.split(path.sep).includes('node_modules')});
+// Generated apps use the immutable dependency tree baked into the trusted image.
+// The writable workspace receives only a symlink to that reviewed dependency tree.
+const entries=await fs.readdir('/opt/f01/scaffold',{withFileTypes:true});
+for(const entry of entries){
+  if(entry.name==='node_modules')continue;
+  await fs.cp(
+    path.join('/opt/f01/scaffold',entry.name),
+    path.join('/work',entry.name),
+    {recursive:true,errorOnExist:true,force:false}
+  );
+}
+await fs.symlink('/opt/f01/scaffold/node_modules','/work/node_modules','dir');
 await fs.chmod('/work',0o700);
 for(const name of ['tsconfig.json','next-env.d.ts'])await fs.chmod('/work/'+name,0o644);
 let bytes=0;
