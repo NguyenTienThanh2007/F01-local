@@ -1,24 +1,28 @@
-# Phase 2B execution implementation — Docker acceptance pending
+# Phase 2B execution implementation — complete
 
-This change continues commit `167c023` and its Phase 2B foundation. Phase 1 M0–M6 and Phase 2A remain completed. The remaining Phase 2B execution path is implemented and passes the available application checks. **Phase 2B is not complete or accepted:** this Work environment has neither a Docker executable nor a Docker socket, so no trusted image was built here, no exact installed image ID is available here, and generated code was never executed here. Phase 2C has not begun.
+**Phase 1 M0–M6, Phase 2A and Phase 2B are complete.** The founder's verified completion record identifies `f9c2a69` (Complete Phase 2B trusted execution path), passing Docker containment and end-to-end acceptance, 289 backend regression tests passed with 2 skipped, and passing frontend typecheck/production build. Phase 2C implementation has not started; [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md) is a proposal only.
+
+The accepted trusted sandbox image is `sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0`. It is an exact installed image identity, not a mutable tag, provider deployment ID or portable production artifact digest.
+
+Evidence provenance: Phase 2B completion is recorded at `f9c2a69`. The exact-image Docker acceptance passed containment and the end-to-end journey; the full backend regression passed 289 tests with 2 skipped, and frontend typecheck/build passed. The acceptance report records `live_provider` and `browser_journey` as `not_run`. Earlier Docker-unavailable notes describe the historical implementation session and are not current Phase 2B blockers.
 
 `PHASE2B_FOUNDATION.md` is the historical foundation checkpoint. Its test counts and absent-capability statements describe that earlier commit, not this implementation.
 
 ## Implemented behavior
 
-| Area | Implementation | Observed verification here |
+| Area | Implementation | Recorded completion evidence |
 | --- | --- | --- |
-| Runtime recipe | Reviewed exact official Node 24 base digest required; pinned Next 16.3.8, React 19.3.0, TypeScript 5.9.3, pnpm 11.25.0 and committed dependency lock/store recipe; operator records exact resulting image ID | Lock generated; recipe and helpers inspected. Image build not run |
-| Isolation adapter | Private worker-owned Docker Engine API, UID/GID 10000, read-only root, network none, private PID/IPC/cgroup/mount/network boundaries, no binds/devices/ports, dropped capabilities, no-new-privileges, bounded memory/swap/CPU/PIDs/tmpfs/time | Existing policy tests plus controlled Engine transport tests. Actual enforcement not run |
-| Materialization | Trusted in-container helper copies only scaffold and validated bounded source; no host extraction, model shell, dependency edits or factory environment inheritance | Source/archive/path tests and controlled orchestration. Actual offline install not run |
+| Runtime recipe | Exact accepted image above; trusted Next.js/React/TypeScript scaffold and pinned dependency lock/store | Trusted image provisioned; exact-image Docker acceptance passed |
+| Isolation adapter | Private worker-owned Docker Engine API, UID/GID 10000, read-only root, network none, private PID/IPC/cgroup/mount/network boundaries, no binds/devices/ports, dropped capabilities, no-new-privileges, bounded memory/swap/CPU/PIDs/tmpfs/time | Docker containment acceptance passed, in addition to policy/transport tests |
+| Materialization | Trusted in-container helper copies only scaffold and validated bounded source; no host extraction, model shell, dependency edits or factory environment inheritance | Real Docker materialization, controlled dependency install and dependency/source integrity verification passed |
 | Durable jobs | PostgreSQL jobs with a global concurrency lock, fenced expiring leases, stable run identities, atomic command receipts, cancellation, frozen context and actor/session rechecks | PostgreSQL duplicate-worker, cancel, stale, deadline, revoked-session and recovery tests |
-| Generation | Authorized persisted Brain, reviewed current plan, request, current source/version and bounded history; existing provider-independent DTOs and OpenAI adapter through provider factory | Controlled source-provider and persistence tests. Live paid OpenAI not run |
+| Generation | Authorized persisted Brain, reviewed current plan, request, current source/version and bounded history; existing provider-independent DTOs and OpenAI adapter through provider factory | Real source-generation orchestration passed in the signed-in journey; acceptance uses controlled provider responses, not a claimed paid model invocation |
 | Metering | Source and repair reservations share the Phase 2A owner-locked daily/minute ledger; per-run token, attempt and wall-clock budgets; uncertain/failed calls stay charged; actual usage nullable | Budget tests and existing usage suite |
-| Verification | Application-owned materialization → offline frozen install with scripts ignored → typecheck → build → explicit generated tests when present → source/scaffold integrity and runtime health | Controlled command evidence persisted. Real commands not run |
-| Repair | Typecheck/build/test failures supply bounded codes, validated paths and lines; minimal digest/hash-bound patches; max 2 repairs by default, max 3 configurable; no indefinite retry | Deliberate controlled failure → repair and exhausted-update preservation tests |
+| Verification | Application-owned materialization → offline frozen install with scripts ignored → typecheck → build → explicit generated tests when present → source/dependency/scaffold integrity and runtime health | Real Docker typecheck/build/test and runtime verification passed with persisted evidence |
+| Repair | Typecheck/build/test failures supply bounded codes, validated paths and lines; minimal digest/hash-bound patches; max 2 repairs by default, max 3 configurable; no indefinite retry | Observed Docker failure → bounded repair → successful verification passed; exhausted update preserved the last good version |
 | Publication | Exact candidate and same-image phase evidence rechecked under owner/session/project locks; immutable version + Brain provenance + scoped preview + current pointers commit together | Atomic publication/rejection and last-good-version tests |
-| Preview | Retains the verified build container; Next base path is a scoped random capability. Separate host/process gateway forwards bounded GETs through Docker exec to container loopback, with no generated network or host ports | Contract and policy inspection. Real runtime/browser isolation not run |
-| Workspace | Real builds from reviewed plans, receipt recovery, cancel/retry, persisted Trace phases, generated file metadata/source inspection, verified iframe descriptors; old simulations remain labeled | Frontend tests, typecheck and production build |
+| Preview | Retains the verified build container; Next base path is a scoped random capability. Separate host/process gateway forwards bounded GETs through Docker exec to container loopback, with no generated network or host ports | Verified isolated preview and gateway isolation passed in Docker acceptance |
+| Workspace | Real builds from reviewed plans, receipt recovery, cancel/retry, persisted Trace phases, generated file metadata/source inspection, verified iframe descriptors; old simulations remain labeled | Signed-in build/repair/reload/change/failure journey passed; frontend typecheck and production build passed |
 
 The supported recipe is a browser-focused Next.js/React/TypeScript application with local UI state, bundled assets and explicitly generated Node tests. This checkpoint provides no application database, outbound API access, uploads, email, payments or production hosting. The GET-only preview gateway does not support arbitrary API mutations, WebSockets, streaming or service workers. These are explicit supported-stack limits; existing planning recommendations do not provision those resources.
 
@@ -36,9 +40,9 @@ A restart can reverify already persisted candidate source in a fresh container w
 
 Preview expiry and cleanup are reconciled by the worker. The trusted PID 1 also has a finite lifetime (build budget plus preview TTL), so processes stop even if a worker disappears. If Docker or PostgreSQL is unavailable, teardown cannot be guaranteed immediately: identities are retained, readiness is not falsely asserted, and recovery retries cleanup. Successful publication is reconciled before teardown if the committing caller was interrupted. Run the worker continuously; do not describe recovery as a guarantee during permanent daemon failure.
 
-## Local Docker acceptance
+## Completed local Docker acceptance and repeatability
 
-No image tag or placeholder is accepted as the execution identity. On the Docker-capable machine, choose and review an exact Docker Official Node 24 Debian image digest, then provision:
+No image tag or placeholder is accepted as the execution identity. The accepted image is recorded above. For a deliberate future reprovision, choose and review an exact Docker Official Node 24 Debian base digest, then provision:
 
 ```sh
 python scripts/provision-sandbox.py --base-image node@sha256:REVIEWED_64_HEX_DIGEST
@@ -50,7 +54,7 @@ Use a **disposable** PostgreSQL database named `f01_test_*`; acceptance tests mi
 
 ```sh
 python scripts/run-phase2b-acceptance.py \
-  --image-id sha256:EXACT_64_HEX_IMAGE_ID_FROM_RECEIPT \
+  --image-id sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0 \
   --database-url postgresql+psycopg://USER@127.0.0.1:5432/f01_test_phase2b \
   --socket /var/run/docker.sock
 ```
@@ -59,14 +63,14 @@ Docker Desktop may use `~/.docker/run/docker.sock`; supply its absolute path if 
 
 Containment probes observe non-root execution, dropped capabilities, no-new-privileges, read-only root, absent factory credentials/socket, loopback-only networking, effective cgroup/tmpfs limits, disk exhaustion, PID exhaustion, CPU throttling, memory OOM enforcement, timeout, cancellation and force cleanup.
 
-The second scenario runs real RSA-verified OIDC login/session creation and owned HTTP APIs, the actual OpenAI source adapter with **controlled responses**, and real Docker: create → reviewed plan → generation → observed type error → bounded repair → typecheck/build/generated test → health → isolated preview → reload → change request → source patch preserving layout → reverify → exhausted update retaining the earlier Brain/version/preview. Tests clean recorded runtimes even after assertion failures. This is an API/gateway acceptance journey, not a completed interactive frontend browser journey or a paid live model call.
+The passing second scenario runs real RSA-verified OIDC login/session creation and owned HTTP APIs, the actual OpenAI source adapter with **controlled responses**, and real Docker: create → reviewed plan → generation → observed type error → bounded repair → typecheck/build/generated test → health → isolated preview → reload → change request → source patch preserving layout → reverify → exhausted update retaining the earlier Brain/version/preview. Tests clean recorded runtimes even after assertion failures. Evidence scope is the signed-in API/gateway journey and preview isolation; it does not invent a paid model call, a public production URL or a new comprehensive frontend accessibility certification.
 
-Only after the image's Docker containment and journey both pass, configure the backend/worker:
+The image's Docker containment and journey have passed. On a runtime with that installed image and its matching passing report, configure the backend/worker:
 
 ```dotenv
 REAL_EXECUTION_ENABLED=true
 EXECUTION_MODE=real
-SANDBOX_IMAGE_ID=sha256:EXACT_64_HEX_IMAGE_ID_FROM_RECEIPT
+SANDBOX_IMAGE_ID=sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0
 SANDBOX_ACCEPTANCE_REPORT=/absolute/path/F01-local/.runtime/phase2b-acceptance-report.json
 SANDBOX_SOCKET=/absolute/path/to/docker.sock
 FACTORY_ORIGIN=http://localhost:3000
@@ -92,7 +96,23 @@ uv run --locked uvicorn f01.execution.preview_gateway:app --host 127.0.0.1 --por
 
 The API process does not open or operate the Docker socket. The worker/gateway require private Docker access; do not expose Engine APIs to the browser or generated code. Docker Desktop/resource provisioning and worker supervision remain operator responsibilities.
 
-## Verification observed in this Work environment
+## Completion record — supplied local verification at f9c2a69
+
+| Check | Result |
+| --- | --- |
+| Exact trusted sandbox image | Provisioned; identity recorded above |
+| Docker containment acceptance | Passed |
+| Docker signed-in generation/build/repair/preview/reload/change/failed-update journey | Passed |
+| Dependency integrity and preview gateway isolation | Passed in Docker acceptance |
+| Full backend regression | 289 passed, 2 skipped |
+| Frontend typecheck | Passed |
+| Frontend production build | Passed |
+
+The two skips belong to the ordinary regression invocation; Docker tests passed in the separate opt-in acceptance invocation. Skips are not the evidence for Docker acceptance.
+
+## Historical application checks — earlier implementation session
+
+These checks remain part of the Phase 2B implementation record:
 
 | Check | Result |
 | --- | --- |
@@ -105,8 +125,7 @@ The API process does not open or operate the Docker socket. The worker/gateway r
 | OpenAPI/generated TypeScript drift | Passed |
 | Fresh migration, downgrade/upgrade and ORM/schema drift | Passed |
 | Upgrade from Phase 2A with existing project/Brain/plan/review records | Passed; identities and workspace retained |
-| Docker provisioning/containment/journey | Not run: `DOCKER_SOCKET_UNAVAILABLE`; no Docker executable/socket here |
-| Interactive Phase 2B browser/responsive acceptance | Not run |
+| Docker provisioning/containment/journey in that earlier Work session | Then unavailable; superseded by the passing local completion record above |
 | Live paid source provider | Not run |
 
-Remaining gates: build and record the exact trusted image in the local Docker environment; run/fix actual offline install/build/test/resource/cleanup and API/gateway acceptance; run the interactive signed-in frontend journey and browser cookie/CSP/accessibility/responsive checks; validate a live provider when deliberately configured. Do not label the milestone stable or start Phase 2C before those gates are met.
+Phase 2B is closed. Its accepted image/report gate remains an operational safeguard: a different image requires its own containment and journey acceptance. Preview expiry, the supported browser-focused stack and the lack of production release storage remain deliberate limits, not missing Phase 2B acceptance. Phase 2C is documentation/planning only until the founder approves the bounded provider, artifact and release decisions in its implementation plan.

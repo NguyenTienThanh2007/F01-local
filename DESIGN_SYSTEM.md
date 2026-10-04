@@ -1,7 +1,7 @@
 # F01 — Design system
 
-Status: Phase 1 design and M6 quality acceptance verified; visual identity preserved.  
-Revision: 0.4 · 2026-10-02  
+Status: Visual identity preserved through completed Phase 2B; Phase 2C UI is a proposal only.
+Revision: 0.5 · 2026-10-04
 Related: [Product specification](PRODUCT_SPEC.md), [Architecture](ARCHITECTURE.md), [Roadmap](ROADMAP.md).
 
 ## 1. Design position
@@ -122,7 +122,7 @@ Trace uses a 52px monospaced time gutter, narrow phase marker, and aligned actio
 - Auto-follow only while the user is at the latest position. Otherwise show “New events” and “Jump to latest.”
 - “Reconnecting” is stream health, not a failed project. Keep the last known state and offer Retry.
 
-Activity reuses this visual language but defaults to user actions and milestone events. Log placeholders say “Source logs become available with real execution”; they do not show fabricated terminal output.
+Activity reuses this visual language and defaults to user actions/milestones. Real builds show persisted bounded command/issue evidence; raw unrestricted logs are not exposed. Simulation entries remain labeled and never stand in for real verification. Unavailable operational panels explain their limits without fabricated terminal output.
 
 ## 8. Component and interaction rules
 
@@ -181,6 +181,8 @@ Check contrast, keyboard path, focus restoration, 200% zoom, reduced motion, and
 The application should remain identifiable when its temporary wordmark is hidden. The rail/canvas contrast, terracotta active marker, Trace gutter, and Pulse should carry the identity. These decisions precede component implementation and change only through an explicit revision to this document.
 
 ## Revision notes
+
+- 0.5: Aligned availability language with completed Phase 2B and the documentation-only 2C proposal. Real versus simulated Trace/preview and separate future production status reuse existing tokens; no UI or visual redesign implemented.
 
 - 0.4: M6 improves compact navigation names, modal focus wrapping/restoration, saved-state connection visibility, current/historical labels and bounded readable Trace layout. Semantic colors and brand identity are unchanged.
 
@@ -246,9 +248,9 @@ connections are explicitly planned. Layout is in operating-entry.css; shared
 planning behavior and existing dashboard/create layouts remain intact.
 
 
-## 13. Final Phase 1 quality — M6
+## 13. Historical Phase 1 quality — M6
 
-Current availability labels distinguish real draft planning, saved Brain/context, simulated versions/deployment records and recorded change intent. Real source generation, application execution, runtime/logs and external release remain unavailable. The homepage sample remains an explicitly labeled illustration.
+At the M6 checkpoint, availability labels distinguished real draft planning, saved Brain/context, simulated versions/deployment records and recorded change intent; source execution and external release were unavailable. Completed 2B now has real source/verification/repair and isolated preview. Production release remains proposed only; the homepage sample remains a labeled illustration.
 
 The saved workspace shows connection health outside the inspector; offline content stays visible and Retry connection resumes ordered replay without clearing loaded history. Pulse announces lifecycle changes politely; sequence increments are not repeated live announcements. Current and historical versions/attempts remain visibly distinct.
 
@@ -257,3 +259,10 @@ Compact-rail links retain explicit accessible names. Skip links focus the main r
 Trace metadata is at least 12px. Its compact inspector title uses 18/24px type. A keyboard-accessible Simulation disclosure holds explanatory scope and timezone metadata, leaving event space in short viewports; phase labels, follow controls and structured event references remain reachable. Linked fixture issues/repairs pause follow and focus the referenced row. Obsolete competing Trace height rules are consolidated.
 
 Acceptance includes long 100-character titles and 10,000-character briefs, 375/768/1280/1440px surfaces plus the compact rail, reduced motion, keyboard/focus review and 200% reflow (1440×1000 physical-equivalent area at 720×500 CSS pixels and DPR 2). Actual screenshots were inspected and visible WCAG A/AA scans passed; this is scoped verification, not an accessibility certification.
+
+
+## 14. Completed Phase 2B and proposed Phase 2C presentation
+
+Real build phases and source/evidence metadata use the existing Trace, Pulse, typography and state tokens. Verified preview is identified by its real source/version; older Simulation records remain explicitly labeled. Verification does not imply production deployment or completion of every user requirement.
+
+The bounded 2C plan proposes separate Current preview and Current production labels, exact artifact/configuration review, observed public URL/health and immutable release inspection. Pending, failed and reconciling releases must not visually replace the previous working production state. Historical inspection is read-only. Use existing drawers/tables/focus/recovery patterns; no redesign, new tokens, release controls or weakened preview sandbox is implemented in this documentation task.

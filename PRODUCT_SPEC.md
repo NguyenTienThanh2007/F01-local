@@ -1,8 +1,10 @@
 # F01 — Product specification
 
-Status: Phase 1 M6 and Phase 2A implemented and verified; Phase 2B foundation only, execution blocked; Phase 2C unimplemented.  
-Revision: 0.13 · 2026-10-02  
-Scope: Phase 1, Phase 2A and inactive Phase 2B source/policy foundations. F01 is a temporary internal codename, not a final brand.
+Status: Phase 1 M0–M6, Phase 2A and Phase 2B complete; Phase 2C documentation/planning only, implementation not started.
+Revision: 0.15 · 2026-10-04
+Scope: Single-owner persisted projects, verified identity/context planning, real source generation, isolated build/test/repair and verified preview. Production release is proposed in [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md), not implemented. F01 remains a temporary internal codename.
+
+The Phase 2B completion record supplied by the founder identifies `f9c2a69`, exact trusted image `sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0`, passing Docker containment and signed-in build/repair/change/failure journey, 289 backend tests passed/2 skipped, and passing frontend typecheck/build. Evidence provenance and historical check counts are in [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md). Phase 1 sections below preserve the demonstration contract; they do not limit current real-run capabilities.
 
 ## 1. Product intent
 
@@ -48,12 +50,12 @@ The founder's explicit requirements take priority. Resolve document conflicts be
 
 | Layer | Actual status and scope |
 | --- | --- |
-| Current implementation | Product shell and stateless draft planning: `/projects/new` → server-only `/api/v1/plan` → FastAPI `/v1/plan`. All six plan sections render; validation, loading, cancellation, retry, and credential-boundary checks exist. M2 implements the PostgreSQL domain and ownership-scoped project API. M3 persists projects. M4 provides the saved workspace, immutable Brain inspection, original brief/request history, context-bound change recording, Activity/Versions reads and isolated synthetic preview foundations. M5 adds the persisted fixture runner, replayable Build Trace, simulation commands and atomic Brain/version/internal-deployment records. Standalone planning still holds an unsaved draft; no application is built. |
+| Current implementation | Phase 1 persisted workspace/history and labeled simulations; Phase 2A verified identity, sessions and stored context-aware planning; Phase 2B actual source candidates, leased execution jobs, trusted isolated Docker install/typecheck/build/test, bounded repair, immutable verified source/version/Brain publication and isolated generated-app preview. Real Trace/source metadata and cancel/retry are integrated. Standalone draft planning remains a separate unsaved proposal. |
 | Completed Phase 1 | Existing M0–M6 plan: complete the shell, then single-owner persistent projects, Brain, workspace, fixture previews, simulated Trace/version history, and polish. M2 persistence is implemented. Dashboard saving is implemented in M3; workspace rendering is M4 and persistent simulation is now implemented in M5. M6 completes the quality, accessibility, consistency and acceptance pass. |
-| Phase 2 | 2A is implemented: verified identity, secure sessions and persisted context-aware planning proposals. 2B: real source generation → isolated sandbox → build → test → bounded automatic repair → real preview. 2C: real deployment → public URL → release versions → modify the existing app → redeploy. 2B/2C are planned scopes, not implemented capabilities. |
-| Long-term platform | Real generation/execution, managed hosting, operational controls, teams, visual editing, monitoring, and outcome improvements. The A–K direction in `ROADMAP.md` is not implementation authorization. |
+| Phase 2 | 2A and 2B complete. 2C proposes production release → observed public URL/health → immutable history → modification of existing pinned source through 2B → redeployment, with preservation of the last working release. Its provider/milestone plan is not implementation authorization. |
+| Long-term platform | Managed production hosting, advanced operational controls, teams, visual editing, monitoring, connectors, and outcome/growth improvements retain later gates. The A–K direction in `ROADMAP.md` is preserved. |
 
-The founder authorized M2 through M6, one milestone at a time. Creation atomically saves the project, original request, immutable initial Brain, queued demonstration run and first event. Initial Brain remains a deterministic scaffold with user/template provenance. M3 dashboard, creation and metadata journeys, M4 workspace/Brain/request views and preview isolation, and the standalone real draft planner are preserved. With the M5 runner enabled, the server progresses versioned fixtures and publishes a curated sample on success. Failed updates retain the current successful preview and Brain. Cancellation returns to Live · Demo when a version exists, otherwise Idle. Active runs still block new requests and archiving. Saving a change records immutable intent only; the optional “Record and simulate” action starts a separate idempotent demonstration command. Arbitrary requested changes may leave the bundled preview unchanged. Historical inspection never changes current pointers. M6 verifies the final Phase 1 journeys and improves focus, connection recovery, inspection clarity and responsive quality. Phase 2A extends identity and planning only; Phase 2B and later capabilities remain unimplemented.
+Historically, M2–M6 delivered atomic demo project/request/Brain/run creation, persisted fixture progression, scoped history and last-good demo preview preservation. That Simulation compatibility path remains labeled and distinct from real execution. In configured real mode, project creation saves intent without starting a simulation; the owner reviews a current context-bound plan and starts a separate durable real build. Generation, observed verification and bounded repair publish a verified source/version/Brain/preview atomically. Failed updates preserve the last verified preview. Historical inspection changes no current pointer; no successful preview implies production deployment.
 
 ## 3. Phase 1 boundaries
 
@@ -84,7 +86,7 @@ An authentication-ready shell is not a production identity system. Phase 1 devel
 
 ### Phase 2 progression
 
-Phase 2 follows the Phase 1 acceptance gate. The current completed checkpoint is Phase 2A; Phase 1 acceptance remains complete. The three stages below introduce real capabilities separately, preserving the workspace, original brief, immutable Brain revisions, request context and existing history.
+Phase 2 follows the completed Phase 1 acceptance gate. Phase 2A and Phase 2B are complete. The stages preserve the workspace, original brief, immutable Brain revisions, request context and existing history; Phase 2C remains a proposal.
 
 | Stage | User-visible result | Completion evidence |
 | --- | --- | --- |
@@ -98,7 +100,7 @@ Phase 2 follows the Phase 1 acceptance gate. The current completed checkpoint is
 
 2C modifies the pinned existing source through the same plan → patch → isolated verification → preview pipeline before promotion. It preserves unrelated behavior and recorded history, rechecks stale bases, and promotes the reviewed artifact. Failed updates do not replace the working public release. Source rollback does not imply reversal of data migrations or external effects.
 
-Teams, billing, connectors, visual editing, advanced operational controls and the outcome engine retain their later roadmap gates. Identity, model, sandbox and deployment provider choices require implementation decisions; this plan does not select them.
+Teams, billing, connectors, visual editing, advanced operational controls, Outcome Engine and Growth Engine retain their later roadmap gates. The 2B trusted stack is implemented. The generated-app production provider remains unselected; [the bounded 2C plan](PHASE2C_IMPLEMENTATION.md) recommends evaluating Vercel staged prebuilt, compares alternatives and lists founder decisions.
 
 ## 4. Initial audience and primary job
 
@@ -109,6 +111,12 @@ Primary job: “Turn my request into a project I can understand, inspect, and re
 Secondary job: “Record a change in the context of the existing project and show its relationship to prior work.”
 
 ## 5. Primary journey
+
+### Current Phase 2B real journey
+
+Sign in → create/reopen a saved project → obtain and review a current persisted plan → generate actual source → isolated Docker materialization/dependency verification/typecheck/build/tests → detect an observed failure → bounded patch repair → successful verification and isolated preview → reload the same project → request a change against pinned Brain/version/source → patch and verify again. A failed update preserves the earlier successful Brain/version/preview. The passing signed-in Docker acceptance records this journey. Production Deploy is unavailable until Phase 2C is separately implemented and accepted.
+
+### Historical Phase 1 demonstration journey — retained compatibility
 
 1. Open `/projects` in a clearly identified development workspace. Existing projects come from the API; the first empty state offers one primary create action.
 2. Open `/projects/new`. Enter an optional title and a brief, for example: “Build a CRM for a small real estate agency with authentication, leads, pipeline, notes and analytics.”
@@ -127,7 +135,7 @@ The interface must not claim that an arbitrary prompt produced a functioning app
 | Region | Role | Content |
 | --- | --- | --- |
 | Global rail | Move between projects and account | Project switcher, Projects, account/development identity |
-| Project header | Establish location and state | Editable title, Pulse, lifecycle, Simulation label, active run, selected version |
+| Project header | Establish location and state | Editable title, Pulse, persisted lifecycle/run, real versus Simulation mode, current/selected version |
 | Project navigation | Inspect a stable project | Preview, Brief, Brain, Activity, Versions, Settings |
 | Main canvas | Inspect the product or its specification | Dominant preview on the root route; structured content on other routes |
 | Utility inspector | Inspect work without losing place | Build Trace, Run details, Files, Logs, Deployment |
@@ -155,7 +163,7 @@ Project Brain is a typed, versioned project dossier. Every project retains:
 
 Store immutable Brain revisions. The current revision is a pointer, not an editable history blob. User requests and events are durable canonical records; Brain history references them rather than copying a growing transcript into every revision.
 
-Display provenance such as **User requested**, **Template assumption**, and **Simulated outcome**. “User requested” describes the source of a requirement, not proof that it has been implemented. Derived issue and deployment summaries remain available even when a failed run produces no new Brain revision.
+Display provenance such as **User requested**, **Model proposed**, **Generated**, **Verified**, **Published**, and historical **Template assumption / Simulated outcome**. “User requested” is not proof of implementation; recipe verification is not proof of every natural-language acceptance criterion. Failed candidates never become completed work. Derived issue/deployment summaries remain available even when a failed run produces no new Brain revision.
 
 A change is tied to a base Brain revision and optional base version. If the base is stale, keep the unsent text and ask the user to review the current project before resubmitting. Future generation must consume this context and produce a patch to the existing project, with traceable decisions. Phase 1 establishes that contract; it does not perform source patches.
 
@@ -353,6 +361,8 @@ Default production changes require human review under project policy. Phase K ma
 
 ## Revision notes
 
+- 0.15: Closed Phase 2B at `f9c2a69` from the verified exact-image Docker acceptance record; labeled historical simulation/foundation notes and aligned the documentation-only 2C plan. No Phase 2C code or provider selection.
+
 - 0.11: Completed M6 and Phase 1 acceptance. Corrected capability copy, keyboard/focus behavior, transport recovery visibility, historical loading/selection and Trace readability. Preserved simulation-only execution, ownership, immutable context, preview isolation and the planned Phase 2 scopes.
 - 0.10: Clarified the planned 2A identity/context-aware planning, 2B real generation/isolated verification/repair/preview, and 2C public deployment/versioned ongoing modification sequence. Real preview belongs to 2B; production release belongs to 2C. Current implementation remains M5, with M6 pending.
 - 0.9: Completed M5 only: persistent versioned fixture progression, atomic publication, ordered simulated Trace, SSE replay/polling/gap recovery, run inspection/retry/cancel and preserved successful previews. No real generation, tests, fixes, commits or external deployment; M6 remains pending.
@@ -376,16 +386,18 @@ Default production changes require human review under project policy. Phase K ma
 
 Sign-in uses a configured OpenID Connect provider; the browser holds opaque HttpOnly sessions. Account shows the verified owner and expiry, and sign-out revokes that session. Stable internal user/project/history IDs remain canonical. A verified operator-only link can attach an existing development owner to an issuer/subject before first sign-in; matching email never transfers ownership. Missing, expired or revoked sessions return no project data. Foreign owners receive 404. Development identity remains an explicit local/test compatibility mode and cannot run in production. No teams or shared workspace permissions are implemented.
 
-Project navigation includes Planning. Original-brief and recorded change planning consume current immutable Brain/version context and bounded relevant requirements/history with provenance. The OpenAI adapter returns a validated structured proposal; it does not execute tools. Proposals and their pinned context are immutable records separate from Brain revisions. Marking a proposal reviewed records acknowledgement only. New requests never overwrite the original brief. Existing source is explicitly unavailable. Current Simulation state, successful preview and Brain/version pointers are unaffected by planning.
+Project navigation includes Planning. Original-brief and recorded change planning consume current immutable Brain/version context and bounded relevant requirements/history with provenance. The OpenAI adapter returns a validated structured proposal; it does not execute tools. Proposals and their pinned context are immutable records separate from Brain revisions. Marking a proposal reviewed records acknowledgement only. New requests never overwrite the original brief. At the Phase 2A checkpoint source was unavailable; completed 2B now supplies actual source manifests when present. Planning alone still changes no successful preview or Brain/version pointer.
 
 A planning attempt reserves a request and conservative token allowance before dispatch. One attempt may be pending per owner. Minute/day limits, context/output limits and deadlines apply; failed, canceled and uncertain requests retain their reservation. Actual provider token fields are nullable and contain only reported counts. Input/key receipts survive uncertain responses; replay does not call the model again. Publication and review reject stale context. Cancellation discards a late result. Lost in-process work expires as abandoned and requires a deliberate new attempt, with no automatic provider retry.
 
-Verification uses a controlled RSA-signed identity provider and the actual OpenAI adapter with controlled transport responses. No live identity account or paid model call was configured or verified. Provider provisioning, public operations, session refresh and commercial readiness remain separate work. Generated application execution/deployment is not yet implemented.
+Verification uses a controlled RSA-signed identity provider and the actual OpenAI adapter with controlled transport responses. No live identity account or paid model call was configured or verified. Provider provisioning, public operations, session refresh and commercial readiness remain separate work. That historical Phase 2A milestone added no generated execution/deployment. Phase 2B subsequently completed real execution and preview; production deployment remains the unimplemented 2C proposal.
 
 Revision 0.12: implemented Phase 2A only; preserved Phase 1 Simulation, immutable history and preview isolation.
 
-Revision 0.13: authorized Phase 2B; added inactive source proposal/patch, artifact-value, bounded provider and Docker prerequisite/policy contracts. The environment has no container daemon and rejects namespace isolation. These foundations create no persisted application source or real execution evidence. No real build, repair, preview or worker is available; Phase 2B acceptance remains pending. Phase 2A remains the latest completed stage. See [Phase 2B foundation](PHASE2B_FOUNDATION.md).
+Historical revision 0.13 at `167c023` added inactive source/patch/provider/policy contracts. That Work environment could not run containers, so the foundation alone did not satisfy execution acceptance. It is superseded by the completed 2B record; see [historical foundation](PHASE2B_FOUNDATION.md).
 
-## Phase 2B execution checkpoint
+## Phase 2B completion and bounded Phase 2C proposal
 
-The foundation-only descriptions above are historical. The remaining execution implementation now uses additive migration 0003, persisted immutable candidates and evidence, fenced leased workers, bounded provider/repair budgets, atomic real version/Brain/preview publication and a separate cookie-host preview gateway. Source/worker/Docker wire types remain outside domain provider contracts. Simulation records remain distinguishable. The supported recipe is browser-focused Next.js/React/TypeScript; no application database, external integrations or production release is provisioned. Available application checks pass, but Docker provisioning/containment/execution and interactive browser acceptance remain unverified here. Real execution is disabled until a passing acceptance report matches the exact image ID. See [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md). Phase 2C and later capabilities have not begun.
+Phase 2B is complete: trusted pinned Docker execution, dependency verification, actual typecheck/build/test, bounded repair, real source persistence/lineage, atomic publication, verified isolated preview/gateway and signed-in change/failure acceptance have passed. Real Trace and Brain provenance distinguish generated, verified and published work from simulations. The supported browser-focused stack provisions no generated database, external integration or production deployment. The exact-image acceptance report remains an operational guard, not an outstanding milestone gate.
+
+Phase 2C proposes explicit owner promotion of an exact production artifact/evidence/configuration, observed URL/health, separate preview and production pointers, immutable release history and safe incremental redeployment. Failures preserve the previous working production release; stale bases reject promotion. External provider effects require reconciliation, not a pretend database transaction. The seven milestones and unselected provider recommendation are in [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md). This task implements none of them.

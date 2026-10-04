@@ -1,14 +1,14 @@
 # F01 — Implementation roadmap
 
-Status: Phase 1 M0–M6 and Phase 2A complete; remaining Phase 2B execution path implemented with application checks passing, Docker/browser acceptance pending. Phase 2C has not begun.
-Revision: 0.14 · 2026-10-03
+Status: Phase 1 M0–M6, Phase 2A and Phase 2B complete; Phase 2C documentation/planning only, implementation not started.
+Revision: 0.15 · 2026-10-04
 Related: [Product specification](PRODUCT_SPEC.md), [Architecture](ARCHITECTURE.md), [Design system](DESIGN_SYSTEM.md).
 
 ## 1. Current checkpoint
 
-Phase 2B now includes a trusted runtime recipe, Docker adapter, leased jobs, source/evidence persistence, bounded repairs, atomic source/version/Brain publication, isolated preview gateway and honest workspace integration. Available checks pass: 289 backend tests (2 Docker tests skipped), strict mypy, 52 frontend tests, generated-client drift/transport, typecheck, factory production build and Phase 2A migration preservation. Real execution remains disabled until a passing Docker acceptance report matches the exact provisioned image. This Work environment has no Docker executable/socket; actual containment, the real Docker journey, interactive browser acceptance and live provider verification remain pending. Phase 2A remains the latest accepted stage. See [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md).
+Phase 2B is complete. The completed `f9c2a69` state uses accepted trusted image `sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0`. Docker containment and the real signed-in generation/build/repair/preview/reload/change/failed-update journey passed, including dependency verification and gateway isolation. Full backend regression: 289 passed, 2 skipped; frontend typecheck and production build passed. Ordinary-suite skips are distinct from the passing opt-in Docker acceptance. [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md) records evidence provenance and historical application checks. The exact-image report guard remains operational; Earlier Docker-unavailable notes are historical and no longer a milestone blocker.
 
-M0 planning documents, the M1 shell, M2 persistence, the M3 projects journey, M4 workspace foundations, M5 persistent simulations and M6 quality/acceptance are implemented. The dashboard now reads saved projects through the generated M2 client. Creation persists title/brief with a stable recovery key; project metadata can be renamed or archived/unarchived when the active-run invariant permits it. The redesigned interface and standalone draft planner are preserved. Phase 1 is complete; Phase 2A identity and contextual planning are implemented. Simulation history remains available alongside the new gated real-run path. Production deployment remains unavailable. The implementation continues repository commit `167c023`.
+M0 planning documents, the M1 shell, M2 persistence, the M3 projects journey, M4 workspace foundations, M5 persistent simulations and M6 quality/acceptance are implemented. The dashboard now reads saved projects through the generated M2 client. Creation persists title/brief with a stable recovery key; project metadata can be renamed or archived/unarchived when the active-run invariant permits it. The redesigned interface and standalone draft planner are preserved. Phase 1 is complete; Phase 2A identity and contextual planning are implemented. Simulation history remains available alongside the new gated real-run path. Production deployment remains unavailable. The supplied completed implementation is `f9c2a69`; the historical foundation is `167c023`.
 
 The founder authorized M3 after M2 and the homepage identity passes, then M4, M5 and M6 separately. The standalone OpenAI planning extension remains separate from deterministic initial Brain creation. An unresolved create command retains its exact key/input in tab session storage until confirmed; this is no project database. M4 adds context-bound request recording and event/version reads through the generated client. Backend ownership, frozen persistence schema/migration, project creation, metadata ETags and explicit local development authentication remain compatible; verified OIDC is the production identity boundary.
 
@@ -16,8 +16,8 @@ At the Phase 1 checkpoint the endpoint was stateless and protected by the develo
 
 | Delivery layer | Checkpoint |
 | --- | --- |
-| Current implementation/workstream | Phase 2B execution and acceptance harness implemented; 289 backend tests passed with 2 Docker tests skipped, strict mypy across 71 files, 52 frontend tests, 2 client transport tests, typecheck, factory build, drift and migration checks passed. Real execution stays gated; Docker and browser acceptance remain unverified. Earlier milestone counts below are historical. |
-| Near-term plan | Provision the exact trusted image and complete Docker containment, real execution and browser acceptance for Phase 2B. Phase 1 and Phase 2A retain their accepted status. Stop before Phase 2C. |
+| Current implementation/workstream | Phase 2B complete with trusted pinned Docker generation/verification/repair/preview and passing containment/journey. Backend 289 passed/2 skipped; frontend typecheck/build passed. Earlier milestone counts below are historical. |
+| Near-term plan | Review the bounded seven-milestone [Phase 2C proposal](PHASE2C_IMPLEMENTATION.md), provider/artifact recommendation and founder decisions. No 2C implementation, provisioning or deployment yet. |
 | Long-term architecture | A–K below describes future product capabilities and dependencies; it adds no implementation work, schema, routes, hosting, team access, or execution now. |
 
 ## 2. Operating rule for every implementation milestone
@@ -149,11 +149,11 @@ Use deterministic scenarios and synthetic data. Do not test cosmetic wrappers si
 | 3: Commercial SaaS | Billing/quotas, future team seats, support/operations, backups, deletion/retention, organization/workspace tenancy | Restore and incident drills; usage controls; multi-user authorization; product reliability; clearly defined support and data obligations |
 | Later categories | SaaS workflows, dashboards, internal tools, simple browser games; mobile/advanced games later | Reliable web lifecycle first; category-specific validation and deployment strategy |
 
-OpenAI, Claude, Gemini, or another provider can be connected behind the same domain-oriented model contract. There is no requirement to implement every provider immediately, and no provider should own stored project state or the lifecycle protocol. Generated-project deployment may use Vercel or another suitable provider; this decision is deferred.
+OpenAI, Claude, Gemini, or another provider can be connected behind the same domain-oriented model contract. There is no requirement to implement every provider immediately, and no provider should own stored project state or the lifecycle protocol. Generated-project deployment may use Vercel or another suitable provider; the decision remains unselected. [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md) recommends evaluating Vercel staged prebuilt and compares Render/Fly with explicit approval and feasibility gates.
 
 ### Phase 2 stage gates
 
-The implementation order is 2A → 2B → 2C after Phase 1 acceptance. M6 completed that acceptance gate; Phase 2A is now implemented and verified. Phase 2B implementation is present but its Docker/browser acceptance gate is pending. Each stage needs its own bounded implementation plan and verification before the next begins.
+The implementation order is 2A → 2B → 2C after Phase 1 acceptance. M6 completed that acceptance gate; Phase 2A is now implemented and verified. Phase 2B is complete with passing local Docker containment and end-to-end acceptance. Phase 2C is planned only. Each stage needs its own bounded implementation plan and verification before the next begins.
 
 **2A:** Replace the private development principal with verified production identity/session handling. Preserve stable project/history identifiers through an explicitly verified ownership migration. Keep authorization server-owned and test cross-user project, request, Brain, version and stream access. Assemble context from the original brief, current Brain, relevant immutable requests and selected version; include source summaries only when actual source exists. Persist validated planning proposals with provider/provenance and exact Brain/version bases. Review/publication must recheck those bases; provider failure, cancellation or conflict preserves the draft and original brief. Retain the standalone /v1/plan integration while introducing project-aware planning separately. Complete a signed-in create/reopen → real plan → context-aware change plan journey, session expiry/revocation, stale-plan, provider-error and budget tests. No generation or execution belongs to 2A.
 
@@ -230,6 +230,8 @@ Evaluation must remain reproducible from defined rules and observed data. Model-
 
 ## Revision notes
 
+- 0.15: Closed Phase 2B from the supplied `f9c2a69` acceptance and exact image; recorded passing Docker containment/journey and current regression results. Added the bounded documentation-only 2C milestone/provider proposal. Long-term stages remain unchanged; no 2C code or push.
+
 - 0.11: Completed M6 only and closed Phase 1 acceptance. Recorded the integrated journeys, accessibility/zoom/motion/focus checks, regression results and honest local/private limitations. Phase 2A–2C remain planned; no real generation or production identity/execution/deployment began.
 - 0.10: Defined the planned 2A/2B/2C scopes and evidence gates. Real generated-app preview completes 2B; public deployment and incremental redeployment follow in 2C. Orchestration technology remains a later choice. M5 remains the completed checkpoint and M6 remains pending.
 - 0.9: Completed M5 only, with persisted simulation/publication and workspace recovery. Existing persistence, creation, M4 views, planning and preview isolation preserved. M6 and all future capabilities remain deferred.
@@ -255,8 +257,22 @@ Implemented configurable verified OIDC identity, opaque revocable sessions and e
 
 The controlled signed-in create → plan → reopen → context-aware change-plan journey passed with a cryptographic test issuer and actual OpenAI adapter using controlled responses. Provider failure/cancel/lost-response and second-owner denial passed. Full backend/frontend suites, strict mypy, client drift, typecheck/build and Phase 1 browser regressions are recorded in PHASE2A_IMPLEMENTATION.md. No live identity account or model invocation was configured or verified.
 
-At that historical Phase 2A checkpoint, execution had not begun. The separately authorized Phase 2B work below now implements source lineage, sandbox, worker and preview boundaries; its Docker/browser acceptance remains pending.
+At that historical Phase 2A checkpoint, execution had not begun. The subsequent Phase 2B work and local Docker acceptance below complete source lineage, sandbox, worker, verification/repair and isolated preview boundaries.
 
-## Phase 2B execution checkpoint
+## Phase 2B completion checkpoint
 
-Implemented the remaining execution path and Docker acceptance harness. Source/repair calls use the existing bounded provider contract and usage ledger; successful recipe verification commits version/Brain/preview pointers atomically. Recovery preserves immutable evidence and last-good previews. Actual Docker containment and end-to-end execution are not verified in this Work environment. Complete the local commands and remaining gates in PHASE2B_IMPLEMENTATION.md before changing this status to complete. Phase 2C, billing, teams, connectors, visual editing, Growth Engine and Outcome Engine remain outside this change.
+Complete at the verified `f9c2a69` acceptance. Source/repair calls use the provider boundary and bounded ledger; exact-image real verification commits immutable source/version/Brain/preview together. Failed updates retain prior successful output. Docker containment, dependency verification, real build/test/repair, isolated preview/gateway and the signed-in change/failure journey passed. See PHASE2B_IMPLEMENTATION.md for the completion record. No production deployment is part of 2B.
+
+## Bounded Phase 2C proposal — implementation not started
+
+| Milestone | Proposed gate |
+| --- | --- |
+| 2C.0 — Architecture/provider decision | Founder-approved provider/profile/storage/policy; exact artifact portability, credential isolation, staging and restoration demonstrated |
+| 2C.1 — Domain/persistence | Additive release records, immutable lineage, separate production pointer, stable commands and durable operations |
+| 2C.2 — Artifact/adapter | Credential-free isolated production packaging, durable digest-bound output, approved provider upload/stage/observe |
+| 2C.3 — Promotion/health | Owner/current-base recheck, observed public URL/health, reconciliation and last-good preservation |
+| 2C.4 — Deployment/version UI | Honest production vs preview states, explicit owner review/Deploy, stable receipt recovery and historical inspection |
+| 2C.5 — Incremental redeploy | Existing source patch through 2B verification/preview, new reviewed release, unrelated code/history preserved |
+| 2C.6 — Recovery acceptance | Real public release/update/failed-update journey plus duplicate, stale, restart, routing/DB uncertainty and restore checks |
+
+Full scope, proposed modules/schema/contracts, tests, exclusions and founder decisions are in [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md). This planning task selects no deployment provider and adds no deployment code, schema, resources or controls. Billing, teams, connectors, custom domains, visual editing, Growth Engine, Outcome Engine and Phase 3 functionality remain deferred.

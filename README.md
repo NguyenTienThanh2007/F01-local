@@ -1,7 +1,6 @@
 # F01 — local project handoff
 
-This is the completed **Phase 1 through M6 and Phase 2A identity/context planning**, not the completed software factory.
-The remaining Phase 2B execution path is implemented and gated on exact-image Docker acceptance. It is disabled by default and is not yet accepted: this Work environment cannot run Docker. See [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md) for current verification, provisioning, isolated worker/gateway setup and remaining gates. PHASE2B_FOUNDATION.md is the historical foundation checkpoint.
+Phase 1 M0–M6, Phase 2A and **Phase 2B are complete**. The verified `f9c2a69` completion includes passing exact-image Docker containment and signed-in build/repair/change/failure acceptance, 289 backend tests passed/2 skipped, and frontend typecheck/build passing. The accepted image and evidence provenance are in [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md). Real execution remains disabled by default until runtime configuration supplies the installed accepted image and matching report; acceptance is complete. PHASE2B_FOUNDATION.md is historical. [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md) proposes production release only; no Phase 2C code or provider is selected.
 The ZIP includes the source, dependency lockfiles, environment templates and the
 four planning documents. Secrets, installed dependencies and generated builds are
 excluded. Dependencies are installed on your Mac, so no Linux virtual environment
@@ -23,12 +22,15 @@ or native binaries need to be reused.
   with validation, loading, cancel, success, error and retry states.
 - `POST /api/v1/plan`: a fixed server-side frontend gateway. The browser receives
   neither the development token nor the backend OpenAI key.
+- Reviewed persisted plans drive real source generation and durable leased builds
+  in the accepted isolated Docker image, with dependency/typecheck/build/test
+  evidence, bounded repairs, source metadata and verified isolated preview.
 
 M3 now connects `/projects` and `/projects/new` to the real M2 APIs through the generated TypeScript client on the server. Create a demo project from an optional title and original brief, reopen it after reload, search/filter it and manage title/archive metadata. `/projects/{id}` is the persisted preview-first workspace with Brief, Brain, Activity, Versions and Settings subroutes, shared header/Pulse and a collapsible inspector/request drawer. The optional **Explore a draft plan** tool preserves the existing real planning behavior and keeps draft results in page memory.
 
 Creation retries retain the same key and submitted input until confirmation. Tab session storage contains only an unresolved command receipt, never a project inventory; after confirmation it is removed. There is no localStorage project database.
 
-New projects queue a deterministic Simulation which progresses on the backend. Success atomically publishes a Brain revision, numbered version and internal-fixture deployment record. Failed updates and cancellations preserve prior successful previews. Active runs still block archiving/new requests; use Run details to cancel or retry where valid. Build Trace is labeled Simulation, supports replay/reconnect/polling and does not assert real source generation, tests, fixes, commits or deployment. Phase 1 and Phase 2A are implemented. Context-aware proposals are available in project Planning. Phase 2B execution, connectors, billing, teams and later capabilities remain deferred.
+Simulation mode retains the deterministic Phase 1 runner and labeled fixture records. Configured real mode saves project intent, then requires a reviewed current plan and a separate real build command. Successful verification atomically publishes source/version/Brain/preview; failed updates and cancellations preserve the prior successful preview. Active runs block conflicting requests/archiving; Run details exposes supported cancel/retry. Real Trace uses persisted command/repair evidence; historical Simulation Trace remains labeled. Phase 1, Phase 2A and Phase 2B are complete. Production deployment, connectors, billing, teams and later capabilities remain deferred.
 
 ## 1. Install prerequisites
 
@@ -410,7 +412,7 @@ Provisioned workspace browser harness: `apps/api/.venv/bin/python scripts/test-m
 See `M5_IMPLEMENTATION.md` for the exact change inventory and verification results. No commit or deployment was made; the source tree has no Git metadata.
 
 
-## Final Phase 1 acceptance — M6
+## Historical final Phase 1 acceptance — M6
 
 Phase 1 now supports persisted create/reopen/search/filter/rename/archive,
 immutable original briefs and Brain revisions with provenance, context-bound
@@ -426,10 +428,12 @@ process backed by PostgreSQL. Development identity is not production auth.
 APP_ENV=production with that adapter is rejected; a production-style web build
 does not authorize public operation. Simulation events never prove source
 generation, application builds/tests/fixes, commits or external deployment.
-Generated application execution/deployment is not yet implemented. Files,
-terminal logs, application runtime and external release controls remain honest
-unavailable capabilities. No billing, teams, connectors, visual editing or
-outcome automation exists. Phase 2A is now implemented as documented below; Phase 2B/2C remain plans only.
+At that Phase 1 checkpoint, generated application execution/deployment, source
+files and application runtime were unavailable. Phase 2B subsequently completed
+real execution, source metadata and verified isolated preview; unrestricted
+terminal logs and external release controls remain unavailable. No billing,
+teams, connectors, visual editing or outcome automation exists. Phase 2A and
+Phase 2B are complete; Phase 2C is documentation/planning only.
 
 In the provisioned workspace, after pnpm build, run the final acceptance and
 regressions from the project root:
@@ -558,7 +562,7 @@ Default controls:
 | PLANNING_OUTPUT_TOKENS | 3000 |
 | PLANNING_TIMEOUT_SECONDS | 30 |
 
-Context includes bounded current Brain summary/plan, requirements, stack/architecture/constraints/decisions/questions, recent request history and the current simulated version. Excerpt provenance and truncation remain explicit. Existing source is unavailable. All project-aware calls and authenticated OIDC draft calls reserve durable usage before dispatch; one pending attempt is allowed per owner. Failures/cancellations/unknown outcomes retain reservations. Reported provider usage is nullable. These values are usage-control foundations, not billing, credits or generated-application test counts. Development DB-free draft limits are process-local and reset on restart.
+The Phase 2A checkpoint assembled bounded Brain summary/plan, requirements, stack/architecture/constraints/decisions/questions, recent request history and the then-current simulated version; source was unavailable at that checkpoint. Phase 2B adds persisted source manifests and exact source/version/Brain bases to real execution context. Excerpt provenance and truncation remain explicit. All project-aware calls and authenticated OIDC draft calls reserve durable usage before dispatch; one pending attempt is allowed per owner. Failures/cancellations/unknown outcomes retain reservations. Reported provider usage is nullable. These values are usage-control foundations, not billing, credits or generated-application test counts. Development DB-free draft limits are process-local and reset on restart.
 
 Project planning returns a persisted pending attempt, then polls its status. An uncertain response retains a frozen input/key receipt in tab session storage; resolve it to avoid duplicate provider dispatch. Cancel prevents publication of a late result but cannot guarantee stopping provider work or cost. Restart does not resend planning calls: a lost pending task becomes abandoned after its persisted deadline. Retry is a deliberate new attempt after reviewing context. No uncontrolled automatic retries occur.
 
@@ -574,8 +578,8 @@ apps/api/.venv/bin/python scripts/test-m5.py --phase2a
 
 That harness creates disposable PostgreSQL, a test-only RSA OIDC provider and controlled model transport, and stops its processes afterward. The test fixture refuses non-test or non-disposable database configuration. Workspace PostgreSQL/Chromium binaries are not shipped in the ZIP. No live provider login or paid model call was configured or verified in this handoff. Configure and validate your intended provider before relying on it operationally.
 
-Phase 2A is complete at the implementation boundary. Generated application execution/deployment is not yet implemented. Phase 2B has only inactive source/provider/policy foundations: no generated source persistence/file materialization, operational sandbox/worker, real builds/tests/fixes, real preview, deployment, billing, teams, connectors, visual editing or outcome engine. Phase 1 execution remains Simulation and preview isolation remains intact. See PHASE2A_IMPLEMENTATION.md for the completed stage and PHASE2B_FOUNDATION.md for the partial checkpoint.
+Historical Phase 2A handoff: that milestone added identity/planning only; its foundation-era absence of execution was superseded by completed Phase 2B. See PHASE2A_IMPLEMENTATION.md and the historical PHASE2B_FOUNDATION.md. Simulation compatibility remains labeled; current real execution/preview is recorded below.
 
-## Phase 2B execution checkpoint
+## Phase 2B completed; Phase 2C proposed only
 
-The previous foundation-only statements above describe earlier milestones. Real runs, immutable source candidates/evidence, fenced workers, bounded repair and isolated preview now have an implementation. They stay disabled until real Docker containment and the acceptance journey pass for the configured exact image ID. Production deployment is not implemented. Follow [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md); do not run generated code on the factory host.
+Real source generation, immutable candidates/evidence, fenced jobs, trusted dependency verification/typecheck/build/tests, bounded repair, verified preview and gateway isolation passed Docker acceptance. Failed updates retain the prior successful version. The matching exact-image report remains required for operational enablement. Production deployment is not implemented; its bounded proposal is in [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md). Never run generated code on the factory host.

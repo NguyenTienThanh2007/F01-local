@@ -1,14 +1,14 @@
 # F01 — System architecture
 
-Status: Phase 1 through M6 and Phase 2A implemented; Phase 2B inactive foundation, execution blocked; Phase 2C planned.  
-Revision: 0.13 · 2026-10-02  
+Status: Phase 1 M0–M6, Phase 2A and Phase 2B complete; Phase 2C documentation/planning only, implementation not started.
+Revision: 0.15 · 2026-10-04
 Related: [Product specification](PRODUCT_SPEC.md), [Design system](DESIGN_SYSTEM.md), [Roadmap](ROADMAP.md).
 
 ## 1. Architectural decision
 
 Use one repository containing a Next.js web application and a modular FastAPI application backed by PostgreSQL. FastAPI owns domain validation, authorization, state transitions, and all domain writes. Next.js owns presentation, server rendering, and a thin same-origin API gateway. The gateway has no independent business rules and no direct domain database access.
 
-The factory is a modular monolith with two application runtimes. Phase 1 execution remains simulated. A standalone real planning endpoint is an explicitly requested extension; autonomous source generation, sandboxing, and generated-project deployment remain deferred.
+The factory remains a modular monolith: Next.js presents the workspace/BFF, FastAPI owns domain writes, and PostgreSQL owns history and execution state. Phase 2B adds separate trusted leased-worker and preview-gateway processes; generated source runs only in isolated Docker containers. Production release remains unimplemented. The table below records historical Phase 1 decisions; later accepted boundaries extend them.
 
 | Concern | Phase 1 decision | Reason |
 | --- | --- | --- |
@@ -30,15 +30,15 @@ Pin compatible released runtime and dependency versions during milestone M1 and 
 
 | Layer | Boundary |
 | --- | --- |
-| Implemented | Next.js shell/draft plan form, server-only planning gateway, FastAPI health/configuration, and the provider-independent OpenAI planning adapter. Planning remains stateless; credentials stay private. M2 adds the nine-table PostgreSQL schema, Alembic migration, ownership-scoped project services/read snapshots and generated client. M3 connects the dashboard, creation and metadata/settings journeys through that client. M4 adds the shared workspace, Brain/request inspection, idempotent change recording, event/version reads and isolated synthetic previews. M5 adds persistent fixture steps, run commands/history, atomic publication and SSE/polling replay. M6 verifies acceptance and refines frontend accessibility, projection/inspection clarity and connection recovery. |
+| Implemented | Completed Phase 1 persistence/workspace/simulation; 2A verified OIDC sessions and persisted contextual proposals; 2B authorized source generation, scoped immutable candidates/evidence, PostgreSQL leased execution, trusted Docker verification/repair, atomic version/Brain publication and isolated preview gateway. Domain authorization and generated contracts remain authoritative. |
 | Phase 1 acceptance | M0–M6 are complete. The existing nine-table schema, frozen migration, backend services and generated contracts are unchanged by M6. |
-| Long-term platform | Section 13 defines future source/execution/hosting, operational, visual-editing, team authorization, and outcome seams. These are conceptual extensions, not additions to current routes, models, infrastructure, or milestones. |
+| Long-term platform | Section 13 relates completed source/execution boundaries to proposed production hosting, operations, visual editing, team authorization and outcome seams. Future seams do not add current routes, models, infrastructure or milestones. |
 
-M2–M6 are implemented under the approved contracts. Standalone frontend planning remains unchanged; the generated project client now handles server-side project/session calls. Phase 2A now adds the verified identity/session and contextual proposal boundaries described in section 14; Phase 2B and later implementation have not begun. The full product lifecycle in `PRODUCT_SPEC.md` is broader than the Phase 1 simulated lifecycle enum. Keep a modular control plane and replaceable execution/deployment/model adapters; do not introduce premature microservices or placeholder packages.
+M2–M6 and Phase 2A/2B are complete. The completed repository state at `f9c2a69` records accepted image `sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0`, passing Docker containment and signed-in build/repair/change/failure acceptance, 289 backend tests passed/2 skipped and passing frontend typecheck/build. [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md) records the completion evidence and historical checks. Preserve modular adapters and existing history. [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md) is a bounded proposal: no production code, selected provider, resources or public release URL exist yet.
 
 ## 2. Target topology and future seams
 
-This diagram describes the Phase 1 topology. Planning/project gateways, PostgreSQL services, workspace and deterministic simulator are implemented. All source execution and external hosting seams remain deferred.
+This diagram is the historical Phase 1 topology. Current 2B additionally has a private Docker worker and separate cookie-host preview gateway using network-disabled generated containers. API processes do not operate the Docker socket. External production hosting remains the proposed 2C seam.
 
 ```mermaid
 flowchart TB
@@ -55,19 +55,19 @@ Server components use a server-only API client directly against FastAPI. Client 
 
 The simulator operates inside the backend process, using the same transaction services as API commands. It is not an autonomous agent or a general job worker.
 
-| Boundary | Phase 1 implementation | Later replacement |
+| Boundary | Historical Phase 1 | Accepted extension / proposed next step |
 | --- | --- | --- |
 | Identity resolver | Development principal from an internal development token | Verified access token from a selected identity provider |
 | Planning source | Standalone `PlanningProvider` + OpenAI draft endpoint; workspace simulation remains separate | Context-aware planning connected to persisted Brain revisions |
-| Execution driver | Due fixture steps with persisted cursor | Redis-backed worker dispatch and isolated execution |
-| Preview descriptor | Allowlisted internal fixture ID | Validated isolated sandbox/preview origin |
+| Execution driver | Due fixture steps with persisted cursor | Implemented PostgreSQL jobs/fenced leases and private isolated Docker worker; Redis is not required |
+| Preview descriptor | Allowlisted internal fixture ID | Implemented source-bound runtime/capability on a separate cookie host |
 | Deployment record | Simulated record with no external URL | Provider adapter with real evidence and credentials |
 
 Do not create a large adapter framework or empty provider packages now. Define small interfaces only where used by Phase 1. No provider SDK types may become domain models. Future models consume an assembled project context and return validated domain proposals; model output is never an instruction to execute arbitrary tools directly.
 
 ## 3. Proposed repository structure
 
-The repository contains the early web shell, standalone planning extension, and implemented M2 persistence/domain/core APIs. The table also includes proposed paths for later milestones; it is not a claim that every listed module exists.
+This historical structure sketch began with the early web shell, standalone planning and M2 persistence/domain/core APIs. Current implementation also contains the completed 2A identity/context and 2B source/execution/preview modules. The table includes proposed paths for later milestones; it is not a claim that every listed module exists.
 
 | Path | Responsibility |
 | --- | --- |
@@ -115,7 +115,9 @@ The repository contains the early web shell, standalone planning extension, and 
 
 App Router pages stay thin: compose a feature and handle route-level loading/errors. Feature components own interactions; reusable primitives own styling and accessibility. Python routers handle HTTP concerns; application services coordinate transactions; domain code validates state. Avoid a repository abstraction around every table, a global frontend store, or a UI package used by only one app.
 
-## 4. Domain and database model
+## 4. Phase 1 domain and database model — historical baseline
+
+This section preserves the original migration and simulation contracts. Phase 2A and completed Phase 2B extend them below; simulation-only restrictions here are not current restrictions on real builds/versions. Production release tables do not exist yet.
 
 ### Standalone planning extension (implemented)
 
@@ -232,7 +234,7 @@ Successful updates preserve unchanged requirement/feature IDs and point explicit
 - Build Trace groups consecutive phases without reordering the global sequence, including repeated Building/Verifying groups for linked fixture repair. Its phase index names Understanding, Planning, Building, Verifying, Deploying and Live / Needs attention. Follow, pause, unread count and jump respect user scrolling and inspector resizing. Run/Brain/version selection is read-only. Unknown command outcomes retain exact separate keys/context across reload.
 - Files, terminal logs and runtime remain honest unavailable capabilities. Deployment inspection shows only Simulation records with an internal fixture target and no external URL. The M4 fixture HTML/CSP/iframe permissions are unchanged. No dependency or migration was added.
 
-## 5. State and simulation mechanics
+## 5. Historical Phase 1 state and simulation mechanics
 
 Project lifecycle: `idle | understanding | planning | building | verifying | deploying | live | error`.
 
@@ -264,11 +266,11 @@ Next.js route groups organize layouts without adding URL segments. Workspace ins
 | `/sign-in` | Connection state; development entry only when enabled; no fake password form |
 | `/projects` | Dashboard with `q`, `status`, `archived`, `cursor` query parameters |
 | `/projects/new` | Optional title/original-brief save journey plus separate real draft planning; stable idempotency recovery |
-| `/projects/[projectId]` | Persisted preview-first workspace; `version` selects a read-only demo version, `panel` opens an inspector view; run state comes from persisted simulation |
+| `/projects/[projectId]` | Persisted preview-first workspace; read-only real or demo version selection, persisted real/simulated run state and inspector selection |
 | `/projects/[projectId]/brief` | Original brief and request history |
 | `/projects/[projectId]/brain` | Current dossier; optional `revision` selection |
 | `/projects/[projectId]/activity` | Project event history |
-| `/projects/[projectId]/versions` | Simulated versions and preview selection |
+| `/projects/[projectId]/versions` | Immutable real/simulated versions, source metadata and preview selection; no production promotion yet |
 | `/projects/[projectId]/settings` | Title, archive, capability information |
 | `/account` | Current identity and development-mode disclosure |
 | `/demo-preview/[fixtureId]` | Allowlisted synthetic demo HTML response, outside factory React layouts |
@@ -305,7 +307,7 @@ Standard error body:
 
 ### Endpoint inventory
 
-Paths below are relative to `/v1`. Capabilities are implemented in the milestones that use them, not as empty endpoints up front.
+Paths below are relative to `/v1`. This is the historical Phase 1 inventory; accepted 2A/2B endpoints are listed in their implementation sections. Proposed 2C routes exist only in the plan, not as empty endpoints.
 
 | Method | Path | Request / result |
 | --- | --- | --- |
@@ -382,7 +384,9 @@ Keep all events during Phase 1, so valid old cursors remain replayable. A stream
 
 Recheck ownership and credential expiry during the stream. Expired credentials close the stream and prompt session renewal. Any host that terminates long streams must pass a documented polling fallback test. Client events trigger narrow resource refetches for Brain/versions/settings; they do not contain untrusted instructions or replacement HTML.
 
-## 8. Authentication, tenancy, and preview isolation
+## 8. Historical Phase 1 authentication, tenancy, and fixture isolation
+
+Completed 2A provides verified identity/session handling and completed 2B provides real preview isolation. The rules below remain development/fixture compatibility boundaries, not the sole current implementation.
 
 Development mode uses one seeded internal user. Next.js holds `DEV_API_TOKEN` server-side and sends it to the private/loopback API. FastAPI maps that token to a configured development principal; it does not trust a caller-supplied subject. Tests use distinct seeded principals to verify ownership boundaries.
 
@@ -435,7 +439,7 @@ The full acceptance checks and milestone gates are in `ROADMAP.md`. Database mig
 - Single-owner projects keep Phase 1 small. Team membership requires a deliberate tenant migration before invitations are added.
 - Immutable Brain snapshots make changes reviewable; compact structured snapshots and history references control duplication. Embeddings and pruning remain future work.
 - Bundled previews demonstrate the product without proving arbitrary app generation. Demo disclosure is part of the contract.
-- The production identity provider, model providers, execution stack, deployment provider, billing, and retention policy remain open. Their adapters cannot bypass existing authorization and event invariants.
+- Identity configuration and future model choices remain decisions behind implemented abstractions. The trusted 2B stack is Next.js/React/TypeScript on pinned Docker. Generated-app production provider, artifact/profile/retention and commercial decisions remain open; the 2C proposal preserves authorization and event invariants.
 
 ## 12. Primary technical references
 
@@ -460,17 +464,17 @@ This section aligns future architecture only. The existing Phase 1 schema, owner
 
 | Stage | New authoritative boundary | Evidence/publication rule |
 | --- | --- | --- |
-| 2A — Identity and contextual planning | Verified identity/session adapter plus domain-owned context assembly and provider-independent planning | A proposal pins the authorized request, Brain revision and selected version. Validated model output and provenance are persisted as proposed work; stale publication is rejected. No source/build/deployment output is implied. |
-| 2B — Generation, sandbox execution and real preview | Source/candidate storage, durable job orchestration, isolated execution and preview adapters | Actual commands produce sanitized evidence and immutable source/artifact identities. Bounded repairs reference observed failures. A verified artifact starts an isolated generated-app preview; unsuccessful candidates retain prior successful preview pointers. |
-| 2C — Production release and continued modification | Deployment adapter, environment-scoped release policy and public runtime records | Promote the reviewed verified artifact, record the observed URL/health and version, and modify existing pinned source through the 2B pipeline. Failure cannot replace the last working production pointer. |
+| 2A complete — Identity and contextual planning | Verified identity/session adapter plus domain-owned context assembly and provider-independent planning | A proposal pins the authorized request, Brain revision and selected version. Validated model output and provenance are persisted as proposed work; stale publication is rejected. No source/build/deployment output is implied. |
+| 2B complete — Generation, sandbox execution and real preview | Source/candidate storage, durable job orchestration, isolated execution and preview adapters | Actual commands produce sanitized evidence and immutable source identities. Bounded repairs reference observed failures. Verified source/build starts an isolated generated-app preview; unsuccessful candidates retain prior successful preview pointers. A portable production package is a separate 2C requirement. |
+| 2C proposed — Production release and continued modification | Deployment adapter, environment-scoped release policy and public runtime records | Promote the reviewed verified production artifact, record observed URL/health and immutable history, and modify existing pinned source through the 2B pipeline. Failure cannot replace the last working production pointer. |
 
-2A keeps stable existing project/history identities and requires a verified migration from development ownership. Session and tenant authorization are enforced in API commands, reads and streams. Context contains the original brief, immutable Brain/request history and selected version, plus actual source summaries once available. Credentials remain outside prompts/Brain; unavailable source is explicit. The standalone /v1/plan input/output contract remains separate from implemented project-aware proposals. Planning publishes no Brain revision.
+2A keeps stable existing project/history identities with a verified migration from development ownership. Session and tenant authorization are enforced in API commands, reads and streams. Context contains the original brief, immutable Brain/request history and selected version; 2B real generation additionally assembles authorized persisted source. Credentials remain outside prompts/Brain; absent source remains explicit. The standalone /v1/plan input/output contract remains separate from implemented project-aware proposals. Planning publishes no Brain revision.
 
-2B generated code, dependency scripts, build/test commands and preview servers never run inside FastAPI or the factory frontend process. Durable job persistence, artifact storage and a queue/worker adapter own restart/cancel/retry/deduplication; the concrete technologies remain undecided. Candidate, source, build attempt, verification evidence and preview instance retain separate identities. Real Trace results must come from observed execution, not fixture progression. A real preview uses its own origin/runtime and environment credentials, denies access to factory sessions/control-plane resources and other projects, and cannot inherit the Phase 1 same-site fixture trust assumptions.
+2B generated code, build/test commands and preview servers never run inside FastAPI or the factory frontend process. Implemented PostgreSQL jobs/fenced leases, immutable source/evidence storage and a private Docker adapter own restart/cancel/retry/deduplication. Candidate, source, build attempt, evidence and preview retain separate identities. Actual execution creates real Trace evidence. The separate-host gateway/runtime denies factory credentials, metadata/network and other-project access. Dependency installation is controlled/offline/frozen with package scripts ignored.
 
 2C separates preview from production configuration/data, isolates release credentials and binds promotion to exact source/artifact/evidence/configuration references. Publication records observed deployment outcomes without treating an external provider operation as a PostgreSQL transaction. Provider retries/reconciliation require stable operation identities and must not publish duplicate releases. Failed updates preserve the prior production release; current preview and current production pointers are separate. Incremental modifications pin their base source/version and Brain context and pass the same isolated verification/preview gates before redeployment.
 
-2A is implemented as described below. The 2B/2C execution and release contracts remain planning boundaries; no worker, sandbox or deployment was implemented. See ROADMAP.md for stage acceptance journeys and completed Phase 1 acceptance.
+2A and 2B are implemented and accepted. Only 2C production release remains a planning boundary. See ROADMAP.md and the completed 2B record for acceptance scope.
 
 ### Control plane, execution, and managed runtime
 
@@ -518,7 +522,7 @@ Isolation and resource enforcement must be demonstrated before real execution is
 
 ### Source, changes, versions, and deployment lineage
 
-Keep source revisions, change candidates, build attempts, artifacts, review decisions, deployments, and running instances as distinct concepts. An application can have multiple deployments of one verified version. A significant AI modification has its own candidate/version and author even if verification fails; failed candidates do not replace production. This is a future extension of the successful simulated `project_versions` contract, not a change to it now.
+Keep source revisions, change candidates, build attempts, artifacts, review decisions, deployments, and running instances as distinct concepts. Phase 2B already extends `project_versions` with real verified source/preview while preserving simulated history. The future release boundary permits multiple deployments of one verified version. A significant AI modification retains its own candidate and provenance even if verification fails; it becomes a verified version only after passing publication gates. Failed candidates do not replace current preview or production.
 
 | Future concept | Minimum lineage to preserve |
 | --- | --- |
@@ -593,6 +597,8 @@ Phase K extends the O1–O4 gates in `ROADMAP.md`. A future improvement orchestr
 
 ## Revision notes
 
+- 0.15: Closed Phase 2B from the supplied `f9c2a69` exact-image Docker acceptance; made historical Phase 1/foundation scope explicit and aligned the unimplemented 2C proposal. No migration, API contract or runtime code changed.
+
 - 0.11: Completed M6 frontend quality and final acceptance with unchanged backend, migration and OpenAPI contracts. Documented explicit transport recovery, resource-path-scoped inspection and modal focus boundaries. Real identity/source/execution/release remain future Phase 2 plans.
 - 0.10: Aligned planned architecture boundaries with 2A production identity/context-aware planning, 2B real source/isolated build-test-repair/preview, and 2C production release/ongoing modification. Preserved current M5 code, migration and contracts; M6 remains pending.
 - 0.9: Completed M5 simulation, commands, atomic publication, replay/polling and workspace integration on the unchanged nine-table migration. M6 and real execution/hosting remain deferred.
@@ -624,7 +630,7 @@ Sessions use random opaque handles, stored SHA-256 handle/CSRF/token hashes, Fer
 
 Frozen migration `0001_phase1` is unchanged. `0002_phase2a` adds six tables: `external_identities`, `auth_flows`, `auth_sessions`, `planning_attempts`, `planning_proposals`, `plan_reviews`. Scoped composite foreign keys bind proposal owner, project, request, Brain, version and attempt; immutable triggers protect proposals, review records and external identity mappings. Upgrade/downgrade tests retain Phase 1 IDs and history.
 
-`PlanInput` pins initial/change intent to an owned immutable request and current Brain/version IDs. Context assembly includes bounded UTF-8 original/intent excerpts, requirements/acceptance/provenance, stack, architecture, decisions/constraints, up to five recent requests and current version metadata. Selection/truncation is explicit. No source is available; Simulation history is never execution evidence. Server-owned JSON context is stored on attempt/proposal; public provenance exposes a hash and source/base manifest. Current-context checks also cover metadata version and latest recorded request. Publication and review lock/recheck current context and archive state. Session end, cancellation, deadline or stale context prevents publication. Review is acknowledgement, not execution approval.
+`PlanInput` pins initial/change intent to an owned immutable request and current Brain/version IDs. Context assembly includes bounded UTF-8 original/intent excerpts, requirements/acceptance/provenance, stack, architecture, decisions/constraints, up to five recent requests and current version metadata. Selection/truncation is explicit. At the 2A checkpoint no generated source existed; 2B now includes the actual current source manifest when available. Simulation history is never execution evidence. Server-owned JSON context is stored on attempt/proposal; public provenance exposes a hash and source/base manifest. Current-context checks also cover metadata version and latest recorded request. Publication and review lock/recheck current context and archive state. Session end, cancellation, deadline or stale context prevents publication. Review is acknowledgement, not execution approval.
 
 `ContextPlanningProvider` returns provider-independent `PlanningResult/ContextPlan`. OpenAI is the current adapter, using one bounded strict-schema Responses request, no tools, no redirect/retry, store=false and bounded output/response bytes. Provider wire types do not enter domain models. Proposal output is validated again at the application boundary, rendered as text and never passed to tools or code. Provider errors and configured credential echoes are sanitized. The standalone `/v1/plan` ProjectPlan contract is preserved.
 
@@ -643,18 +649,24 @@ The project POST returns 202 then FastAPI BackgroundTasks performs the bounded p
 | POST /v1/projects/{id}/planning/proposals/{proposal}/review | Current-context acknowledgement only |
 | GET /v1/planning/usage | Owned UTC allowance/reservations |
 
-No source files, executable operations, real builds/tests/fixes, external preview/release records, billing, teams or connectors are created. Session refresh, provider SSO logout, encrypted-key rotation, public operations and retention jobs remain deliberate limits. A live provider must be configured and validated separately. See README and PHASE2A_IMPLEMENTATION.md.
+The Phase 2A milestone alone created no source files, executable operations, real builds/tests/fixes or external preview/release records; Phase 2B subsequently completed source execution and isolated preview. Production release, billing, teams and connectors remain outside implemented scope. Session refresh, provider SSO logout, encrypted-key rotation, public operations and retention jobs remain deliberate limits. A live provider must be configured and validated separately. See README and PHASE2A_IMPLEMENTATION.md.
 
-## Phase 2B foundation checkpoint — not an execution capability
+## Historical Phase 2B foundation checkpoint — superseded
 
-Pure source proposals and compare-and-apply patches are validated before any future materialization. In-memory source values record project/request/Brain/plan/base-version lineage, sorted per-file hashes and a canonical manifest digest. Archive packaging/inspection accepts text regular files only and performs no host extraction. These values are not yet persisted source records or verified project versions.
+The following paragraphs record `167c023` only. Their absent-capability statements are historical; current execution and acceptance are complete as recorded below.
 
-The independent source provider accepts bounded typed context and returns strict proposals with nullable reported token usage. It is not wired into API dispatch or the usage ledger. No provider output selects commands, dependencies, configuration, sockets, mounts or environment variables.
+At that checkpoint, pure source proposals and compare-and-apply patches were validated before future materialization. In-memory source values recorded project/request/Brain/plan/base-version lineage, sorted per-file hashes and a canonical manifest digest. Archive packaging/inspection accepted text regular files only and performed no host extraction. These values were not yet persisted source records or verified project versions.
 
-The proposed Docker policy requires an exact local image content ID, non-root user, read-only root, private namespaces, dropped capabilities, no-new-privileges, network disabled, bounded tmpfs/memory/swap/CPU/PIDs and no host binds/devices/ports/secret inheritance. Command policies are fixed application-owned argument lists with deadlines; dependency installation is offline/frozen and ignores scripts. There is no provisioned trusted scaffold/image/lockfile catalog or operational container create/start/exec adapter yet. Policy values describe intended controls; they do not demonstrate enforcement, cleanup or cancellation.
+The independent source provider accepted bounded typed context and returned strict proposals with nullable reported token usage. It was not yet wired into API dispatch or the usage ledger. Provider output could not select commands, dependencies, configuration, sockets, mounts or environment variables.
 
-The read-only Engine probe fails closed on unavailable daemon/image or missing resource/security prerequisites. Even a passing probe reports execution_enabled=false and requires real isolation verification. No production API executes generated code or exposes the Docker socket. Phase 2B durable orchestration, atomic source/version/Brain/evidence publication and separate preview runtime remain pending. See [foundation status and acceptance blocker](PHASE2B_FOUNDATION.md).
+The then-proposed Docker policy required an exact local image content ID, non-root user, read-only root, private namespaces, dropped capabilities, no-new-privileges, network disabled, bounded tmpfs/memory/swap/CPU/PIDs and no host binds/devices/ports/secret inheritance. Command policies were fixed application-owned argument lists with deadlines; dependency installation was offline/frozen and ignored scripts. No trusted scaffold/image/lockfile catalog or operational container create/start/exec adapter had yet been provisioned. Those policy values alone did not demonstrate enforcement, cleanup or cancellation.
 
-## Phase 2B execution checkpoint
+The read-only Engine probe failed closed on unavailable daemon/image or missing resource/security prerequisites. Even a passing probe reported execution_enabled=false and required real isolation verification. No production API executed generated code or exposed the Docker socket. Durable orchestration, atomic source/version/Brain/evidence publication and separate preview runtime were still pending at that historical checkpoint; Phase 2B subsequently completed them. See [historical foundation](PHASE2B_FOUNDATION.md).
 
-The foundation-only descriptions above are historical. The remaining execution implementation now uses additive migration 0003, persisted immutable candidates and evidence, fenced leased workers, bounded provider/repair budgets, atomic real version/Brain/preview publication and a separate cookie-host preview gateway. Source/worker/Docker wire types remain outside domain provider contracts. Simulation records remain distinguishable. The supported recipe is browser-focused Next.js/React/TypeScript; no application database, external integrations or production release is provisioned. Available application checks pass, but Docker provisioning/containment/execution and interactive browser acceptance remain unverified here. Real execution is disabled until a passing acceptance report matches the exact image ID. See [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md). Phase 2C and later capabilities have not begun.
+## Phase 2B completion and bounded Phase 2C architecture
+
+Phase 2B is complete with additive migration 0003, immutable source candidates/evidence, fenced leased workers, bounded generation/repair budgets, real command evidence and atomic source/version/Brain/preview publication. The trusted pinned image and dependency verification, containment, actual Docker typecheck/build/test, bounded repair, isolated preview/gateway and signed-in build/reload/change/failure journey have passed. Historical Simulation records remain distinct. The exact-image passing report remains an operational safeguard. The supported browser-focused stack does not provision a generated database, integration or production deployment. See [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md).
+
+The documentation-only 2C proposal adds a digest-bound durable production package derived from exact saved 2B source and separately verified production configuration. A private release service holds provider credentials; generated code never runs in that service. Proposed additive release/operation/observation records preserve immutable bindings and separate production pointers from 2B preview/version pointers. Owner/session/current source/Brain/configuration/production bases are rechecked before promotion. External staging, cutover and restoration happen outside database transactions; uncertain results require observation and stable-identity reconciliation. Failed deployment preserves the last successful production record and restores prior routing when needed; code rollback does not reverse data/external effects.
+
+[PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md) owns the seven milestone scopes, proposed tables/contracts, portability handoff, provider comparison, tests and founder decisions. Vercel staged prebuilt is recommended for evaluation, not selected. Existing Phase 1 deployment records stay simulated; frozen migrations stay unchanged. No 2C code, schema or provider provisioning is added here.
