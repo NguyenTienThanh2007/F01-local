@@ -5,19 +5,23 @@ import { ProjectPulse } from '@/features/project-pulse/project-pulse';
 import { ProjectPlanningForm } from '@/features/project-planning/project-planning-form';
 import { ProjectStarters, projectStarters } from '@/features/project-planning/project-starters';
 import { projectRequest, ProjectAPIError } from '@/lib/projects/browser';
-import { createInput, type Created } from '@/lib/projects/contracts';
-import { ATTEMPT_STORAGE, readAttempt, outcomeIsUnknown, type Attempt } from '@/lib/projects/creation';
+import { createInput, type Created, type Session } from '@/lib/projects/contracts';
+import { ATTEMPT_STORAGE, readAttempt, outcomeIsUnknown, creationTarget, type Attempt } from '@/lib/projects/creation';
 
 export function ProjectCreation({ initialIdea, planning = false }: { initialIdea: string; planning?: boolean }) {
   const router = useRouter();
   const [mode, setMode] = useState<'create' | 'plan'>(planning ? 'plan' : 'create');
   const [title, setTitle] = useState(''), [brief, setBrief] = useState(initialIdea), [error, setError] = useState(''), [pending, setPending] = useState(false), [unknown, setUnknown] = useState(false), [ready, setReady] = useState(false);
   const attempt = useRef<Attempt | null>(null), busy = useRef(false), briefRef = useRef<HTMLTextAreaElement>(null);
+  const [executionMode, setExecutionMode] = useState<'real' | 'simulated' | null>(null);
   useEffect(() => {
     let saved: Attempt | null = null;
     try { saved = readAttempt(sessionStorage); } catch { /* Private browsing may block storage. */ }
     if (saved) { attempt.current = saved; setTitle(saved.input.title ?? ''); setBrief(saved.input.brief); setUnknown(true); setMode('create'); }
     setReady(true);
+    const controller = new AbortController();
+    void projectRequest<Session>('/session', { signal: controller.signal }).then(value => { if (!controller.signal.aborted) setExecutionMode(value.capabilities?.execution_mode ?? null); }).catch(() => { /* Saving reports its own actionable error. */ });
+    return () => controller.abort();
   }, []);
   function forgetReceipt() { attempt.current = null; try { sessionStorage.removeItem(ATTEMPT_STORAGE); } catch { /* memory receipt still works */ } }
   async function create() {
@@ -31,9 +35,10 @@ export function ProjectCreation({ initialIdea, planning = false }: { initialIdea
     busy.current = true; setPending(true); setError('');
     try {
       const result = await projectRequest<Created>('/projects', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': command.key }, body: JSON.stringify(command.input) });
-      if (!/^[0-9a-f-]{36}$/i.test(result.project.id) || result.execution_mode !== 'simulated') throw new ProjectAPIError('SERVICE_UNAVAILABLE', 0);
+      const target = creationTarget(result);
+      if (!target) throw new ProjectAPIError('SERVICE_UNAVAILABLE', 0);
       forgetReceipt(); setUnknown(false);
-      router.push(`/projects/${result.project.id}`);
+      router.push(target);
     } catch (reason) {
       const unresolved = !(reason instanceof ProjectAPIError) || outcomeIsUnknown(reason.status, reason.code) || reason.code === 'IDEMPOTENCY_KEY_REUSED';
       setUnknown(unresolved); if (!unresolved) forgetReceipt();
@@ -52,11 +57,11 @@ export function ProjectCreation({ initialIdea, planning = false }: { initialIdea
         <div className="brief-support"><p id="saved-brief-help">Your original request will be preserved.</p><span className="meta">{Array.from(brief).length.toLocaleString('en-US')} / 10,000</span></div>
         {unknown && <div className="unresolved-creation" role="status">The previous save has not been confirmed. Retry uses the same brief and creation key to recover the existing result. Keep this tab until the result is known.</div>}
         {error && <p className="form-error" role="alert">{error}</p>}
-        <div className="planning-actions"><button className="button button-primary" disabled={pending || !ready}>{pending ? 'Saving project…' : unknown ? 'Retry project creation' : 'Create demo project'}</button><span className="meta">BRIEF → PERSISTED PROJECT</span></div>
-        <p className="composer-note" id="creation-boundary"><strong>Demo mode.</strong> Your brief and project history are saved. The initial Brain is a deterministic scaffold. A server-owned Simulation is queued and publishes a bundled sample on success. No code, application tests, fixes, commits or external deployment are performed.</p>
+        <div className="planning-actions"><button className="button button-primary" disabled={pending || !ready}>{pending ? 'Saving project…' : unknown ? 'Retry project creation' : executionMode === 'simulated' ? 'Create demo project' : 'Create project'}</button><span className="meta">BRIEF → PERSISTED PROJECT</span></div>
+        <p className="composer-note" id="creation-boundary">{executionMode === 'simulated' ? <><strong>Demo mode.</strong> Your brief and project history are saved. A server-owned demonstration publishes a bundled sample on success.</> : <>Your brief and project history are saved. Review a plan in your workspace before starting a build. Saving alone does not build or deploy your application.</>}</p>
         <ProjectStarters selected={projectStarters.find(item => item.brief === brief)?.id} disabled={locked} onSelect={id => { setBrief(projectStarters.find(item => item.id === id)!.brief); setError(''); briefRef.current?.focus(); }} />
       </form>
-      <aside className="planning-guide" aria-labelledby="save-guide"><span className="meta">WHAT HAPPENS NEXT</span><h2 id="save-guide">A project you<br />can return to.</h2><ol><li><span className="meta">01</span><div><h3>Set the intention</h3><p>A title and an original brief. Plain language is enough.</p></div></li><li><span className="meta">02</span><div><h3>Confirm the save</h3><p>The server saves your project and its initial context together. A safe retry recovers the same result.</p></div></li><li><span className="meta">03</span><div><h3>Keep it in your workspace</h3><p>Reload, find it, rename it and manage its archive state.</p></div></li></ol><div className="guide-boundary"><span className="meta">THIS STEP / PERSISTENCE</span><p>Open your saved workspace to inspect Brain, simulated Build Trace, run controls and version history.</p></div></aside>
+      <aside className="planning-guide" aria-labelledby="save-guide"><span className="meta">WHAT HAPPENS NEXT</span><h2 id="save-guide">A project you<br />can return to.</h2><ol><li><span className="meta">01</span><div><h3>Set the intention</h3><p>A title and an original brief. Plain language is enough.</p></div></li><li><span className="meta">02</span><div><h3>Confirm the save</h3><p>The server saves your project and its initial context together. A safe retry recovers the same result.</p></div></li><li><span className="meta">03</span><div><h3>Keep it in your workspace</h3><p>Reload, find it, rename it and manage its archive state.</p></div></li></ol><div className="guide-boundary"><span className="meta">DESCRIBE → PLAN → BUILD → PREVIEW</span><p>Open your saved workspace to review the plan, follow progress and inspect version history.</p></div></aside>
     </div>}
   </>;
 }

@@ -13,7 +13,8 @@
     "test:workspace:e2e": "node --test tests/workspace.e2e.test.mjs",
     "test:simulation:e2e": "node --test tests/simulation.e2e.test.mjs",
     "test:phase1:e2e": "node --test tests/phase1.e2e.test.mjs",
-    "test:phase2a:e2e": "node --test tests/phase2a.e2e.test.mjs"
+    "test:phase2a:e2e": "node --test tests/phase2a.e2e.test.mjs",
+    "test:ux0:e2e": "node --test tests/ux0.e2e.test.mjs"
   },
   "dependencies": {
     "@f01/api-client": "workspace:*",

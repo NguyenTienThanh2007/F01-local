@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { handleProjectsRequest } from '../src/lib/projects/server.ts';
 import { createInput, projectETag } from '../src/lib/projects/contracts.ts';
-import { readAttempt, ATTEMPT_STORAGE, outcomeIsUnknown } from '../src/lib/projects/creation.ts';
+import { readAttempt, ATTEMPT_STORAGE, outcomeIsUnknown, creationTarget } from '../src/lib/projects/creation.ts';
 const token = 'synthetic-m3-private-token-1234567890123456789';
 const env = { APP_ENV: 'test', DEV_API_TOKEN: token, API_INTERNAL_URL: 'http://127.0.0.1:8000', NEXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000' };
 const id = 'ab56889d-a04c-41bb-831e-429948d34cb8', key = '30fe5cca-25e1-4f68-b80a-6b281d7b5c22';
@@ -13,6 +13,10 @@ test('generated client gateway forwards trimmed creation, stable key and private
     return Response.json({ project: { id }, execution_mode: 'simulated' }, { status: 201, headers: { 'Set-Cookie': 'private=secret' } });
   });
   assert.equal(response.status, 201); assert.equal(response.headers.get('Set-Cookie'), null); assert.equal(response.headers.get('Cache-Control'), 'no-store');
+});
+test('creation accepts the real saved-project contract and rejects unsafe navigation',()=>{
+ const result={project:{id},project_url:`/projects/${id}`,request_id:key,brain_revision_id:key,execution_mode:'real',run_id:null};
+ assert.equal(creationTarget(result),`/projects/${id}`);assert.equal(creationTarget({...result,execution_mode:'simulated',run_id:key}),`/projects/${id}`);assert.equal(creationTarget({...result,execution_mode:'invented'}),null);assert.equal(creationTarget({...result,project_url:'https://foreign.example'}),null);assert.equal(creationTarget({...result,run_id:'bad'}),null);assert.equal(outcomeIsUnknown(409,'IDEMPOTENCY_IN_PROGRESS'),true);assert.equal(outcomeIsUnknown(408,'timeout'),true);
 });
 test('list forwards validated search, lifecycle, archive and pagination', async () => {
   const response = await handleProjectsRequest(request('GET', undefined, {}, '?q=estate&status=understanding&archived=true&cursor=abc'), 'projects', undefined, env, async req => { const url = new URL(req.url); assert.equal(url.searchParams.get('q'), 'estate'); assert.equal(url.searchParams.get('status'), 'understanding'); assert.equal(url.searchParams.get('archived'), 'true'); assert.equal(url.searchParams.get('cursor'), 'abc'); assert.equal(url.searchParams.get('limit'), '20'); return Response.json({ items: [], next_cursor: null }); });

@@ -13,9 +13,15 @@ export function createInput(title: string, brief: string): CreateInput | null {
   return { title: name || null, brief: text };
 }
 export const errors: Record<string, string> = {
-  ACTIVE_RUN_EXISTS: 'This project has a queued or running demonstration. Wait for it to finish or cancel it in Run details.',
-  RUN_NOT_RETRYABLE: 'Only a failed simulation attempt can be retried. Inspect the current run state.',
-  STALE_BRAIN_REVISION: 'The Brain changed since this draft began. Your text is preserved. Review the current project before recording it.',
+  ACTIVE_RUN_EXISTS: 'This project has a queued or running build. Wait for it to finish or cancel it in Run details.',
+  RUN_NOT_RETRYABLE: 'Only a failed build can be retried. Inspect the current run state.',
+  STALE_BRAIN_REVISION: 'The project changed since this draft began. Your text is preserved. Review the current project before recording it.',
+  EXECUTION_UNAVAILABLE: 'The build runtime is unavailable. Your plan is saved; try again when the runtime is ready.',
+  PLAN_REVIEW_REQUIRED: 'Review the current plan before starting a build.',
+  CLEANUP_PENDING: 'The previous build is still being cleaned up. Your last successful version is preserved. Try again after cleanup.',
+  SOURCE_BASE_UNAVAILABLE: 'The current source is unavailable for this update. Inspect its saved version before retrying.',
+  BUILD_TIMEOUT: 'This build reached its time limit. Your last successful version is preserved.',
+  BUILD_CANCELED: 'This build was canceled. Your last successful version is preserved.',
   STALE_BASE_VERSION: 'The current version changed since this draft began. Your text is preserved. Review the current project before recording it.',
   PROJECT_ARCHIVED: 'Unarchive this project before recording a change.',
   UNSUPPORTED_BRAIN_SCHEMA: 'This Brain schema is not supported. The saved content has not been changed.',

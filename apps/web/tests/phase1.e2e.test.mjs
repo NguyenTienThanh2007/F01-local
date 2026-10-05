@@ -80,7 +80,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
       await page.getByRole('checkbox', { name: 'Run an optional demonstration after saving' }).check();
       await page.getByRole('button', { name: 'Record and simulate', exact: true }).click();
       await until(async () => (await saved(id)).latest_run.status === 'failed');
-      await page.getByText(/Latest simulated update needs attention/).waitFor();
+      await page.getByText(/Latest update needs attention/).waitFor();
       assert.equal((await saved(id)).current_version.id, firstVersion); assert.equal((await saved(id)).current_brain.id, initial.current_brain.id);
       await page.getByRole('button', { name: 'Run details', exact: true }).click(); await page.getByRole('button', { name: 'Retry simulation', exact: true }).click();
       await page.getByRole('heading', { name: 'Demo version 2', exact: true }).waitFor(); finalVersion = (await saved(id)).current_version.id;
@@ -127,7 +127,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
           if (suffix === '/brief') { await page.locator('.preserved-text').first().waitFor(); assert.equal(await page.locator('.preserved-text').first().innerText(), brief); assert.equal(await page.evaluate(() => window.notExecutable), undefined); }
           await scan(page, `${width}px ${suffix || 'preview'} long content`);
         }
-        await page.goto(`${base}/projects/${longId}?panel=trace`); await page.getByRole('heading', { name: 'Saved demonstration timeline', exact: true }).waitFor();
+        await page.goto(`${base}/projects/${longId}?panel=trace`); await page.getByRole('heading', { name: 'Saved execution timeline', exact: true }).waitFor();
         await page.getByText('Event connection: live', { exact: true }).waitFor();
         const trace = page.getByLabel('Ordered Build Trace', { exact: true }); await until(async () => trace.evaluate(element => element.scrollHeight-element.clientHeight-element.scrollTop < 24));
         const last = await trace.locator('li[data-sequence]').last().boundingBox(); assert.ok(last && last.y+last.height <= 1000, `${width}px latest Trace event inside viewport`);
@@ -179,7 +179,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
       await sample.contentFrame().locator('h1').waitFor(); await zoom.evaluate(() => window.scrollTo(0,0));
       await zoom.getByRole('button', { name: 'Inspect work', exact: true }).click();
       await zoom.getByRole('button', { name: 'Build Trace', exact: true }).click();
-      await zoom.getByRole('heading', { name: 'Saved demonstration timeline', exact: true }).waitFor();
+      await zoom.getByRole('heading', { name: 'Saved execution timeline', exact: true }).waitFor();
       await zoom.getByText('Event connection: live', { exact: true }).waitFor();
       const zoomTrace=zoom.getByLabel('Ordered Build Trace', { exact: true }); await until(async () => zoomTrace.evaluate(element => element.scrollHeight-element.clientHeight-element.scrollTop < 24));
       const zoomLast=await zoomTrace.locator('li[data-sequence]').last().boundingBox(); assert.ok(zoomLast && zoomLast.y+zoomLast.height <= 500, '200% reflow latest Trace event inside viewport');
