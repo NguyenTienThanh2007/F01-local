@@ -1,5 +1,7 @@
 # F01 — local project handoff
 
+Commercial-v1 continuation starts from GitHub main `449b058` on `codex/f01-commercial-v1`. Core real-mode creation/build command fixes and their guarded browser acceptance are described in [UX0_IMPLEMENTATION.md](UX0_IMPLEMENTATION.md). Milestone 1 still requires fresh Docker acceptance in a Docker-capable runtime; deployment and commercial-v1 acceptance are unfinished. The historical completion evidence below remains preserved.
+
 Phase 1 M0–M6, Phase 2A and **Phase 2B are complete**. The verified `f9c2a69` completion includes passing exact-image Docker containment and signed-in build/repair/change/failure acceptance, 289 backend tests passed/2 skipped, and frontend typecheck/build passing. The accepted image and evidence provenance are in [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md). Real execution remains disabled by default until runtime configuration supplies the installed accepted image and matching report; acceptance is complete. PHASE2B_FOUNDATION.md is historical. [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md) proposes production release only; no Phase 2C code or provider is selected.
 The ZIP includes the source, dependency lockfiles, environment templates and the
 four planning documents. Secrets, installed dependencies and generated builds are
