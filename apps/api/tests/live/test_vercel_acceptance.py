@@ -2,6 +2,7 @@
 import asyncio
 import json
 import os
+import subprocess
 from pathlib import Path
 from uuid import UUID, uuid4
 import httpx
@@ -124,6 +125,9 @@ def test_live_staged_package_public_release_redeploy_and_restore(database: Datab
             live_two = releases.workspace(database, settings, owner, pid)
             assert live_two.current_release_id == second_release and live_two.target_generation == 2 and len(live_two.releases) == 2
             report['redeploy'], report['release_v2'], report['artifact_v2'] = 'passed', str(second_release), live_two.artifacts[0].digest
+            assert live_two.configuration is not None
+            subprocess.run(['node',str(root/'apps/web/tests/public-release-probe.mjs'),live_two.configuration.public_url,json.dumps(live_two.artifacts[0].manifest['marker']),'priority'],check=True,capture_output=True,timeout=60)
+            report['public_browser'] = 'passed'
             # Explicitly prove retained old package restoration through the same provider primitive, then restore v2.
             async def restore() -> None:
                 with database.session() as session:

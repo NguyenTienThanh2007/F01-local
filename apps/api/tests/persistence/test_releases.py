@@ -390,3 +390,29 @@ def test_historical_release_and_artifact_reads_are_owner_scoped(database: Databa
         client.headers['Authorization'] = 'Bearer '+release_settings.dev_api_token.get_secret_value()
         assert client.get(f'/v1/projects/{pid}/releases/{release.id}').status_code == 404
         assert client.get(f'/v1/projects/{pid}/release-artifacts/{command.artifact_id}').status_code == 404
+
+
+def test_terminal_packaging_cleanup_retries_without_rewriting_failure_evidence(database: Database, release_settings: Settings, project_plan: ProjectPlan) -> None:
+    from f01.release.packaging import PackagingWorker
+    owner, pid, command = setup(database, release_settings, project_plan)
+    identifier = uuid4()
+    name = 'f01-'+identifier.hex+'-1-0'
+    with database.session() as session, session.begin():
+        session.add(db.ArtifactPreparation(id=identifier, project_id=pid, version_id=command.expected_version_id, brain_revision_id=command.expected_brain_revision_id,
+            configuration_id=command.configuration_id, intent_hash=identifier.hex*2, state='failed', epoch=1, container_name=name, error_code='CONTROLLED_PACKAGING_FAILURE',
+            evidence=[], created_at=now(), deadline_at=now()+timedelta(seconds=600)))
+    sandbox = ControlledSandbox()
+    sandbox.names.add(name)
+    sandbox.reject_cleanup = True
+    worker = PackagingWorker(database, release_settings, sandbox)
+    assert asyncio.run(worker.run_once()) is False
+    retry = PrepareRelease(version_id=command.expected_version_id, configuration_id=command.configuration_id, expected_brain_revision_id=command.expected_brain_revision_id)
+    with pytest.raises(ApplicationError, match='RELEASE_NOT_RETRYABLE'):
+        service.prepare(database, release_settings, owner, pid, retry, 'cleanup-blocked', identifier)
+    sandbox.reject_cleanup = False
+    assert asyncio.run(worker.run_once()) is False
+    with database.session() as session:
+        saved = session.get(db.ArtifactPreparation, identifier)
+        assert saved and saved.container_name is None and saved.state == 'failed' and saved.evidence == [] and saved.error_code == 'CONTROLLED_PACKAGING_FAILURE'
+    assert name in sandbox.removed
+    assert service.prepare(database, release_settings, owner, pid, retry, 'cleanup-reviewed-retry', identifier).id != identifier

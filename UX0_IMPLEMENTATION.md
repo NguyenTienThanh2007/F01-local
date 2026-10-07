@@ -1,5 +1,6 @@
 # Commercial v1 continuation — core stabilization checkpoint
 
+Historical checkpoint/proposal. The commercial-v1 implementation, selected Vercel/static profile and final runtime evidence are documented in [COMMERCIAL_V1.md](COMMERCIAL_V1.md). The earlier status and blockers below are preserved as historical records, not the current continuation status.
 Date: 2026-10-05. Starting GitHub main: `449b0588e072cda102144c0c629d776049b4f2d2`.
 Branch: `codex/f01-commercial-v1`. Main was fetched and independently verified through GitHub before editing. No old patch or chat implementation was applied.
 
