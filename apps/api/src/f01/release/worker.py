@@ -3,7 +3,8 @@ import asyncio
 import os
 from datetime import timedelta
 from uuid import UUID, uuid4
-from sqlalchemy import select
+from sqlalchemy import select, text, func
+from sqlalchemy.orm import Session
 from f01.application import releases as service
 from f01.application.execution import now
 from f01.application.projects import append_event
@@ -14,12 +15,26 @@ from f01.domain.errors import ApplicationError
 from f01.release.provider import ReleaseProvider, ReleaseProviderError
 
 
+def locked_operation(session: 'Session', identifier: UUID) -> tuple[db.Project, db.ReleaseOperation]:
+    initial = session.get(db.ReleaseOperation, identifier)
+    if not initial:
+        raise ApplicationError('NOT_FOUND')
+    project = session.get(db.Project, initial.project_id, with_for_update=True)
+    op = session.get(db.ReleaseOperation, identifier, with_for_update=True, populate_existing=True)
+    assert project and op
+    return project, op
+
+
 class ReleaseWorker:
     def __init__(self, database: Database, settings: Settings, provider: ReleaseProvider) -> None:
         self.database, self.settings, self.provider = database, settings, provider
 
     def claim(self) -> tuple[UUID, UUID] | None:
         with self.database.session() as session, session.begin():
+            session.execute(text('SELECT pg_advisory_xact_lock(710062)'))
+            count = session.scalar(select(func.count()).select_from(db.ReleaseOperation).where(db.ReleaseOperation.state.not_in(service.TERMINAL),db.ReleaseOperation.lease_until > now())) or 0
+            if count >= self.settings.release_concurrency:
+                return None
             row = session.scalar(select(db.ReleaseOperation).where(db.ReleaseOperation.state.not_in(service.TERMINAL), db.ReleaseOperation.attempts < 120,
                 db.ReleaseOperation.next_attempt_at <= now(), (db.ReleaseOperation.lease_until.is_(None)) | (db.ReleaseOperation.lease_until <= now()))
                 .order_by(db.ReleaseOperation.created_at).with_for_update(skip_locked=True).limit(1))
@@ -33,7 +48,7 @@ class ReleaseWorker:
     def save(self, identifier: UUID, token: UUID, *, action: str | None = None, state: str | None = None, error: str | None = None,
              deployment: str | None = None, url: str | None = None, observation: dict[str, object] | None = None, finish: bool = False) -> None:
         with self.database.session() as session, session.begin():
-            op = session.get(db.ReleaseOperation, identifier, with_for_update=True)
+            project, op = locked_operation(session, identifier)
             if not op or op.lease_token != token or op.lease_until is None or op.lease_until <= now() or op.state in service.TERMINAL:
                 raise ApplicationError('RELEASE_LEASE_LOST')
             if action is not None:
@@ -50,7 +65,6 @@ class ReleaseWorker:
                 op.last_observed_at = now()
                 session.add(db.ReleaseObservation(id=uuid4(), project_id=op.project_id, operation_id=op.id, content=observation, created_at=now()))
             if finish:
-                project = session.get(db.Project, op.project_id, with_for_update=True)
                 intent = session.get(db.ReleaseIntent, op.release_id)
                 assert project and intent
                 append_event(session, project, type='release.'+op.state, message='Production release '+op.state+'.', actor=intent.user_id)
@@ -79,11 +93,10 @@ class ReleaseWorker:
 
     def validate_bases(self, identifier: UUID, token: UUID) -> None:
         with self.database.session() as session, session.begin():
-            op = session.get(db.ReleaseOperation, identifier, with_for_update=True)
+            project, op = locked_operation(session, identifier)
             assert op
             intent = session.get(db.ReleaseIntent, op.release_id)
             assert intent
-            project = session.get(db.Project, intent.project_id, with_for_update=True)
             assert project
             target, _ = service.configured(session, project.id, intent.configuration_id)
             if (op.lease_token != token or op.lease_until is None or op.lease_until <= now()):
@@ -105,11 +118,10 @@ class ReleaseWorker:
     def commit(self, identifier: UUID, token: UUID, url: str) -> None:
         self.validate_bases(identifier, token)
         with self.database.session() as session, session.begin():
-            op = session.get(db.ReleaseOperation, identifier, with_for_update=True)
+            project, op = locked_operation(session, identifier)
             assert op
             intent = session.get(db.ReleaseIntent, op.release_id)
             assert intent
-            project = session.get(db.Project, intent.project_id, with_for_update=True)
             assert project
             target, _ = service.configured(session, project.id, intent.configuration_id)
             if op.lease_token != token or op.lease_until is None or op.lease_until <= now() or target.generation != intent.target_generation or target.current_release_id != intent.previous_release_id:
@@ -274,7 +286,7 @@ class ReleaseWorker:
             self.save(identifier, token, state='reconciling', error='RELEASE_RECOVERY_REQUIRED')
         finally:
             with self.database.session() as session, session.begin():
-                op = session.get(db.ReleaseOperation, identifier, with_for_update=True)
+                project, op = locked_operation(session, identifier)
                 if op and op.lease_token == token and op.state not in service.TERMINAL:
                     op.lease_token = op.lease_until = None
                     op.next_attempt_at = now()+timedelta(seconds=min(30, 1+op.attempts//4))

@@ -258,6 +258,7 @@ def test_database_ready_checks_migration_compatibility(
 ) -> None:
     assert client.get("/v1/health/ready").status_code == 200
     with database.engine.begin() as connection:
+        original_revision = connection.scalar(text("SELECT version_num FROM alembic_version"))
         connection.execute(
             text("UPDATE alembic_version SET version_num='incompatible'")
         )
@@ -269,8 +270,9 @@ def test_database_ready_checks_migration_compatibility(
     finally:
         with database.engine.begin() as connection:
             connection.execute(
-                text("UPDATE alembic_version SET version_num='0002_phase2a'")
+                text("UPDATE alembic_version SET version_num=:revision"), {"revision": original_revision}
             )
+    assert client.get("/v1/health/ready").status_code == 200
 
 
 def test_etags_rename_archive_unarchive_and_atomic_patch(

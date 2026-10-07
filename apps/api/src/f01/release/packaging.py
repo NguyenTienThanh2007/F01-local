@@ -5,7 +5,7 @@ import json
 import secrets
 from datetime import timedelta
 from uuid import UUID, uuid4
-from sqlalchemy import select
+from sqlalchemy import select, text, func
 from f01.application import releases as service
 from f01.application.execution import now
 from f01.application.projects import append_event
@@ -24,6 +24,10 @@ class PackagingWorker:
 
     def claim(self) -> tuple[UUID, UUID, str] | None:
         with self.database.session() as session, session.begin():
+            session.execute(text('SELECT pg_advisory_xact_lock(710063)'))
+            count = session.scalar(select(func.count()).select_from(db.ArtifactPreparation).where(db.ArtifactPreparation.state == 'packaging',db.ArtifactPreparation.lease_until > now())) or 0
+            if count >= self.settings.release_concurrency:
+                return None
             row = session.scalar(select(db.ArtifactPreparation).where(db.ArtifactPreparation.state.in_(('queued', 'packaging')),
                 (db.ArtifactPreparation.lease_until.is_(None)) | (db.ArtifactPreparation.lease_until <= now())).order_by(db.ArtifactPreparation.created_at).with_for_update(skip_locked=True).limit(1))
             if row is None:

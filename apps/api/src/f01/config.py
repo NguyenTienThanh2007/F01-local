@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     release_enabled: bool = False
     production_image_id: str = ""
     production_acceptance_report: str = ""
+    release_concurrency: int = Field(default=1, ge=1, le=4)
     release_timeout_seconds: int = Field(default=600, ge=60, le=1200)
     sandbox_image_id: str = ""
     sandbox_acceptance_report: str = ""

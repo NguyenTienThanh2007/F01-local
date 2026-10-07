@@ -335,3 +335,40 @@ def test_definitive_provider_auth_rejection_can_be_explicitly_retried(database: 
     provider.stage = original  # type: ignore[method-assign]
     tick(database, release_settings, provider, 10)
     assert service.workspace(database, release_settings, owner, pid).current_release_id == retried.id
+
+
+def test_release_and_packaging_lease_capacity_is_global(database: Database, release_settings: Settings, project_plan: ProjectPlan) -> None:
+    owner, pid, command = setup(database, release_settings, project_plan)
+    other_owner, other_pid, other_command = setup(database, release_settings, project_plan)
+    service.promote(database, release_settings, owner, pid, command, 'capacity-one', None)
+    service.promote(database, release_settings, other_owner, other_pid, other_command, 'capacity-two', None)
+    worker = ReleaseWorker(database, release_settings, ControlledProvider())
+    assert worker.claim() is not None
+    assert worker.claim() is None
+
+
+def test_release_publication_locks_project_before_operation(database: Database, release_settings: Settings, project_plan: ProjectPlan) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+    import time
+    owner, pid, command = setup(database, release_settings, project_plan)
+    service.promote(database, release_settings, owner, pid, command, 'lock-order', None)
+    worker = ReleaseWorker(database, release_settings, ControlledProvider())
+    claim = worker.claim()
+    assert claim
+    identifier, token = claim
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        with database.session() as session, session.begin():
+            session.get(db.Project, pid, with_for_update=True)
+            future = pool.submit(worker.save, identifier, token, state='failed', error='CONTROLLED_TEST', finish=True)
+            for _ in range(200):
+                session.execute(text('SELECT pg_stat_clear_snapshot()'))
+                blocked = session.scalar(text("SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() AND pid<>pg_backend_pid() AND wait_event_type='Lock' AND query LIKE '%projects%FOR UPDATE%'"))
+                if blocked:
+                    break
+                time.sleep(.01)
+            else:
+                raise AssertionError('The worker did not reach the project-lock barrier.')
+            # Cancellation/settings already own the project lock. The operation must still be available.
+            operation = session.scalar(select(db.ReleaseOperation).where(db.ReleaseOperation.id == identifier).with_for_update(nowait=True))
+            assert operation and operation.state == 'queued'
+        future.result(timeout=5)
