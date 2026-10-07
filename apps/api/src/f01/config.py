@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     auth_mode: Literal["development", "oidc"] = "development"
     execution_mode: Literal["simulated", "real"] = "simulated"
     real_execution_enabled: bool = False
+    release_enabled: bool = False
+    production_image_id: str = ""
+    production_acceptance_report: str = ""
+    release_timeout_seconds: int = Field(default=600, ge=60, le=1200)
     sandbox_image_id: str = ""
     sandbox_acceptance_report: str = ""
     sandbox_socket: str = "/var/run/docker.sock"
@@ -66,6 +70,18 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def private_identity_only(self) -> Self:
+        if self.release_enabled:
+            import json
+            import re
+            if not re.fullmatch(r"sha256:[a-f0-9]{64}", self.production_image_id):
+                raise ValueError("An exact production packaging image is required.")
+            try:
+                acceptance = json.loads(Path(self.production_acceptance_report).read_text())
+                passed = acceptance.get('image_id') == self.production_image_id and all(acceptance.get(k) == 'passed' for k in ('docker_containment', 'docker_journey', 'production_packaging'))
+            except (OSError, ValueError):
+                passed = False
+            if not passed:
+                raise ValueError("Passing containment, journey and production packaging acceptance for the exact image is required.")
         if self.real_execution_enabled:
             import re
             if not re.fullmatch(r"sha256:[a-f0-9]{64}", self.sandbox_image_id):

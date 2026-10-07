@@ -488,3 +488,128 @@ class IsolatedPreview(Base):
     state: Mapped[str] = mapped_column(String(20))
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ReleaseConfiguration(Base):
+    __tablename__ = 'release_configurations'
+    __table_args__ = (UniqueConstraint('project_id', 'id'), UniqueConstraint('project_id', 'digest'),
+        CheckConstraint("profile = 'next-static-v1' AND provider = 'vercel' AND length(digest) = 64", name='profile'),)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.id'))
+    profile: Mapped[str] = mapped_column(String(40))
+    provider: Mapped[str] = mapped_column(String(20))
+    provider_project_id: Mapped[str] = mapped_column(String(100), unique=True)
+    provider_team_id: Mapped[str | None] = mapped_column(String(100))
+    public_url: Mapped[str] = mapped_column(String(250), unique=True)
+    digest: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ArtifactPreparation(Base):
+    __tablename__ = 'artifact_preparations'
+    __table_args__ = (UniqueConstraint('project_id', 'id'), UniqueConstraint('project_id', 'intent_hash'),
+        scoped_fk('version_id', 'project_versions'), scoped_fk('brain_revision_id', 'brain_revisions'), scoped_fk('configuration_id', 'release_configurations'),
+        scoped_fk('artifact_id', 'release_artifacts'),
+        CheckConstraint("state IN ('queued','packaging','succeeded','failed','canceled') AND epoch >= 0", name='state'),)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.id'))
+    version_id: Mapped[UUID]
+    brain_revision_id: Mapped[UUID]
+    configuration_id: Mapped[UUID]
+    intent_hash: Mapped[str] = mapped_column(String(64))
+    state: Mapped[str] = mapped_column(String(20))
+    artifact_id: Mapped[UUID | None]
+    error_code: Mapped[str | None] = mapped_column(String(100))
+    epoch: Mapped[int] = mapped_column(Integer)
+    lease_token: Mapped[UUID | None]
+    lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    container_name: Mapped[str | None] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ReleaseArtifact(Base):
+    __tablename__ = 'release_artifacts'
+    __table_args__ = (UniqueConstraint('project_id', 'id'), UniqueConstraint('preparation_id'),
+        scoped_fk('preparation_id', 'artifact_preparations'), scoped_fk('version_id', 'project_versions'), scoped_fk('brain_revision_id', 'brain_revisions'),
+        scoped_fk('configuration_id', 'release_configurations'), scoped_fk('candidate_id', 'source_candidates'),
+        CheckConstraint("length(digest) = 64 AND octet_length(package::text) <= 24000000 AND octet_length(manifest::text) <= 131072", name='bounds'),)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.id'))
+    preparation_id: Mapped[UUID]
+    version_id: Mapped[UUID]
+    brain_revision_id: Mapped[UUID]
+    configuration_id: Mapped[UUID]
+    candidate_id: Mapped[UUID]
+    digest: Mapped[str] = mapped_column(String(64))
+    package: Mapped[dict[str, object]] = mapped_column(JSONB)
+    manifest: Mapped[dict[str, object]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ReleaseIntent(Base):
+    __tablename__ = 'release_intents'
+    __table_args__ = (UniqueConstraint('project_id', 'id'), UniqueConstraint('project_id', 'intent_hash'),
+        scoped_fk('artifact_id', 'release_artifacts'), scoped_fk('configuration_id', 'release_configurations'),
+        scoped_fk('version_id', 'project_versions'), scoped_fk('brain_revision_id', 'brain_revisions'), scoped_fk('previous_release_id', 'release_intents'),
+        ForeignKeyConstraint(['project_id', 'user_id'], ['projects.id', 'projects.owner_user_id'], name='fk_release_owner'),)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.id'))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
+    auth_session_id: Mapped[UUID | None] = mapped_column(ForeignKey('auth_sessions.id'))
+    artifact_id: Mapped[UUID]
+    configuration_id: Mapped[UUID]
+    version_id: Mapped[UUID]
+    brain_revision_id: Mapped[UUID]
+    previous_release_id: Mapped[UUID | None]
+    target_generation: Mapped[int] = mapped_column(Integer)
+    intent_hash: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ReleaseOperation(Base):
+    __tablename__ = 'release_operations'
+    __table_args__ = (UniqueConstraint('project_id', 'id'), UniqueConstraint('release_id'), scoped_fk('release_id', 'release_intents'),
+        CheckConstraint("state IN ('queued','staging','checking','promoting','verifying','reconciling','restoring','succeeded','failed','canceled') AND epoch >= 0 AND attempts >= 0", name='state'),
+        Index('uq_release_one_active', 'project_id', unique=True, postgresql_where=text("state NOT IN ('succeeded','failed','canceled')")),)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.id'))
+    release_id: Mapped[UUID]
+    state: Mapped[str] = mapped_column(String(20))
+    action: Mapped[str] = mapped_column(String(30))
+    deployment_id: Mapped[str | None] = mapped_column(String(100))
+    deployment_url: Mapped[str | None] = mapped_column(String(250))
+    public_url: Mapped[str | None] = mapped_column(String(250))
+    error_code: Mapped[str | None] = mapped_column(String(100))
+    cancel_requested: Mapped[bool]
+    epoch: Mapped[int] = mapped_column(Integer)
+    attempts: Mapped[int] = mapped_column(Integer)
+    lease_token: Mapped[UUID | None]
+    lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    next_attempt_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    last_observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ReleaseObservation(Base):
+    __tablename__ = 'release_observations'
+    __table_args__ = (UniqueConstraint('project_id', 'id'), scoped_fk('operation_id', 'release_operations'),
+        CheckConstraint('octet_length(content::text) <= 8192', name='bounds'),)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.id'))
+    operation_id: Mapped[UUID]
+    content: Mapped[dict[str, object]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ProductionTarget(Base):
+    __tablename__ = 'production_targets'
+    __table_args__ = (UniqueConstraint('project_id', 'id'), UniqueConstraint('project_id'),
+        scoped_fk('configuration_id', 'release_configurations'), scoped_fk('current_release_id', 'release_intents'),
+        CheckConstraint('generation >= 0', name='generation'),)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.id'))
+    configuration_id: Mapped[UUID]
+    current_release_id: Mapped[UUID | None]
+    generation: Mapped[int] = mapped_column(Integer)

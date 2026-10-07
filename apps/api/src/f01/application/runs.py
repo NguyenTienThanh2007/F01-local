@@ -59,6 +59,8 @@ def reserve(session: Session, owner: UUID, route: str, key: str, body: dict[str,
 
 
 def available(session: Session, project: Project, brain_id: UUID, version_id: UUID | None) -> None:
+    from f01.application.releases import guard
+    guard(session, project.id)
     if project.archived_at is not None:
         raise ApplicationError("PROJECT_ARCHIVED")
     if project.current_brain_revision_id != brain_id:

@@ -284,6 +284,8 @@ def update_project(
 ) -> ProjectSummary:
     with database.session() as session, session.begin():
         project = owned_project(session, owner, project_id, lock=True)
+        from f01.application.releases import guard
+        guard(session, project.id)
         if if_match is None:
             raise ApplicationError("PRECONDITION_REQUIRED")
         if if_match != etag(ProjectSummary.model_validate(project)):
@@ -626,6 +628,8 @@ def record_change(
                 raise ApplicationError("IDEMPOTENCY_IN_PROGRESS")
             return RequestRecord.model_validate(receipt.response_body)
         project = owned_project(session, owner, project_id, lock=True)
+        from f01.application.releases import guard
+        guard(session, project.id)
         if project.archived_at is not None:
             raise ApplicationError("PROJECT_ARCHIVED")
         if body.base_brain_revision_id != project.current_brain_revision_id:

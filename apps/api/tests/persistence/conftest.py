@@ -36,11 +36,11 @@ def database_url() -> str:
         command.downgrade(config, "base")
         assert inspect(connection).get_table_names() == ["alembic_version"]
         command.upgrade(config, "head")
-        assert len(inspect(connection).get_table_names()) == 20
+        assert len(inspect(connection).get_table_names()) == 27
         command.downgrade(config, "base")
         assert inspect(connection).get_table_names() == ["alembic_version"]
         command.upgrade(config, "head")
-        assert len(inspect(connection).get_table_names()) == 20
+        assert len(inspect(connection).get_table_names()) == 27
         command.check(config)
     engine.dispose()
     return url

@@ -96,6 +96,14 @@ async def _provider_error_handler(_request: Request, exc: Exception) -> JSONResp
 
 APPLICATION_ERRORS: dict[str, tuple[int, str]] = {
     **APPLICATION_EXECUTION_ERRORS,
+    "RELEASE_UNAVAILABLE": (503, "Production release support is unavailable until the exact packaging runtime is accepted."),
+    "RELEASE_NOT_CONFIGURED": (503, "This project needs a separate production hosting target."),
+    "RELEASE_IN_PROGRESS": (409, "A production release is in progress. Resolve it before changing this project."),
+    "RELEASE_STALE_CONTEXT": (409, "Source, Brain, configuration or production changed. Review the current release context."),
+    "RELEASE_VERIFICATION_REQUIRED": (409, "Only verified real source and production packages can be released."),
+    "RELEASE_PACKAGE_INVALID": (409, "The saved production package failed integrity validation."),
+    "RELEASE_URL_INVALID": (422, "The production URL is outside the allowed isolated hosting boundary."),
+    "RELEASE_CONFIGURATION_LOCKED": (409, "The production target is already bound. Operator recovery is required to change it."),
     "AUTHENTICATION_REQUIRED": (401, "A valid authenticated session is required."),
     "IDENTITY_LINK_CONFLICT": (409, "Identity linking requires operator review; existing ownership was not changed."),
     "AUTH_RATE_LIMITED": (429, "Sign-in attempts are temporarily limited. Try again later."),

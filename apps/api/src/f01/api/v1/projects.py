@@ -173,7 +173,7 @@ def ready(database: DatabaseDependency) -> dict[str, str]:
         versions = connection.scalars(
             text("SELECT version_num FROM alembic_version")
         ).all()
-        if versions != ["0003_phase2b"]:
+        if versions != ["0004_phase2c"]:
             raise ApplicationError("DATABASE_NOT_READY")
     return {"status": "ready"}
 
