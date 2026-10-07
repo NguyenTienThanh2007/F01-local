@@ -1,0 +1,62 @@
+name: Commercial regression
+on:
+  pull_request:
+  push:
+    branches: [codex/f01-commercial-v1, main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: commercial-regression-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: f01_test
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: f01_test_ci
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U f01_test -d f01_test_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://f01_test:test-only-password@127.0.0.1:5432/f01_test_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.8.22'
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile
+      - run: uv sync --locked --python 3.12
+        working-directory: apps/api
+      - name: Backend regression and strict types
+        run: |
+          uv run --locked pytest -q
+          uv run --locked mypy src/f01 tests migrations scripts
+        working-directory: apps/api
+      - name: Client drift, frontend, types and production build
+        run: |
+          pnpm api:check
+          pnpm test:client
+          pnpm test:web
+          pnpm typecheck
+          pnpm build
+      - run: pnpm --filter @f01/web exec playwright install --with-deps chromium
+      - name: Planning and signed-in command browser regression
+        run: |
+          pnpm test:e2e
+          F01_TEST_PG_BIN="$(pg_config --bindir)" apps/api/.venv/bin/python scripts/test-m5.py --ux0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence
+          path: apps/web/test-results

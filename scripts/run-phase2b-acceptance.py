@@ -16,7 +16,7 @@ if not re.fullmatch(r'sha256:[a-f0-9]{64}',args.image_id):parser.error('Exact lo
 from urllib.parse import urlsplit
 if not urlsplit(args.database_url).path.startswith('/f01_test_') or not args.database_url.startswith('postgresql+psycopg://'):parser.error('Disposable PostgreSQL f01_test_* database required.')
 root=Path(__file__).resolve().parents[1]
-report={'image_id':args.image_id,'docker_containment':'not_run','docker_journey':'not_run','model_transport':'controlled OpenAI adapter responses','live_provider':'not_run','browser_journey':'not_run','phase2c_started':False}
+report={'image_id':args.image_id,'docker_containment':'not_run','docker_journey':'not_run','model_transport':'controlled OpenAI adapter responses','live_provider':'not_run','browser_journey':'not_run','phase2c_started':args.production}
 if args.production: report['production_packaging']='not_run'
 output=root/('.runtime/production-acceptance-report.json' if args.production else '.runtime/phase2b-acceptance-report.json');output.parent.mkdir(exist_ok=True)
 if not Path(args.socket).is_socket():

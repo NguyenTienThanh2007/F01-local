@@ -196,3 +196,54 @@ def test_revoked_identity_before_promotion_never_cuts_over(database: Database, r
     tick(database, settings, provider, 2)
     assert service.workspace(database, settings, owner, pid).releases[0].state == 'failed'
     assert provider.stage_calls == provider.promote_calls == 0
+
+
+def test_modified_version_requires_new_package_and_failed_redeploy_retains_live(database: Database, release_settings: Settings, project_plan: ProjectPlan) -> None:
+    from f01.application.projects import record_change
+    from f01.domain.projects import RecordChange
+    from tests.persistence.test_phase2b import review_plan
+    owner, pid, first = setup(database, release_settings, project_plan)
+    provider = ControlledProvider()
+    release = service.promote(database, release_settings, owner, pid, first, 'first-live', None)
+    tick(database, release_settings, provider, 8)
+    before = workspace(database, owner, pid)
+    change = record_change(database, owner, pid, RecordChange(text='Add a priority filter to the existing leads overview.', base_brain_revision_id=before.project.current_brain_revision_id, base_version_id=before.project.current_version_id), 'modify')
+    command = review_plan(database, release_settings, project_plan, owner, pid, change.id, 'change')
+    execution.queue(database, release_settings, owner, pid, command, 'rebuild')
+    asyncio.run(BuildWorker(database, release_settings, ControlledSandbox(), SourceProvider()).run_once())
+    after = workspace(database, owner, pid)
+    assert after.current_version and before.current_version and after.current_version.id != before.current_version.id
+    assert service.workspace(database, release_settings, owner, pid).current_release_id == release.id
+    prepared = service.prepare(database, release_settings, owner, pid, PrepareRelease(version_id=after.current_version.id, configuration_id=first.configuration_id, expected_brain_revision_id=after.project.current_brain_revision_id), 'new-package')
+    with database.session() as session, session.begin():
+        _, candidate, _, _ = service.source_for_version(session, pid, after.current_version.id)
+        content = package({'test': 'v2-controlled'})
+        saved = db.ReleaseArtifact(id=uuid4(), project_id=pid, preparation_id=prepared.id, version_id=after.current_version.id, brain_revision_id=after.project.current_brain_revision_id,
+            configuration_id=first.configuration_id, candidate_id=candidate.id, digest=package_digest(validate_package(content)), package=content, manifest={'test': 'controlled-v2'}, created_at=now())
+        session.add(saved)
+        row = session.get(db.ArtifactPreparation, prepared.id)
+        assert row
+        row.state, row.artifact_id = 'succeeded', saved.id
+        artifact_id = saved.id
+    second = PromoteRelease(artifact_id=artifact_id, configuration_id=first.configuration_id, expected_brain_revision_id=after.project.current_brain_revision_id,
+        expected_version_id=after.current_version.id, expected_production_release_id=release.id, expected_target_generation=1)
+    service.promote(database, release_settings, owner, pid, second, 'redeploy', None)
+    original_health = provider.health
+    async def fail_updated_public(url: str, artifact: db.ReleaseArtifact) -> None:
+        if artifact.id == artifact_id and 'staged' not in url:
+            raise ReleaseProviderError('RELEASE_HEALTH_FAILED')
+        await original_health(url, artifact)
+    provider.health = fail_updated_public  # type: ignore[method-assign]
+    tick(database, release_settings, provider, 12)
+    final = service.workspace(database, release_settings, owner, pid)
+    assert final.current_release_id == release.id and final.target_generation == 1
+    assert final.releases[0].state == 'failed' and final.releases[1].state == 'succeeded'
+    assert provider.current == 'dpl_1' and provider.stage_calls == 2 and provider.promote_calls == 3
+    assert workspace(database, owner, pid).preview == after.preview
+    with database.session() as session:
+        first_source = session.get(db.SourceCandidate, service.source_for_version(session, pid, before.current_version.id)[1].id)
+        next_source = service.source_for_version(session, pid, after.current_version.id)[1]
+        assert first_source and next_source.parent_digest == first_source.digest
+        source_one, source_two = first_source.source['files'], next_source.source['files']
+        assert isinstance(source_one, list) and isinstance(source_two, list)
+        assert next(f for f in source_one if f['path'] == 'app/layout.tsx') == next(f for f in source_two if f['path'] == 'app/layout.tsx')
