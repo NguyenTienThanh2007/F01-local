@@ -72,7 +72,7 @@ def create_project(
         str, Header(min_length=1, max_length=200, pattern=r"^[A-Za-z0-9._:-]+$")
     ],
 ) -> ProjectCreated:
-    result = service.create_project(database, principal, body, idempotency_key, schedule=settings.simulation_runner_enabled, real=settings.real_execution_enabled)
+    result = service.create_project(database, principal, body, idempotency_key, schedule=settings.simulation_runner_enabled, real=settings.execution_mode == "real")
     response.headers["Location"] = f"/v1/projects/{result.project.id}"
     # A replay's metadata is the saved creation snapshot; read Location for current state.
     metadata_headers(response, result.project)
@@ -173,7 +173,7 @@ def ready(database: DatabaseDependency) -> dict[str, str]:
         versions = connection.scalars(
             text("SELECT version_num FROM alembic_version")
         ).all()
-        if versions != ["0005_release_target"]:
+        if versions != ["0006_release_hardening"]:
             raise ApplicationError("DATABASE_NOT_READY")
     return {"status": "ready"}
 

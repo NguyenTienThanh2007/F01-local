@@ -23,7 +23,7 @@ with test_database(root) as database:
             with engine.begin() as connection:
                 config.attributes['connection'] = connection; command.upgrade(config, 'head')
             engine.dispose()
-            api_env = dict(os.environ, SIMULATION_RUNNER_ENABLED='false' if ux0 else 'true', SIMULATION_CHANGE_SCENARIO='terminal-failure', SIMULATION_TICK_MS='800', APP_ENV='test', AUTH_MODE='development', EXECUTION_MODE='simulated', DATABASE_URL=database, DEV_API_TOKEN=token, DEV_AUTH_SUBJECT='m5-browser-owner', OPENAI_API_KEY='')
+            api_env = dict(os.environ, SIMULATION_RUNNER_ENABLED='false' if ux0 else 'true', SIMULATION_CHANGE_SCENARIO='terminal-failure', SIMULATION_TICK_MS='800', APP_ENV='test', AUTH_MODE='development', EXECUTION_MODE='simulated', REAL_EXECUTION_ENABLED='false', RELEASE_ENABLED='false', DATABASE_URL=database, DEV_API_TOKEN=token, DEV_AUTH_SUBJECT='m5-browser-owner', OPENAI_API_KEY='')
             if phase2:
                 from cryptography.fernet import Fernet
                 api_env.update(AUTH_MODE='oidc', AUTH_GATEWAY_TOKEN='synthetic-phase2a-gateway-12345678901234567890', SESSION_ENCRYPTION_KEY=Fernet.generate_key().decode(),

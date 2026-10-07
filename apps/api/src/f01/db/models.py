@@ -520,6 +520,7 @@ class ArtifactPreparation(Base):
     state: Mapped[str] = mapped_column(String(20))
     artifact_id: Mapped[UUID | None]
     error_code: Mapped[str | None] = mapped_column(String(100))
+    evidence: Mapped[list[dict[str, object]]] = mapped_column(JSONB, default=list, server_default=text("'[]'::jsonb"))
     epoch: Mapped[int] = mapped_column(Integer)
     lease_token: Mapped[UUID | None]
     lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

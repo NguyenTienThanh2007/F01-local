@@ -247,3 +247,91 @@ def test_modified_version_requires_new_package_and_failed_redeploy_retains_live(
         source_one, source_two = first_source.source['files'], next_source.source['files']
         assert isinstance(source_one, list) and isinstance(source_two, list)
         assert next(f for f in source_one if f['path'] == 'app/layout.tsx') == next(f for f in source_two if f['path'] == 'app/layout.tsx')
+
+
+@pytest.mark.parametrize('race', ['cancel', 'deadline'])
+def test_cancel_or_deadline_during_public_health_compensates_before_committing(database: Database, release_settings: Settings, project_plan: ProjectPlan, race: str) -> None:
+    owner, pid, command = setup(database, release_settings, project_plan)
+    release = service.promote(database, release_settings, owner, pid, command, 'race', None)
+    provider = ControlledProvider()
+    original = provider.health
+    async def mutate_during_health(url: str, artifact: db.ReleaseArtifact) -> None:
+        await original(url, artifact)
+        if 'staged' not in url:
+            if race == 'cancel':
+                service.cancel(database, owner, pid, release.id)
+            else:
+                with database.session() as session, session.begin():
+                    # Simulate time crossing the frozen deadline during an in-flight health observation.
+                    session.execute(text('ALTER TABLE release_operations DISABLE TRIGGER guard_release_operation'))
+                    row = session.scalar(select(db.ReleaseOperation).where(db.ReleaseOperation.release_id == release.id))
+                    assert row
+                    row.deadline_at = now()-timedelta(seconds=1)
+                    session.flush()
+                    session.execute(text('ALTER TABLE release_operations ENABLE TRIGGER guard_release_operation'))
+    provider.health = mutate_during_health  # type: ignore[method-assign]
+    tick(database, release_settings, provider, 12)
+    final = service.workspace(database, release_settings, owner, pid)
+    assert final.current_release_id is None and final.target_generation == 0
+    assert final.releases[0].state == ('canceled' if race == 'cancel' else 'failed')
+    assert provider.current is None
+
+
+def test_real_mode_creation_retains_intent_when_runtime_is_unavailable(project_settings: Settings) -> None:
+    from fastapi.testclient import TestClient
+    from f01.main import create_app
+    settings = project_settings.model_copy(update={'execution_mode': 'real', 'real_execution_enabled': False, 'simulation_runner_enabled': False})
+    with TestClient(create_app(settings)) as client:
+        client.headers['Authorization'] = 'Bearer '+settings.dev_api_token.get_secret_value()
+        response = client.post('/v1/projects', json={'title': 'Real intent', 'brief': 'Build a browser dashboard for property leads.'}, headers={'Idempotency-Key': 'runtime-unavailable'})
+        assert response.status_code == 201 and response.json()['execution_mode'] == 'real' and response.json()['run_id'] is None
+        saved = client.get(response.headers['Location']+'/workspace').json()
+        assert saved['active_run'] is None and saved['current_version'] is None
+
+
+def test_failed_release_retry_has_new_immutable_history_and_idempotent_intent(database: Database, release_settings: Settings, project_plan: ProjectPlan) -> None:
+    owner, pid, command = setup(database, release_settings, project_plan)
+    first = service.promote(database, release_settings, owner, pid, command, 'first', None)
+    provider = ControlledProvider()
+    provider.bad_public = True
+    tick(database, release_settings, provider, 10)
+    assert service.workspace(database, release_settings, owner, pid).releases[0].state == 'failed'
+    second = service.promote(database, release_settings, owner, pid, command, 'retry', None, first.id)
+    assert second.id != first.id and service.promote(database, release_settings, owner, pid, command, 'retry', None, first.id).id == second.id
+    provider.bad_public = False
+    tick(database, release_settings, provider, 10)
+    saved = service.workspace(database, release_settings, owner, pid)
+    assert saved.current_release_id == second.id and saved.target_generation == 1 and saved.releases[1].state == 'failed'
+
+
+def test_observation_resume_keeps_pending_write_identity(database: Database, release_settings: Settings, project_plan: ProjectPlan) -> None:
+    owner, pid, command = setup(database, release_settings, project_plan)
+    release = service.promote(database, release_settings, owner, pid, command, 'uncertain', None)
+    provider = ControlledProvider()
+    provider.lose_stage = provider.unknown_stage = True
+    tick(database, release_settings, provider, 4)
+    with database.session() as session, session.begin():
+        op = session.scalar(select(db.ReleaseOperation).where(db.ReleaseOperation.release_id == release.id))
+        assert op
+        op.attempts = 120
+    service.resume(database, owner, pid, release.id)
+    provider.unknown_stage = False
+    tick(database, release_settings, provider, 10)
+    saved = service.workspace(database, release_settings, owner, pid)
+    assert saved.current_release_id == release.id and provider.stage_calls == 1 and provider.promote_calls == 1
+
+
+def test_definitive_provider_auth_rejection_can_be_explicitly_retried(database: Database, release_settings: Settings, project_plan: ProjectPlan) -> None:
+    owner, pid, command = setup(database, release_settings, project_plan)
+    release = service.promote(database, release_settings, owner, pid, command, 'auth-reject', None)
+    provider = ControlledProvider()
+    original = provider.stage
+    async def unauthorized(config: db.ReleaseConfiguration, artifact: db.ReleaseArtifact, operation: str) -> StagedDeployment:
+        raise ReleaseProviderError('RELEASE_PROVIDER_AUTHENTICATION')
+    provider.stage = unauthorized  # type: ignore[method-assign]
+    tick(database, release_settings, provider, 4)
+    assert service.workspace(database, release_settings, owner, pid).releases[0].state == 'failed'
+    retried = service.promote(database, release_settings, owner, pid, command, 'auth-reviewed-retry', None, release.id)
+    provider.stage = original  # type: ignore[method-assign]
+    tick(database, release_settings, provider, 10)
+    assert service.workspace(database, release_settings, owner, pid).current_release_id == retried.id

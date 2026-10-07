@@ -96,6 +96,8 @@ async def _provider_error_handler(_request: Request, exc: Exception) -> JSONResp
 
 APPLICATION_ERRORS: dict[str, tuple[int, str]] = {
     **APPLICATION_EXECUTION_ERRORS,
+    "RELEASE_NOT_RETRYABLE": (409, "Only a confirmed failed command with the same reviewed package can be retried."),
+    "RELEASE_RECOVERY_REQUIRED": (409, "Resolve the saved provider observation before continuing."),
     "RELEASE_UNAVAILABLE": (503, "Production release support is unavailable until the exact packaging runtime is accepted."),
     "RELEASE_NOT_CONFIGURED": (503, "This project needs a separate production hosting target."),
     "RELEASE_IN_PROGRESS": (409, "A production release is in progress. Resolve it before changing this project."),

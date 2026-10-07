@@ -3,6 +3,7 @@ from typing import Literal
 from uuid import UUID
 from pydantic import Field
 from f01.domain.projects import Contract
+from f01.domain.execution import CommandEvidence
 from f01.domain.types import UtcDateTime
 
 
@@ -51,6 +52,7 @@ class ArtifactPreparation(Contract):
     state: Literal['queued', 'packaging', 'succeeded', 'failed', 'canceled']
     artifact_id: UUID | None
     error_code: str | None
+    evidence: list[CommandEvidence]
     created_at: UtcDateTime
 
 

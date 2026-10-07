@@ -42,3 +42,19 @@ def cancel(project_id: UUID, release_id: UUID, database: DB, owner: Owner) -> Re
 def setup_target(project_id: UUID, body: SetupReleaseTarget, request: Request, database: DB, owner: Owner, settings: Config, idempotency_key: Key) -> HostingSetup:
     auth = getattr(request.state, 'auth_session', None)
     return service.setup_target(database, settings, owner.id, project_id, body, idempotency_key, auth.id if auth else None)
+
+
+@router.post('/release-artifacts/{preparation_id}/retry', response_model=ArtifactPreparation, status_code=202)
+def retry_preparation(project_id: UUID, preparation_id: UUID, body: PrepareRelease, database: DB, owner: Owner, settings: Config, idempotency_key: Key) -> ArtifactPreparation:
+    return service.prepare(database, settings, owner.id, project_id, body, idempotency_key, preparation_id)
+
+
+@router.post('/releases/{release_id}/retry', response_model=ReleaseDetail, status_code=202)
+def retry_release(project_id: UUID, release_id: UUID, body: PromoteRelease, request: Request, database: DB, owner: Owner, settings: Config, idempotency_key: Key) -> ReleaseDetail:
+    auth = getattr(request.state, 'auth_session', None)
+    return service.promote(database, settings, owner.id, project_id, body, idempotency_key, auth.id if auth else None, release_id)
+
+
+@router.post('/releases/{release_id}/resume', response_model=ReleaseDetail)
+def resume_release(project_id: UUID, release_id: UUID, database: DB, owner: Owner) -> ReleaseDetail:
+    return service.resume(database, owner.id, project_id, release_id)

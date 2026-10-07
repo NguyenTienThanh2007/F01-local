@@ -88,6 +88,10 @@ class ReleaseWorker:
             target, _ = service.configured(session, project.id, intent.configuration_id)
             if (op.lease_token != token or op.lease_until is None or op.lease_until <= now()):
                 raise ApplicationError('RELEASE_LEASE_LOST')
+            if op.cancel_requested:
+                raise ApplicationError('RELEASE_CANCELED')
+            if op.deadline_at <= now():
+                raise ApplicationError('RELEASE_DEADLINE_EXCEEDED')
             if (project.archived_at or project.current_version_id != intent.version_id or project.current_brain_revision_id != intent.brain_revision_id
                 or target.generation != intent.target_generation or target.current_release_id != intent.previous_release_id):
                 raise ApplicationError('RELEASE_STALE_CONTEXT')
@@ -110,6 +114,17 @@ class ReleaseWorker:
             target, _ = service.configured(session, project.id, intent.configuration_id)
             if op.lease_token != token or op.lease_until is None or op.lease_until <= now() or target.generation != intent.target_generation or target.current_release_id != intent.previous_release_id:
                 raise ApplicationError('RELEASE_LEASE_LOST')
+            # Recheck mutable authorization after health, under the same lock as the pointer commit.
+            if op.cancel_requested:
+                raise ApplicationError('RELEASE_CANCELED')
+            if op.deadline_at <= now():
+                raise ApplicationError('RELEASE_DEADLINE_EXCEEDED')
+            if project.archived_at or project.current_version_id != intent.version_id or project.current_brain_revision_id != intent.brain_revision_id:
+                raise ApplicationError('RELEASE_STALE_CONTEXT')
+            if intent.auth_session_id:
+                auth = session.get(db.AuthSession, intent.auth_session_id, with_for_update=True)
+                if not auth or auth.revoked_at or auth.expires_at <= now() or auth.last_seen_at+timedelta(seconds=self.settings.session_idle_seconds) <= now():
+                    raise ApplicationError('AUTHENTICATION_REQUIRED')
             target.current_release_id, target.generation = intent.id, target.generation+1
             op.state, op.action, op.public_url, op.error_code = 'succeeded', 'done', url, None
             op.last_observed_at = now()
@@ -234,6 +249,12 @@ class ReleaseWorker:
                 action = op.action
             if exc.code == 'RELEASE_LEASE_LOST':
                 pass
+            elif action in ('stage_pending','promote_pending') and isinstance(exc,ReleaseProviderError) and not exc.uncertain:
+                # A definitive provider rejection establishes that this write did not take effect.
+                if exc.retryable:
+                    self.save(identifier,token,action='stage' if action=='stage_pending' else 'promote',state='staging' if action=='stage_pending' else 'promoting',error=exc.code,observation={'kind':'dispatch_rejected','code':exc.code})
+                else:
+                    self.save(identifier,token,state='failed',error=exc.code,observation={'kind':'dispatch_rejected','code':exc.code},finish=True)
             elif action in ('promote_pending', 'restore_pending', 'clear_pending', 'stage_pending'):
                 # Even a successful response followed by an invalid/failed DB write is an unknown dispatch.
                 self.save(identifier, token, state='reconciling', error=exc.code)

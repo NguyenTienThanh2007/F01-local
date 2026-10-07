@@ -4,7 +4,7 @@ export function releaseReceipt(value:unknown,id:string):ReleaseReceipt|null{
  if(!value||typeof value!=='object')return null;
  const receipt=value as ReleaseReceipt;
  if(typeof receipt.key!=='string'||!/^[A-Za-z0-9._:-]{1,200}$/.test(receipt.key)||typeof receipt.created!=='number'||!Number.isFinite(receipt.created)||receipt.created<=0||receipt.created>Date.now()+60000||!receipt.body||typeof receipt.body!=='object'||Array.isArray(receipt.body))return null;
- const keys=Object.keys(receipt.body).sort().join(','),preparing=receipt.path===`/projects/${id}/release-artifacts`,deploying=receipt.path===`/projects/${id}/releases`,settingUp=receipt.path===`/projects/${id}/release-target`;
+ const keys=Object.keys(receipt.body).sort().join(','),preparing=receipt.path===`/projects/${id}/release-artifacts`||new RegExp(`^/projects/${id}/release-artifacts/[0-9a-f-]{36}/retry$`,'i').test(receipt.path),deploying=receipt.path===`/projects/${id}/releases`||new RegExp(`^/projects/${id}/releases/[0-9a-f-]{36}/retry$`,'i').test(receipt.path),settingUp=receipt.path===`/projects/${id}/release-target`;
  if(preparing&&keys!=='configuration_id,expected_brain_revision_id,version_id'||deploying&&keys!=='artifact_id,configuration_id,expected_brain_revision_id,expected_production_release_id,expected_target_generation,expected_version_id'||settingUp&&keys!=='expected_brain_revision_id,expected_version_id'||!preparing&&!deploying&&!settingUp)return null;
  for(const [key,item] of Object.entries(receipt.body)){
   if(key==='expected_target_generation'){if(!Number.isSafeInteger(item)||Number(item)<0)return null;}

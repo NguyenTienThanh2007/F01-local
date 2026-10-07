@@ -129,18 +129,24 @@ def detail(session: Session, row: db.ReleaseIntent) -> dto.ReleaseDetail:
         cancel_requested=op.cancel_requested, last_observed_at=op.last_observed_at, created_at=row.created_at)
 
 
-def prepare(database: Database, settings: Settings, owner: UUID, project_id: UUID, body: dto.PrepareRelease, key: str) -> dto.ArtifactPreparation:
+def prepare(database: Database, settings: Settings, owner: UUID, project_id: UUID, body: dto.PrepareRelease, key: str, retry_id: UUID | None = None) -> dto.ArtifactPreparation:
     with database.session() as session, session.begin():
         lock_owner(session, owner)
         project = owned_project(session, owner, project_id, lock=True)
         if not settings.release_enabled:
             raise ApplicationError('RELEASE_UNAVAILABLE')
-        saved, replay = receipt(session, owner, project_id, key, 'release-artifacts', body.model_dump(mode='json'))
+        saved, replay = receipt(session, owner, project_id, key, 'release-artifacts'+(f'/{retry_id}/retry' if retry_id else ''), body.model_dump(mode='json'))
         if replay:
             row = session.get(db.ArtifactPreparation, replay)
             assert row is not None
             return preparation(row)
-        intent = fingerprint(body.model_dump(mode='json'))
+        intent = fingerprint({**body.model_dump(mode='json'), **({'retry_of': str(retry_id)} if retry_id else {})})
+        if retry_id:
+            prior = session.get(db.ArtifactPreparation, retry_id)
+            if not prior or prior.project_id != project_id:
+                raise ApplicationError('NOT_FOUND')
+            if prior.state != 'failed' or prior.container_name or (prior.version_id, prior.brain_revision_id, prior.configuration_id) != (body.version_id, body.expected_brain_revision_id, body.configuration_id):
+                raise ApplicationError('RELEASE_NOT_RETRYABLE')
         row = session.scalar(select(db.ArtifactPreparation).where(db.ArtifactPreparation.project_id == project_id, db.ArtifactPreparation.intent_hash == intent))
         if row is None:
             configured(session, project_id, body.configuration_id)
@@ -158,18 +164,25 @@ def prepare(database: Database, settings: Settings, owner: UUID, project_id: UUI
         return preparation(row)
 
 
-def promote(database: Database, settings: Settings, owner: UUID, project_id: UUID, body: dto.PromoteRelease, key: str, auth_id: UUID | None) -> dto.ReleaseDetail:
+def promote(database: Database, settings: Settings, owner: UUID, project_id: UUID, body: dto.PromoteRelease, key: str, auth_id: UUID | None, retry_id: UUID | None = None) -> dto.ReleaseDetail:
     with database.session() as session, session.begin():
         lock_owner(session, owner)
         project = owned_project(session, owner, project_id, lock=True)
         if not settings.release_enabled:
             raise ApplicationError('RELEASE_UNAVAILABLE')
-        saved, replay = receipt(session, owner, project_id, key, 'releases', body.model_dump(mode='json'))
+        saved, replay = receipt(session, owner, project_id, key, 'releases'+(f'/{retry_id}/retry' if retry_id else ''), body.model_dump(mode='json'))
         if replay:
             row = session.get(db.ReleaseIntent, replay)
             assert row is not None
             return detail(session, row)
-        intent = fingerprint(body.model_dump(mode='json'))
+        intent = fingerprint({**body.model_dump(mode='json'), **({'retry_of': str(retry_id)} if retry_id else {})})
+        if retry_id:
+            prior_release = session.get(db.ReleaseIntent, retry_id)
+            if not prior_release or prior_release.project_id != project_id:
+                raise ApplicationError('NOT_FOUND')
+            prior_op = session.scalar(select(db.ReleaseOperation).where(db.ReleaseOperation.release_id == retry_id))
+            if not prior_op or prior_op.state not in ('failed','canceled') or prior_release.artifact_id != body.artifact_id or prior_release.configuration_id != body.configuration_id:
+                raise ApplicationError('RELEASE_NOT_RETRYABLE')
         row = session.scalar(select(db.ReleaseIntent).where(db.ReleaseIntent.project_id == project_id, db.ReleaseIntent.intent_hash == intent))
         if row is None:
             target, config = configured(session, project_id, body.configuration_id)
@@ -190,6 +203,10 @@ def promote(database: Database, settings: Settings, owner: UUID, project_id: UUI
             session.add(db.ReleaseOperation(id=uuid4(), project_id=project_id, release_id=row.id, state='queued', action='upload', cancel_requested=False,
                 epoch=0, attempts=0, next_attempt_at=now(), created_at=now(), deadline_at=now()+timedelta(seconds=settings.release_timeout_seconds)))
             session.flush()
+            if retry_id:
+                operation = session.scalar(select(db.ReleaseOperation).where(db.ReleaseOperation.release_id == row.id))
+                assert operation
+                session.add(db.ReleaseObservation(id=uuid4(),project_id=project_id,operation_id=operation.id,content={'kind':'owner_retry','retry_of_release_id':str(retry_id)},created_at=now()))
             append_event(session, project, type='release.queued', message='Owner approved this exact production package for deployment.', actor=owner)
         saved.response_body = {'id': str(row.id)}
         return detail(session, row)
@@ -247,3 +264,19 @@ def setup_target(database: Database, settings: Settings, owner: UUID, project_id
             append_event(session, project, type='release.target_queued', message='Production hosting setup requested.', actor=owner)
         saved.response_body = {'id': str(row.id)}
         return dto.HostingSetup.model_validate(row)
+
+
+def resume(database: Database, owner: UUID, project_id: UUID, release_id: UUID) -> dto.ReleaseDetail:
+    with database.session() as session, session.begin():
+        owned_project(session, owner, project_id, lock=True)
+        intent = session.get(db.ReleaseIntent, release_id)
+        if not intent or intent.project_id != project_id:
+            raise ApplicationError('NOT_FOUND')
+        op = session.scalar(select(db.ReleaseOperation).where(db.ReleaseOperation.release_id == release_id).with_for_update())
+        assert op
+        if op.state != 'reconciling' or op.lease_until and op.lease_until > now():
+            raise ApplicationError('RELEASE_RECOVERY_REQUIRED')
+        # Only renew a bounded observation budget. Pending writes and the original deadline stay frozen.
+        op.attempts, op.next_attempt_at, op.lease_token, op.lease_until = 0, now(), None, None
+        session.add(db.ReleaseObservation(id=uuid4(), project_id=project_id, operation_id=op.id, content={'kind': 'owner_resumed_observation'}, created_at=now()))
+        return detail(session, intent)

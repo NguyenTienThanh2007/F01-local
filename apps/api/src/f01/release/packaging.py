@@ -35,12 +35,25 @@ class PackagingWorker:
             return row.id, row.lease_token, row.container_name or ''
 
     async def run_once(self) -> bool:
+        with self.database.session() as session:
+            cleanup_rows = list(session.scalars(select(db.ArtifactPreparation).where(db.ArtifactPreparation.state.in_(('failed','succeeded','canceled')),db.ArtifactPreparation.container_name.is_not(None))))
+        for saved in cleanup_rows:
+            assert saved.container_name
+            try:
+                await self.sandbox.remove(saved.container_name)
+            except SandboxError:
+                continue
+            with self.database.session() as session, session.begin():
+                row = session.get(db.ArtifactPreparation,saved.id,with_for_update=True)
+                if row and row.container_name == saved.container_name:
+                    row.container_name = None
         claimed = await asyncio.to_thread(self.claim)
         if not claimed:
             return False
         identifier, token, prior = claimed
         name = ''
         error: str | None = None
+        observations: list[dict[str, object]] = []
         try:
             if prior:
                 await self.sandbox.remove(prior)
@@ -75,10 +88,13 @@ class PackagingWorker:
             await self.sandbox.ready()
             await self.sandbox.create(name, source.lineage.project_id, identifier, '/p/'+str(uuid4())+'/'+secrets.token_urlsafe(32))
             materialized = await self.sandbox.materialize(name, source, alive)
+            observations.append(materialized.model_dump(mode='json'))
             if materialized.exit_code:
                 raise ApplicationError('RELEASE_PACKAGE_INVALID')
             raw = await self.sandbox.exec(name, ('/usr/local/bin/node', '/opt/f01/production.mjs', self.sandbox.source_argument(source), base64.b64encode(json.dumps(marker).encode()).decode()), 250, alive, limit=24000000)
             result = json.loads(raw)
+            if isinstance(result.get('evidence'),list):
+                observations.extend(CommandEvidence.model_validate({**item,'image_id':self.sandbox.image}).model_dump(mode='json') for item in result['evidence'])
             if result.get('error') in {'PRODUCTION_CONFIGURATION_FAILED','PRODUCTION_INSTALL_FAILED','PRODUCTION_TYPECHECK_FAILED','PRODUCTION_BUILD_FAILED','PRODUCTION_TEST_FAILED','PRODUCTION_INTEGRITY_FAILED','PRODUCTION_EXPORT_FAILED'}:
                 raise ApplicationError(result['error'])
             package = result['package']
@@ -118,6 +134,7 @@ class PackagingWorker:
                 artifact_id = uuid4()
                 session.add(db.ReleaseArtifact(id=artifact_id, project_id=row.project_id, preparation_id=row.id, candidate_id=candidate.id, version_id=row.version_id,
                     brain_revision_id=row.brain_revision_id, configuration_id=row.configuration_id, digest=package_digest(files), package=package, manifest=manifest, created_at=now()))
+                row.evidence = observations
                 row.artifact_id, row.state = artifact_id, 'succeeded'
                 append_event(session, project, type='release.package_verified', message='Production package verified. Review it before deploying.', actor=project.owner_user_id)
         except (SandboxError, ApplicationError) as exc:
@@ -138,7 +155,8 @@ class PackagingWorker:
                     row.container_name = cleanup or None
                     row.lease_token = None
                     row.lease_until = None
-                    if error:
+                    if error and row.state != 'succeeded':
+                        row.evidence = observations
                         row.state, row.error_code = 'failed', error
         return True
 
