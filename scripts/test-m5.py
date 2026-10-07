@@ -11,29 +11,13 @@ if sys.argv[1:] not in ([], ['--phase1'], ['--phase2a'], ['--ux0']):
 ux0 = sys.argv[1:] == ['--ux0']
 phase2 = ux0 or sys.argv[1:] == ['--phase2a']
 suite = 'test:ux0:e2e' if ux0 else 'test:phase2a:e2e' if phase2 else 'test:phase1:e2e' if sys.argv[1:] else 'test:simulation:e2e'
-pg_bin = root / '.runtime/postgres/usr/lib/postgresql/16/bin'
-if not pg_bin.exists():
-    raise SystemExit('This workspace harness needs its provisioned PostgreSQL 16 binaries. Alternatively run test:simulation:e2e with M5_API_URL, M5_TEST_DATABASE_URL and M5_TEST_TOKEN against a disposable migrated f01_test_* database.')
-def port():
-    with socket.socket() as sock:
-        sock.bind(('127.0.0.1', 0)); return sock.getsockname()[1]
-data = Path(tempfile.mkdtemp(prefix='f01-m5-', dir='/dev/shm')) / 'data'
-pg_env = dict(os.environ, LD_LIBRARY_PATH=str(root/'.runtime/postgres/usr/lib/x86_64-linux-gnu'), LD_PRELOAD=str(root/'.runtime/postgres-identity.so'))
-subprocess.run([str(pg_bin/'initdb'), '-D', str(data), '-U', 'f01_test', '--auth=trust', '--no-locale', '--encoding=UTF8'], env=pg_env, check=True, stdout=subprocess.DEVNULL)
-pg_port, api_port, web_port = port(), port(), port()
+from test_database import test_database, free_port
+api_port, web_port = free_port(), free_port()
 token = 'synthetic-m5-browser-token-12345678901234567890'
-database = f'postgresql+psycopg://f01_test@127.0.0.1:{pg_port}/f01_test_m5'
 api_process = None
-try:
-    with (root/'.runtime/m5-postgres.log').open('w') as pg_log, (root/'.runtime/m5-api.log').open('w') as api_log:
-        pg = subprocess.Popen([str(pg_bin/'postgres'), '-D', str(data), '-h', '127.0.0.1', '-p', str(pg_port), '-c', 'unix_socket_directories=', '-c', 'jit=off', '-c', 'timezone=UTC'], env=pg_env, stdout=pg_log, stderr=pg_log)
+with test_database(root) as database:
+    with (root/'.runtime/m5-api.log').open('w') as api_log:
         try:
-            for _ in range(100):
-                try:
-                    with psycopg.connect(host='127.0.0.1', port=pg_port, user='f01_test', dbname='postgres', autocommit=True) as connection: connection.execute('CREATE DATABASE f01_test_m5')
-                    break
-                except psycopg.OperationalError: time.sleep(.1)
-            else: raise RuntimeError('PostgreSQL did not start')
             config = Config(str(root/'apps/api/alembic.ini')); engine = create_engine(database)
             with engine.begin() as connection:
                 config.attributes['connection'] = connection; command.upgrade(config, 'head')
@@ -63,7 +47,4 @@ try:
             result = subprocess.run(['pnpm', '--filter', '@f01/web', suite], cwd=root, env=test_env)
         finally:
             if api_process: api_process.terminate(); api_process.wait(timeout=15)
-            pg.terminate(); pg.wait(timeout=15)
-finally:
-    shutil.rmtree(data.parent)
 raise SystemExit(result.returncode)
