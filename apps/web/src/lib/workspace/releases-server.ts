@@ -5,9 +5,9 @@ import {configuration,sameOrigin,input,fail,object} from '../projects/server.ts'
 import {backendCredentials,SessionUnavailable} from '../auth/session.ts';
 import {uuid} from './contracts.ts';
 export async function handleRelease(request:Request,projectId:string,kind:'releases'|'release-artifacts'|'release-target',segments:string[],env:Record<string,string|undefined>,send:typeof fetch=fetch){
- if(!uuid.test(projectId)||segments.length>2||segments.length===1||segments.length===2&&(!uuid.test(segments[0]!)||!['cancel','retry','resume'].includes(segments[1]!))||kind==='release-target'&&segments.length||kind==='release-artifacts'&&segments.length&&segments[1]!=='retry')return fail('NOT_FOUND',404);
+ if(!uuid.test(projectId)||segments.length>2||segments.length===1&&!uuid.test(segments[0]!)||segments.length===2&&(!uuid.test(segments[0]!)||!['cancel','retry','resume'].includes(segments[1]!))||kind==='release-target'&&segments.length||kind==='release-artifacts'&&segments.length===2&&segments[1]!=='retry')return fail('NOT_FOUND',404);
  const write=request.method==='POST';
- if(!['GET','POST'].includes(request.method)||!write&&(kind!=='releases'||segments.length))return fail('REQUEST_FORBIDDEN',405);
+ if(!['GET','POST'].includes(request.method)||write&&segments.length===1||!write&&(kind==='release-target'||segments.length===2||kind==='release-artifacts'&&!segments.length))return fail('REQUEST_FORBIDDEN',405);
  let config:ReturnType<typeof configuration>;try{config=configuration(env);}catch{return fail('PROJECTS_NOT_CONFIGURED',503);}
  if(write&&!sameOrigin(request,config.origin,config.local))return fail('REQUEST_FORBIDDEN',403);
  try{
@@ -33,7 +33,7 @@ export async function handleRelease(request:Request,projectId:string,kind:'relea
     if(Object.keys(body).length!==6||!ids.every(k=>typeof body[k]==='string'&&uuid.test(body[k]))||!(body.expected_production_release_id===null||typeof body.expected_production_release_id==='string'&&uuid.test(body.expected_production_release_id))||!Number.isSafeInteger(body.expected_target_generation)||Number(body.expected_target_generation)<0)return fail('VALIDATION_ERROR',422);
     result=segments.length?await client.POST('/v1/projects/{project_id}/releases/{release_id}/retry',{params:{path:{...path,release_id:segments[0]!},header:{'idempotency-key':key!}},body:body as components['schemas']['PromoteRelease'],signal}):await client.POST('/v1/projects/{project_id}/releases',{params:{path,header:{'idempotency-key':key!}},body:body as components['schemas']['PromoteRelease'],signal});
    }
-  }else result=await client.GET('/v1/projects/{project_id}/releases',{params:{path},signal});
+  }else result=kind==='release-artifacts'?await client.GET('/v1/projects/{project_id}/release-artifacts/{artifact_id}',{params:{path:{...path,artifact_id:segments[0]!}},signal}):segments.length?await client.GET('/v1/projects/{project_id}/releases/{release_id}',{params:{path:{...path,release_id:segments[0]!}},signal}):await client.GET('/v1/projects/{project_id}/releases',{params:{path},signal});
   if(!result.response.ok){const code=object(result.error)&&object(result.error.error)?String(result.error.error.code):'SERVICE_UNAVAILABLE';return Response.json({error:{code,message:'The release command could not complete. Review saved release status and current context.'}},{status:result.response.status,headers:{'Cache-Control':'no-store'}});}
   const raw=JSON.stringify(result.data);if(!raw||raw.length>2*1024*1024||raw.includes(actor.token)||raw.includes(config.token))return fail('INTERNAL_ERROR',502);
   return Response.json(result.data,{status:result.response.status,headers:{'Cache-Control':'no-store'}});

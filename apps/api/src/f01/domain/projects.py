@@ -235,7 +235,7 @@ class Principal(Contract):
 class Capabilities(Contract):
     execution_mode: Literal["simulated", "real"] = "simulated"
     real_generation: bool = False
-    external_deployment: Literal[False] = False
+    external_deployment: bool = False
     source_artifacts: bool = False
     simulation_runner: bool = False
 

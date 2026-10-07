@@ -58,7 +58,7 @@ def metadata_headers(response: Response, project: ProjectSummary) -> None:
 @router.get("/session", response_model=SessionView)
 def session(request: Request, principal: PrincipalDependency, settings: SettingsDependency) -> SessionView:
     auth_session = getattr(request.state, "auth_session", None)
-    return SessionView(principal=principal, capabilities=Capabilities(simulation_runner=settings.simulation_runner_enabled, execution_mode=settings.execution_mode, real_generation=settings.real_execution_enabled, source_artifacts=settings.real_execution_enabled), expires_at=auth_session.expires_at if auth_session else None)
+    return SessionView(principal=principal, capabilities=Capabilities(external_deployment=settings.release_enabled, simulation_runner=settings.simulation_runner_enabled, execution_mode=settings.execution_mode, real_generation=settings.real_execution_enabled, source_artifacts=settings.real_execution_enabled), expires_at=auth_session.expires_at if auth_session else None)
 
 
 @router.post("/projects", response_model=ProjectCreated, status_code=201)

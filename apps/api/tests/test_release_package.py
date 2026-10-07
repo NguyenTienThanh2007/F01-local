@@ -39,4 +39,6 @@ def test_public_url_rejects_untrusted_origins(url: str) -> None:
 def test_factory_cookie_boundary() -> None:
     assert public_url('https://app.vercel.app') == 'https://app.vercel.app'
     with pytest.raises(ApplicationError):
-        public_url('https://app.vercel.app', 'https://factory.vercel.app')
+        public_url('https://app.vercel.app', 'https://app.vercel.app')
+    # vercel.app is a public suffix; distinct provider projects are separate browser sites.
+    assert public_url('https://app.vercel.app', 'https://factory.vercel.app') == 'https://app.vercel.app'

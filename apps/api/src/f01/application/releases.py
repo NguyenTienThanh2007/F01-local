@@ -33,7 +33,7 @@ def public_url(value: str, factory_origin: str = '') -> str:
     factory = urlsplit(factory_origin).hostname
     if (parsed.scheme != 'https' or not parsed.hostname or not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,100}\.vercel\.app', parsed.hostname)
         or parsed.netloc != parsed.hostname or parsed.path not in ('', '/') or parsed.query or parsed.fragment
-        or factory and (factory == parsed.hostname or factory.endswith('.vercel.app'))):
+        or factory == parsed.hostname):
         raise ApplicationError('RELEASE_URL_INVALID')
     return 'https://' + parsed.hostname
 

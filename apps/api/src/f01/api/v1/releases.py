@@ -5,10 +5,11 @@ from fastapi import APIRouter, Depends, Header, Request
 from f01.api.dependencies import get_database, get_principal
 from f01.api.errors import ErrorEnvelope
 from f01.application import releases as service
+from f01.application.projects import owned_project
 from f01.config import Settings, get_settings
 from f01.db.session import Database
 from f01.domain.projects import Principal
-from f01.domain.releases import ArtifactPreparation, PrepareRelease, PromoteRelease, ReleaseDetail, ReleaseWorkspace, HostingSetup, SetupReleaseTarget
+from f01.domain.releases import ArtifactPreparation, PrepareRelease, PromoteRelease, ReleaseDetail, ReleaseWorkspace, HostingSetup, SetupReleaseTarget, ReleaseArtifact as ArtifactView
 
 router = APIRouter(prefix='/v1/projects/{project_id}', tags=['Production releases'], responses={code: {'model': ErrorEnvelope} for code in (401, 404, 409, 422, 503)})
 DB = Annotated[Database, Depends(get_database)]
@@ -58,3 +59,27 @@ def retry_release(project_id: UUID, release_id: UUID, body: PromoteRelease, requ
 @router.post('/releases/{release_id}/resume', response_model=ReleaseDetail)
 def resume_release(project_id: UUID, release_id: UUID, database: DB, owner: Owner) -> ReleaseDetail:
     return service.resume(database, owner.id, project_id, release_id)
+
+
+@router.get('/releases/{release_id}', response_model=ReleaseDetail)
+def historical_release(project_id: UUID, release_id: UUID, database: DB, owner: Owner) -> ReleaseDetail:
+    from f01.db.models import ReleaseIntent
+    from f01.domain.errors import ApplicationError
+    with database.session(snapshot=True) as session:
+        owned_project(session, owner.id, project_id)
+        row = session.get(ReleaseIntent, release_id)
+        if not row or row.project_id != project_id:
+            raise ApplicationError('NOT_FOUND')
+        return service.detail(session, row)
+
+
+@router.get('/release-artifacts/{artifact_id}', response_model=ArtifactView)
+def historical_artifact(project_id: UUID, artifact_id: UUID, database: DB, owner: Owner) -> ArtifactView:
+    from f01.db.models import ReleaseArtifact
+    from f01.domain.errors import ApplicationError
+    with database.session(snapshot=True) as session:
+        owned_project(session, owner.id, project_id)
+        row = session.get(ReleaseArtifact, artifact_id)
+        if not row or row.project_id != project_id:
+            raise ApplicationError('NOT_FOUND')
+        return ArtifactView.model_validate(row)

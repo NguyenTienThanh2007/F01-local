@@ -372,3 +372,21 @@ def test_release_publication_locks_project_before_operation(database: Database, 
             operation = session.scalar(select(db.ReleaseOperation).where(db.ReleaseOperation.id == identifier).with_for_update(nowait=True))
             assert operation and operation.state == 'queued'
         future.result(timeout=5)
+
+
+def test_historical_release_and_artifact_reads_are_owner_scoped(database: Database, release_settings: Settings, project_plan: ProjectPlan) -> None:
+    from fastapi.testclient import TestClient
+    from f01.main import create_app
+    owner, pid, command = setup(database, release_settings, project_plan)
+    release = service.promote(database, release_settings, owner, pid, command, 'history', None)
+    tick(database, release_settings, ControlledProvider(), 8)
+    with TestClient(create_app(release_settings.model_copy(update={'dev_auth_subject': 'real-owner'}))) as client:
+        client.headers['Authorization'] = 'Bearer '+release_settings.dev_api_token.get_secret_value()
+        response = client.get(f'/v1/projects/{pid}/releases/{release.id}')
+        assert response.status_code == 200 and response.json()['state'] == 'succeeded'
+        response = client.get(f'/v1/projects/{pid}/release-artifacts/{command.artifact_id}')
+        assert response.status_code == 200 and 'package' not in response.json()
+    with TestClient(create_app(release_settings.model_copy(update={'dev_auth_subject': 'other-history-owner'}))) as client:
+        client.headers['Authorization'] = 'Bearer '+release_settings.dev_api_token.get_secret_value()
+        assert client.get(f'/v1/projects/{pid}/releases/{release.id}').status_code == 404
+        assert client.get(f'/v1/projects/{pid}/release-artifacts/{command.artifact_id}').status_code == 404
