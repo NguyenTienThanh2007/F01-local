@@ -51,8 +51,8 @@ export function Workspace({ id, children }: { id: string; children: ReactNode })
     finally { if (!quiet) setPending(false); }
   }, [id]);
   const onEvents = useCallback((batch: BuildEvent[]) => {
-    const relevant = batch.some(event => ['execution.context_resolution','execution.generated','execution.materialization','execution.install','execution.typecheck','execution.build','execution.test','execution.verification','execution.preview_ready','execution.failed','execution.canceled','execution.queued','run.phase_changed','run.queued','run.succeeded','run.failed','run.canceled','request.recorded','project.renamed','project.archived','project.unarchived'].includes(event.type));
-    const resources = batch.some(event => ['execution.preview_ready','execution.failed','execution.canceled','run.queued','run.succeeded','run.failed','run.canceled','request.recorded','project.renamed','project.archived','project.unarchived'].includes(event.type));
+    const relevant = batch.some(event => ['release.packaging_queued','release.package_verified','release.target_queued','release.queued','release.succeeded','release.failed','release.canceled','execution.context_resolution','execution.generated','execution.materialization','execution.install','execution.typecheck','execution.build','execution.test','execution.verification','execution.preview_ready','execution.failed','execution.canceled','execution.queued','run.phase_changed','run.queued','run.succeeded','run.failed','run.canceled','request.recorded','project.renamed','project.archived','project.unarchived'].includes(event.type));
+    const resources = batch.some(event => ['release.packaging_queued','release.package_verified','release.target_queued','release.queued','release.succeeded','release.failed','release.canceled','execution.preview_ready','execution.failed','execution.canceled','run.queued','run.succeeded','run.failed','run.canceled','request.recorded','project.renamed','project.archived','project.unarchived'].includes(event.type));
     if (relevant) void refresh(true,resources);
   }, [refresh]);
   const feed = useBuildFeed(id,snapshot,onEvents);

@@ -6,6 +6,18 @@ from f01.domain.projects import Contract
 from f01.domain.types import UtcDateTime
 
 
+class SetupReleaseTarget(Contract):
+    expected_version_id: UUID
+    expected_brain_revision_id: UUID
+
+
+class HostingSetup(Contract):
+    id: UUID
+    project_id: UUID
+    state: Literal['queued', 'creating', 'reconciling', 'ready', 'failed']
+    error_code: str | None
+
+
 class PrepareRelease(Contract):
     version_id: UUID
     configuration_id: UUID
@@ -72,6 +84,8 @@ class ReleaseDetail(Contract):
 
 class ReleaseWorkspace(Contract):
     available: bool
+    setup_available: bool
+    hosting_setup: HostingSetup | None
     configuration: ProductionConfiguration | None
     target_generation: int
     current_release_id: UUID | None

@@ -414,6 +414,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projects/{project_id}/release-artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Prepare */
+        post: operations["prepare_v1_projects__project_id__release_artifacts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/release-target": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Setup Target */
+        post: operations["setup_target_v1_projects__project_id__release_target_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/releases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Workspace */
+        get: operations["workspace_v1_projects__project_id__releases_get"];
+        put?: never;
+        /** Promote */
+        post: operations["promote_v1_projects__project_id__releases_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/releases/{release_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_v1_projects__project_id__releases__release_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projects/{project_id}/requests": {
         parameters: {
             query?: never;
@@ -601,6 +670,40 @@ export interface components {
             evidence: "proposed" | "simulated";
             overview: components["schemas"]["Statement"];
             rationale: components["schemas"]["Statement"];
+        };
+        /** ArtifactPreparation */
+        ArtifactPreparation: {
+            /** Artifact Id */
+            artifact_id: string | null;
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /** Created At */
+            created_at: string;
+            /** Error Code */
+            error_code: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "packaging" | "succeeded" | "failed" | "canceled";
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
         };
         /** AttemptRecord */
         AttemptRecord: {
@@ -1067,6 +1170,26 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HostingSetup */
+        HostingSetup: {
+            /** Error Code */
+            error_code: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "creating" | "reconciling" | "ready" | "failed";
+        };
         /** ImplementationMilestone */
         ImplementationMilestone: {
             /** Deliverables */
@@ -1122,6 +1245,24 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** PrepareRelease */
+        PrepareRelease: {
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /**
+             * Expected Brain Revision Id
+             * Format: uuid
+             */
+            expected_brain_revision_id: string;
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+        };
         /** PreviewDescriptor */
         PreviewDescriptor: {
             /**
@@ -1170,6 +1311,35 @@ export interface components {
             /** Requirements */
             requirements: components["schemas"]["Requirement"][];
             summary: components["schemas"]["Statement"];
+        };
+        /** ProductionConfiguration */
+        ProductionConfiguration: {
+            /** Created At */
+            created_at: string;
+            /** Digest */
+            digest: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Profile
+             * @constant
+             */
+            profile: "next-static-v1";
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * Provider
+             * @constant
+             */
+            provider: "vercel";
+            /** Public Url */
+            public_url: string;
         };
         /** ProjectCreated */
         ProjectCreated: {
@@ -1256,6 +1426,33 @@ export interface components {
             title: string;
             /** Updated At */
             updated_at: string;
+        };
+        /** PromoteRelease */
+        PromoteRelease: {
+            /**
+             * Artifact Id
+             * Format: uuid
+             */
+            artifact_id: string;
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /**
+             * Expected Brain Revision Id
+             * Format: uuid
+             */
+            expected_brain_revision_id: string;
+            /** Expected Production Release Id */
+            expected_production_release_id: string | null;
+            /** Expected Target Generation */
+            expected_target_generation: number;
+            /**
+             * Expected Version Id
+             * Format: uuid
+             */
+            expected_version_id: string;
         };
         /** ProposalList */
         ProposalList: {
@@ -1375,6 +1572,113 @@ export interface components {
             base_version_id: string | null;
             /** Text */
             text: string;
+        };
+        /** ReleaseArtifact */
+        ReleaseArtifact: {
+            /**
+             * Brain Revision Id
+             * Format: uuid
+             */
+            brain_revision_id: string;
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /** Created At */
+            created_at: string;
+            /** Digest */
+            digest: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+        };
+        /** ReleaseDetail */
+        ReleaseDetail: {
+            /**
+             * Artifact Id
+             * Format: uuid
+             */
+            artifact_id: string;
+            /** Cancel Requested */
+            cancel_requested: boolean;
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /** Created At */
+            created_at: string;
+            /** Deployment Url */
+            deployment_url: string | null;
+            /** Error Code */
+            error_code: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Observed At */
+            last_observed_at: string | null;
+            /** Previous Release Id */
+            previous_release_id: string | null;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Public Url */
+            public_url: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "staging" | "checking" | "promoting" | "verifying" | "reconciling" | "restoring" | "succeeded" | "failed" | "canceled";
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+        };
+        /** ReleaseWorkspace */
+        ReleaseWorkspace: {
+            /** Artifacts */
+            artifacts: components["schemas"]["ReleaseArtifact"][];
+            /** Available */
+            available: boolean;
+            configuration: components["schemas"]["ProductionConfiguration"] | null;
+            /** Current Release Id */
+            current_release_id: string | null;
+            hosting_setup: components["schemas"]["HostingSetup"] | null;
+            /** Preparations */
+            preparations: components["schemas"]["ArtifactPreparation"][];
+            /** Releases */
+            releases: components["schemas"]["ReleaseDetail"][];
+            /** Setup Available */
+            setup_available: boolean;
+            /** Target Generation */
+            target_generation: number;
         };
         /** RequestList */
         RequestList: {
@@ -1512,6 +1816,19 @@ export interface components {
             /** Expires At */
             expires_at?: string | null;
             principal: components["schemas"]["Principal"];
+        };
+        /** SetupReleaseTarget */
+        SetupReleaseTarget: {
+            /**
+             * Expected Brain Revision Id
+             * Format: uuid
+             */
+            expected_brain_revision_id: string;
+            /**
+             * Expected Version Id
+             * Format: uuid
+             */
+            expected_version_id: string;
         };
         /**
          * SourceArtifact
@@ -3741,6 +4058,360 @@ export interface operations {
             };
             /** @description Internal Server Error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    prepare_v1_projects__project_id__release_artifacts_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrepareRelease"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArtifactPreparation"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    setup_target_v1_projects__project_id__release_target_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetupReleaseTarget"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HostingSetup"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    workspace_v1_projects__project_id__releases_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseWorkspace"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    promote_v1_projects__project_id__releases_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoteRelease"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    cancel_v1_projects__project_id__releases__release_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                release_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

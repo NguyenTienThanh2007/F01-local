@@ -5,8 +5,9 @@ import {spawn} from 'node:child_process';
 const source=JSON.parse(Buffer.from(process.argv[2],'base64').toString('utf8'));
 const marker=JSON.parse(Buffer.from(process.argv[3],'base64').toString('utf8'));
 const configuration="export default {output:'export',trailingSlash:true,experimental:{cpus:1},poweredByHeader:false,productionBrowserSourceMaps:false,images:{unoptimized:true}};\n";
-const evidence=[];
+const evidence=[];let stage='configuration';
 async function command(phase,argv){
+ stage=phase;
  const started=Date.now();
  const result=await new Promise((resolve,reject)=>{
   const child=spawn('/usr/local/bin/node',['/opt/f01/command.mjs',phase,...argv],{cwd:'/work',stdio:['ignore','pipe','ignore']});
@@ -19,17 +20,21 @@ async function command(phase,argv){
 }
 try{
  if(source.files.some(f=>f.path==='public/__f01_release.json'))throw Error('RESERVED_MARKER');
- await fs.writeFile('/work/next.config.mjs',configuration,{mode:0o644});
- // materialize copies a read-only scaffold; make this one approved config writable first.
  await command('install',['/usr/local/bin/node','/opt/f01/dependency-check.mjs']);
+ stage='configuration';
+ await fs.chmod('/work/next.config.mjs',0o644);
+ await fs.writeFile('/work/next.config.mjs',configuration,{mode:0o644});
+ // Only the application-owned production configuration differs from the preview scaffold.
  await command('typecheck',['/usr/local/bin/node','/opt/f01/node_modules/typescript/bin/tsc','--noEmit']);
  await command('build',['/usr/local/bin/node','/opt/f01/node_modules/next/dist/bin/next','build','--webpack']);
  const tests=source.files.filter(f=>f.path.startsWith('tests/')&&f.path.endsWith('.test.mjs')).map(f=>f.path).sort();
  if(!tests.length||tests.length>16)throw Error('TEST_POLICY');
  await command('test',['/usr/local/bin/node','--test','--',...tests]);
+ stage='integrity';
  for(const file of source.files){const stat=await fs.lstat('/work/'+file.path);if(!stat.isFile()||stat.isSymbolicLink()||crypto.createHash('sha256').update(await fs.readFile('/work/'+file.path)).digest('hex')!==file.sha256)throw Error('SOURCE_MUTATED');}
  if((await fs.readFile('/work/next.config.mjs','utf8'))!==configuration)throw Error('CONFIG_MUTATED');
  for(const name of ['package.json','pnpm-lock.yaml','.npmrc'])if(!Buffer.from(await fs.readFile('/work/'+name)).equals(await fs.readFile('/opt/f01/scaffold/'+name)))throw Error('SCAFFOLD_MUTATED');
+ stage='export';
  const files=[];let bytes=0;
  async function add(path,data){bytes+=data.length;if(bytes>16777216||files.length>=2000)throw Error('PACKAGE_BOUNDS');files.push({path,data:data.toString('base64'),sha256:crypto.createHash('sha256').update(data).digest('hex')});}
  async function walk(relative=''){
@@ -51,4 +56,4 @@ try{
  await add('.vercel/output/static/__f01_release.json',markerData);
  const lock_digest=crypto.createHash('sha256').update(await fs.readFile('/opt/f01/scaffold/pnpm-lock.yaml')).digest('hex');
  console.log(JSON.stringify({package:{files},evidence,lock_digest,configuration_digest:crypto.createHash('sha256').update(configuration).digest('hex'),platform:process.platform,architecture:process.arch}));
-}catch{console.log(JSON.stringify({error:'PRODUCTION_PACKAGING_FAILED',evidence}));process.exitCode=1;}
+}catch{console.log(JSON.stringify({error:'PRODUCTION_'+stage.toUpperCase()+'_FAILED',evidence}));}

@@ -35,6 +35,81 @@
         "title": "Architecture",
         "type": "object"
       },
+      "ArtifactPreparation": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Id"
+          },
+          "configuration_id": {
+            "format": "uuid",
+            "title": "Configuration Id",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "packaging",
+              "succeeded",
+              "failed",
+              "canceled"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "version_id": {
+            "format": "uuid",
+            "title": "Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "version_id",
+          "configuration_id",
+          "state",
+          "artifact_id",
+          "error_code",
+          "created_at"
+        ],
+        "title": "ArtifactPreparation",
+        "type": "object"
+      },
       "AttemptRecord": {
         "additionalProperties": false,
         "properties": {
@@ -1475,6 +1550,51 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HostingSetup": {
+        "additionalProperties": false,
+        "properties": {
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "creating",
+              "reconciling",
+              "ready",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "state",
+          "error_code"
+        ],
+        "title": "HostingSetup",
+        "type": "object"
+      },
       "ImplementationMilestone": {
         "additionalProperties": false,
         "properties": {
@@ -1623,6 +1743,33 @@
         "title": "PlanStep",
         "type": "object"
       },
+      "PrepareRelease": {
+        "additionalProperties": false,
+        "properties": {
+          "configuration_id": {
+            "format": "uuid",
+            "title": "Configuration Id",
+            "type": "string"
+          },
+          "expected_brain_revision_id": {
+            "format": "uuid",
+            "title": "Expected Brain Revision Id",
+            "type": "string"
+          },
+          "version_id": {
+            "format": "uuid",
+            "title": "Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version_id",
+          "configuration_id",
+          "expected_brain_revision_id"
+        ],
+        "title": "PrepareRelease",
+        "type": "object"
+      },
       "PreviewDescriptor": {
         "additionalProperties": false,
         "properties": {
@@ -1747,6 +1894,54 @@
           "requirements"
         ],
         "title": "Product",
+        "type": "object"
+      },
+      "ProductionConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "digest": {
+            "title": "Digest",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "profile": {
+            "const": "next-static-v1",
+            "title": "Profile",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "provider": {
+            "const": "vercel",
+            "title": "Provider",
+            "type": "string"
+          },
+          "public_url": {
+            "title": "Public Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "profile",
+          "provider",
+          "public_url",
+          "digest",
+          "created_at"
+        ],
+        "title": "ProductionConfiguration",
         "type": "object"
       },
       "ProjectCreated": {
@@ -1995,6 +2190,58 @@
           "updated_at"
         ],
         "title": "ProjectSummary",
+        "type": "object"
+      },
+      "PromoteRelease": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "format": "uuid",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "configuration_id": {
+            "format": "uuid",
+            "title": "Configuration Id",
+            "type": "string"
+          },
+          "expected_brain_revision_id": {
+            "format": "uuid",
+            "title": "Expected Brain Revision Id",
+            "type": "string"
+          },
+          "expected_production_release_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Production Release Id"
+          },
+          "expected_target_generation": {
+            "minimum": 0.0,
+            "title": "Expected Target Generation",
+            "type": "integer"
+          },
+          "expected_version_id": {
+            "format": "uuid",
+            "title": "Expected Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id",
+          "configuration_id",
+          "expected_brain_revision_id",
+          "expected_version_id",
+          "expected_production_release_id",
+          "expected_target_generation"
+        ],
+        "title": "PromoteRelease",
         "type": "object"
       },
       "ProposalList": {
@@ -2324,6 +2571,277 @@
           "base_version_id"
         ],
         "title": "RecordChange",
+        "type": "object"
+      },
+      "ReleaseArtifact": {
+        "additionalProperties": false,
+        "properties": {
+          "brain_revision_id": {
+            "format": "uuid",
+            "title": "Brain Revision Id",
+            "type": "string"
+          },
+          "candidate_id": {
+            "format": "uuid",
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "configuration_id": {
+            "format": "uuid",
+            "title": "Configuration Id",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "digest": {
+            "title": "Digest",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "manifest": {
+            "additionalProperties": true,
+            "title": "Manifest",
+            "type": "object"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "version_id": {
+            "format": "uuid",
+            "title": "Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "version_id",
+          "brain_revision_id",
+          "configuration_id",
+          "candidate_id",
+          "digest",
+          "manifest",
+          "created_at"
+        ],
+        "title": "ReleaseArtifact",
+        "type": "object"
+      },
+      "ReleaseDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "format": "uuid",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "cancel_requested": {
+            "title": "Cancel Requested",
+            "type": "boolean"
+          },
+          "configuration_id": {
+            "format": "uuid",
+            "title": "Configuration Id",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "deployment_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment Url"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "last_observed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Observed At"
+          },
+          "previous_release_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Release Id"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "public_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Url"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "staging",
+              "checking",
+              "promoting",
+              "verifying",
+              "reconciling",
+              "restoring",
+              "succeeded",
+              "failed",
+              "canceled"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "version_id": {
+            "format": "uuid",
+            "title": "Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "artifact_id",
+          "configuration_id",
+          "version_id",
+          "previous_release_id",
+          "state",
+          "public_url",
+          "deployment_url",
+          "error_code",
+          "cancel_requested",
+          "last_observed_at",
+          "created_at"
+        ],
+        "title": "ReleaseDetail",
+        "type": "object"
+      },
+      "ReleaseWorkspace": {
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/ReleaseArtifact"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "configuration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProductionConfiguration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current_release_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Release Id"
+          },
+          "hosting_setup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HostingSetup"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "preparations": {
+            "items": {
+              "$ref": "#/components/schemas/ArtifactPreparation"
+            },
+            "title": "Preparations",
+            "type": "array"
+          },
+          "releases": {
+            "items": {
+              "$ref": "#/components/schemas/ReleaseDetail"
+            },
+            "title": "Releases",
+            "type": "array"
+          },
+          "setup_available": {
+            "title": "Setup Available",
+            "type": "boolean"
+          },
+          "target_generation": {
+            "title": "Target Generation",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "available",
+          "setup_available",
+          "hosting_setup",
+          "configuration",
+          "target_generation",
+          "current_release_id",
+          "preparations",
+          "artifacts",
+          "releases"
+        ],
+        "title": "ReleaseWorkspace",
         "type": "object"
       },
       "RequestList": {
@@ -2748,6 +3266,27 @@
           "principal"
         ],
         "title": "SessionView",
+        "type": "object"
+      },
+      "SetupReleaseTarget": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_brain_revision_id": {
+            "format": "uuid",
+            "title": "Expected Brain Revision Id",
+            "type": "string"
+          },
+          "expected_version_id": {
+            "format": "uuid",
+            "title": "Expected Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "expected_version_id",
+          "expected_brain_revision_id"
+        ],
+        "title": "SetupReleaseTarget",
         "type": "object"
       },
       "SourceArtifact": {
@@ -6159,6 +6698,520 @@
         "summary": "Review",
         "tags": [
           "Contextual planning"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/release-artifacts": {
+      "post": {
+        "operationId": "prepare_v1_projects__project_id__release_artifacts_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9._:-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrepareRelease"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArtifactPreparation"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Prepare",
+        "tags": [
+          "Production releases"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/release-target": {
+      "post": {
+        "operationId": "setup_target_v1_projects__project_id__release_target_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9._:-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupReleaseTarget"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HostingSetup"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Setup Target",
+        "tags": [
+          "Production releases"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/releases": {
+      "get": {
+        "operationId": "workspace_v1_projects__project_id__releases_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseWorkspace"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Workspace",
+        "tags": [
+          "Production releases"
+        ]
+      },
+      "post": {
+        "operationId": "promote_v1_projects__project_id__releases_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9._:-]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromoteRelease"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Promote",
+        "tags": [
+          "Production releases"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}/releases/{release_id}/cancel": {
+      "post": {
+        "operationId": "cancel_v1_projects__project_id__releases__release_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "release_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Release Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "AuthenticatedBearer": []
+          }
+        ],
+        "summary": "Cancel",
+        "tags": [
+          "Production releases"
         ]
       }
     },

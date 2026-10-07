@@ -264,6 +264,7 @@ async def main() -> None:
     import httpx
     from f01.config import get_settings
     from f01.release.vercel import VercelProvider
+    from f01.release.provisioning import TargetWorker
     settings = get_settings()
     if not settings.release_enabled:
         raise SystemExit('RELEASE_UNAVAILABLE')
@@ -272,9 +273,12 @@ async def main() -> None:
     database = Database(settings.database_url)
     try:
         async with httpx.AsyncClient(trust_env=False, timeout=20) as client, httpx.AsyncClient(trust_env=False, timeout=10) as health:
-            worker = ReleaseWorker(database, settings, VercelProvider(client, health, token, settings.factory_origin))
+            provider = VercelProvider(client, health, token, settings.factory_origin, os.environ.get('F01_VERCEL_TEAM_ID') or None)
+            worker = ReleaseWorker(database, settings, provider)
+            targets = TargetWorker(database, settings, provider)
             while True:
-                if not await worker.run_once():
+                progressed = await targets.run_once()
+                if not await worker.run_once() and not progressed:
                     await asyncio.sleep(1)
     finally:
         database.close()

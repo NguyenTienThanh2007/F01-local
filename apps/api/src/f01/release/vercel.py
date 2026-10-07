@@ -11,7 +11,7 @@ import httpx
 from f01.application.releases import public_url
 from f01.db.models import ReleaseArtifact, ReleaseConfiguration
 from f01.release.package import validate_package
-from f01.release.provider import ReleaseProviderError, StagedDeployment
+from f01.release.provider import ReleaseProviderError, StagedDeployment, ProvisionedTarget
 
 
 def identifier(value: object) -> str:
@@ -21,10 +21,13 @@ def identifier(value: object) -> str:
 
 
 class VercelProvider:
-    def __init__(self, client: httpx.AsyncClient, health_client: httpx.AsyncClient, token: str, factory_origin: str) -> None:
+    def __init__(self, client: httpx.AsyncClient, health_client: httpx.AsyncClient, token: str, factory_origin: str, team_id: str | None = None) -> None:
         if not token:
             raise ReleaseProviderError('RELEASE_PROVIDER_NOT_CONFIGURED')
         self.client, self.health_client, self.token, self.factory_origin = client, health_client, token, factory_origin
+        if team_id and not re.fullmatch(r"team_[A-Za-z0-9]{1,90}", team_id):
+            raise ReleaseProviderError("RELEASE_TARGET_INVALID")
+        self.team_id = team_id
 
     async def request(self, config: ReleaseConfiguration, method: str, path: str, body: object = None, *, content: bytes | None = None, extra_headers: dict[str, str] | None = None, missing_ok: bool = False) -> dict[str, Any]:
         # Fixed provider origin, no caller supplied upstream URLs, no redirects or env proxies.
@@ -151,3 +154,32 @@ class VercelProvider:
                         raise ReleaseProviderError('RELEASE_HEALTH_FAILED')
         except (httpx.HTTPError, OSError, TimeoutError):
             raise ReleaseProviderError('RELEASE_HEALTH_UNAVAILABLE', retryable=True) from None
+
+    async def find_target(self, name: str) -> 'ProvisionedTarget | None':
+        if not re.fullmatch(r'f01-[a-f0-9]{32}', name):
+            raise ReleaseProviderError('RELEASE_TARGET_INVALID')
+        config = ReleaseConfiguration(provider_team_id=self.team_id)
+        value = await self.request(config, 'GET', '/v9/projects/'+name, missing_ok=True)
+        if not value:
+            return None
+        project = value.get('id')
+        if value.get('name') != name or not isinstance(project, str) or not re.fullmatch(r'prj_[A-Za-z0-9]{1,90}', project):
+            raise ReleaseProviderError('RELEASE_TARGET_INVALID')
+        domains = await self.request(config, 'GET', '/v9/projects/'+project+'/domains')
+        entries = domains.get('domains')
+        if not isinstance(entries, list):
+            raise ReleaseProviderError('RELEASE_TARGET_INVALID')
+        urls = [public_url('https://'+x['name'], self.factory_origin) for x in entries if isinstance(x, dict) and isinstance(x.get('name'), str) and x['name'].endswith('.vercel.app')]
+        if len(urls) != 1:
+            raise ReleaseProviderError('RELEASE_TARGET_INVALID')
+        return ProvisionedTarget(project, urls[0], self.team_id)
+
+    async def create_target(self, name: str) -> 'ProvisionedTarget':
+        if not re.fullmatch(r'f01-[a-f0-9]{32}', name):
+            raise ReleaseProviderError('RELEASE_TARGET_INVALID')
+        config = ReleaseConfiguration(provider_team_id=self.team_id)
+        await self.request(config, 'POST', '/v10/projects', {'name': name, 'framework': None, 'publicSource': False, 'ssoProtection': None})
+        result = await self.find_target(name)
+        if not result:
+            raise ReleaseProviderError('RELEASE_PROVIDER_OUTCOME_UNKNOWN', uncertain=True)
+        return result

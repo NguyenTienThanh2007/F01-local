@@ -10,7 +10,7 @@ if(process.argv[2]!=='serve'){
   try{
    const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
    const resolved=path.resolve('/work/out','.'+pathname);
-   if(!resolved.startsWith('/work/out/')){res.writeHead(404);return res.end();}
+   if(resolved!=='/work/out'&&!resolved.startsWith('/work/out/')){res.writeHead(404);return res.end();}
    let file=resolved;const stat=await fs.lstat(file);if(stat.isSymbolicLink())throw Error();if(stat.isDirectory())file=path.join(file,'index.html');
    if(!(await fs.lstat(file)).isFile())throw Error();
    const content=await fs.readFile(file);res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html':file.endsWith('.json')?'application/json':file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':'application/octet-stream'});res.end(content);

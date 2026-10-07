@@ -79,6 +79,8 @@ class PackagingWorker:
                 raise ApplicationError('RELEASE_PACKAGE_INVALID')
             raw = await self.sandbox.exec(name, ('/usr/local/bin/node', '/opt/f01/production.mjs', self.sandbox.source_argument(source), base64.b64encode(json.dumps(marker).encode()).decode()), 250, alive, limit=24000000)
             result = json.loads(raw)
+            if result.get('error') in {'PRODUCTION_CONFIGURATION_FAILED','PRODUCTION_INSTALL_FAILED','PRODUCTION_TYPECHECK_FAILED','PRODUCTION_BUILD_FAILED','PRODUCTION_TEST_FAILED','PRODUCTION_INTEGRITY_FAILED','PRODUCTION_EXPORT_FAILED'}:
+                raise ApplicationError(result['error'])
             package = result['package']
             if not isinstance(package, dict):
                 raise ApplicationError('RELEASE_PACKAGE_INVALID')

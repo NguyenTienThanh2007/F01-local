@@ -8,7 +8,7 @@ from f01.application import releases as service
 from f01.config import Settings, get_settings
 from f01.db.session import Database
 from f01.domain.projects import Principal
-from f01.domain.releases import ArtifactPreparation, PrepareRelease, PromoteRelease, ReleaseDetail, ReleaseWorkspace
+from f01.domain.releases import ArtifactPreparation, PrepareRelease, PromoteRelease, ReleaseDetail, ReleaseWorkspace, HostingSetup, SetupReleaseTarget
 
 router = APIRouter(prefix='/v1/projects/{project_id}', tags=['Production releases'], responses={code: {'model': ErrorEnvelope} for code in (401, 404, 409, 422, 503)})
 DB = Annotated[Database, Depends(get_database)]
@@ -36,3 +36,9 @@ def promote(project_id: UUID, body: PromoteRelease, request: Request, database: 
 @router.post('/releases/{release_id}/cancel', response_model=ReleaseDetail)
 def cancel(project_id: UUID, release_id: UUID, database: DB, owner: Owner) -> ReleaseDetail:
     return service.cancel(database, owner.id, project_id, release_id)
+
+
+@router.post('/release-target', response_model=HostingSetup, status_code=202)
+def setup_target(project_id: UUID, body: SetupReleaseTarget, request: Request, database: DB, owner: Owner, settings: Config, idempotency_key: Key) -> HostingSetup:
+    auth = getattr(request.state, 'auth_session', None)
+    return service.setup_target(database, settings, owner.id, project_id, body, idempotency_key, auth.id if auth else None)

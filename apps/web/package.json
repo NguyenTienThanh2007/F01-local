@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start --hostname 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "test": "node --conditions=react-server --test tests/config.test.mjs tests/planning.test.mjs tests/projects.test.mjs tests/workspace.test.mjs tests/simulation.test.mjs tests/auth.test.mjs tests/real-build.test.mjs",
+    "test": "node --conditions=react-server --test tests/config.test.mjs tests/planning.test.mjs tests/projects.test.mjs tests/workspace.test.mjs tests/simulation.test.mjs tests/auth.test.mjs tests/real-build.test.mjs tests/releases.test.mjs",
     "test:e2e": "node --test tests/planning.e2e.test.mjs",
     "test:projects:e2e": "node --test tests/projects.e2e.test.mjs",
     "test:workspace:e2e": "node --test tests/workspace.e2e.test.mjs",

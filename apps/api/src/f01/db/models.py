@@ -613,3 +613,26 @@ class ProductionTarget(Base):
     configuration_id: Mapped[UUID]
     current_release_id: Mapped[UUID | None]
     generation: Mapped[int] = mapped_column(Integer)
+
+
+class TargetProvisioning(Base):
+    __tablename__ = 'target_provisioning'
+    __table_args__ = (UniqueConstraint('project_id'), UniqueConstraint('provider_name'),
+        ForeignKeyConstraint(['project_id', 'user_id'], ['projects.id', 'projects.owner_user_id'], name='fk_target_provisioning_owner'),
+        scoped_fk('version_id', 'project_versions'), scoped_fk('brain_revision_id', 'brain_revisions'),
+        CheckConstraint("state IN ('queued','creating','reconciling','ready','failed') AND epoch >= 0 AND attempts >= 0", name='state'),)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.id'))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
+    auth_session_id: Mapped[UUID | None] = mapped_column(ForeignKey('auth_sessions.id'))
+    version_id: Mapped[UUID]
+    brain_revision_id: Mapped[UUID]
+    provider_name: Mapped[str] = mapped_column(String(100))
+    state: Mapped[str] = mapped_column(String(20))
+    error_code: Mapped[str | None] = mapped_column(String(100))
+    epoch: Mapped[int] = mapped_column(Integer)
+    attempts: Mapped[int] = mapped_column(Integer)
+    lease_token: Mapped[UUID | None]
+    lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

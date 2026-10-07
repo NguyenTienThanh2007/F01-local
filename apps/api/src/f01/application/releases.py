@@ -215,9 +215,35 @@ def workspace(database: Database, settings: Settings, owner: UUID, project_id: U
         owned_project(session, owner, project_id)
         target = session.scalar(select(db.ProductionTarget).where(db.ProductionTarget.project_id == project_id))
         config = session.get(db.ReleaseConfiguration, target.configuration_id) if target else None
-        return dto.ReleaseWorkspace(available=settings.release_enabled and config is not None,
+        return dto.ReleaseWorkspace(available=settings.release_enabled and config is not None, setup_available=settings.release_enabled,
+            hosting_setup=dto.HostingSetup.model_validate(setup) if (setup := session.scalar(select(db.TargetProvisioning).where(db.TargetProvisioning.project_id == project_id))) else None,
             configuration=dto.ProductionConfiguration.model_validate(config) if config else None,
             target_generation=target.generation if target else 0, current_release_id=target.current_release_id if target else None,
             preparations=[preparation(x) for x in session.scalars(select(db.ArtifactPreparation).where(db.ArtifactPreparation.project_id == project_id).order_by(db.ArtifactPreparation.created_at.desc()).limit(30))],
             artifacts=[dto.ReleaseArtifact.model_validate(x) for x in session.scalars(select(db.ReleaseArtifact).where(db.ReleaseArtifact.project_id == project_id).order_by(db.ReleaseArtifact.created_at.desc()).limit(30))],
             releases=[detail(session, x) for x in session.scalars(select(db.ReleaseIntent).where(db.ReleaseIntent.project_id == project_id).order_by(db.ReleaseIntent.created_at.desc()).limit(50))])
+
+
+def setup_target(database: Database, settings: Settings, owner: UUID, project_id: UUID, body: dto.SetupReleaseTarget, key: str, auth_id: UUID | None) -> dto.HostingSetup:
+    with database.session() as session, session.begin():
+        lock_owner(session, owner)
+        project = owned_project(session, owner, project_id, lock=True)
+        if not settings.release_enabled:
+            raise ApplicationError('RELEASE_UNAVAILABLE')
+        saved, replay = receipt(session, owner, project_id, key, 'release-target', body.model_dump(mode='json'))
+        if replay:
+            row = session.get(db.TargetProvisioning, replay)
+            assert row
+            return dto.HostingSetup.model_validate(row)
+        row = session.scalar(select(db.TargetProvisioning).where(db.TargetProvisioning.project_id == project_id))
+        if row is None:
+            available(session, project, body.expected_brain_revision_id, body.expected_version_id)
+            source_for_version(session, project_id, body.expected_version_id)
+            row = db.TargetProvisioning(id=uuid4(), project_id=project_id, user_id=owner, auth_session_id=auth_id, version_id=body.expected_version_id,
+                brain_revision_id=body.expected_brain_revision_id, provider_name='f01-'+project_id.hex, state='queued', epoch=0, attempts=0,
+                created_at=now(), deadline_at=now()+timedelta(seconds=settings.release_timeout_seconds))
+            session.add(row)
+            session.flush()
+            append_event(session, project, type='release.target_queued', message='Production hosting setup requested.', actor=owner)
+        saved.response_body = {'id': str(row.id)}
+        return dto.HostingSetup.model_validate(row)
