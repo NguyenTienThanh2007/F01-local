@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {usePathname,useSearchParams} from 'next/navigation';
 import type {components} from '@f01/api-client/schema';
 import type {Run} from '@/lib/workspace/contracts';
-import {observeBuild,type BuildProgress} from '@/lib/workspace/build-progress';
+import {observeBuild,buildReadUnavailable,type BuildProgress} from '@/lib/workspace/build-progress';
 import {projectJourney} from '@/lib/workspace/journey';
 import {productionURL} from '@/lib/workspace/release-receipt';
 import {observedRun,acknowledgementObserved} from '@/lib/workspace/command-state';
@@ -42,7 +42,7 @@ export function useBuildProgress(runOverride?:Run|null):BuildProgress|null{
  if(!run||run.mode!=='real')return null;
  const currentRead=flow.build.data?.run.id===run.id?flow.build.data:null;
  const detail=currentRead??flow.builds.data?.items.find(item=>item.run.id===run.id)??null;
- return observeBuild({run,detail,events,version:snapshot.current_version,now:flow.now,disconnected:Boolean(flow.build.error||!currentRead&&flow.builds.error)||['offline','session expired','access unavailable'].includes(transport)});
+ return observeBuild({run,detail,events,version:snapshot.current_version,now:flow.now,disconnected:buildReadUnavailable({currentRead:Boolean(currentRead),readError:Boolean(flow.build.error),historyError:Boolean(flow.builds.error),transport})});
 }
 export function useJourney(){
  const {snapshot,transport}=useWorkspace(),flow=useFlow(),query=useSearchParams(),pathname=usePathname(),progress=useBuildProgress();

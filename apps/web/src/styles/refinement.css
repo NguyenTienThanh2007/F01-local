@@ -6,7 +6,7 @@ h3, h4 { font-weight: 500; }
 p { text-wrap: pretty; }
 button, a, summary { touch-action: manipulation; }
 summary { cursor: pointer; }
-.button { min-height: 44px; padding: 10px 18px; border-radius: 3px; transition: background 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease); }
+.button { min-height: 44px; padding: 10px 18px; border-radius: 3px; transition: border-color 140ms var(--ease); }
 .button-secondary { border-color: var(--line-strong); }
 .button-quiet { color: var(--muted); }
 .button-quiet:hover { color: var(--ink); }

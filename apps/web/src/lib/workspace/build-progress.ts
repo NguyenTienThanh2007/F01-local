@@ -7,6 +7,9 @@ export const buildStages=['Understanding','Generating code','Building','Verifyin
 export type BuildProgress={run:Run;stage:number;state:ObservedState;title:string;description:string;steps:{label:string;state:ObservedState;description:string}[];animate:boolean;waiting:string|null;lastObservedAt:string;lastHeartbeatAt:string|null;repairing:boolean;published:boolean};
 // These thresholds describe missing observations, never a build duration or ETA.
 export const PROGRESS_WAIT_MS=45000,HEARTBEAT_WAIT_MS=30000;
+export function buildReadUnavailable({currentRead,readError,historyError,transport}:{currentRead:boolean;readError:boolean;historyError:boolean;transport:string}){
+ return readError||!currentRead&&historyError||['session expired','access unavailable'].includes(transport)||transport==='offline'&&!currentRead;
+}
 export function buildPulse(progress:BuildProgress){
  if(['failed','canceled'].includes(progress.run.status))return {state:progress.run.status==='failed'?'error' as const:'idle' as const,label:progress.title};
  if(progress.run.status==='succeeded')return progress.published?null:{state:'idle' as const,label:progress.title};
@@ -66,7 +69,7 @@ export function observeBuild({run,detail,events,version,now,disconnected=false}:
  else if(saved.status==='running'&&noProgress){state='waiting';waiting='No new build step has been saved recently. The worker has checked in, but the next result is still pending. This does not confirm further progress.';}
  const descriptions=[
   stage===0?'Resolving your saved brief and approved plan before generation begins.':'Your saved brief and approved plan are attached to this build.',
-  repairing?record?.repair_attempts?`Repair attempt ${record.repair_attempts}: revising application files after a failed check.`:'A repair request is saved. Revising application files after a failed check.':generated?'Application files have been saved.':'Generating application files. Waiting for the generation result.',
+  saved.status==='queued'?'Waiting for a worker before code generation begins.':!record&&!tracePhase?'Waiting to confirm generation from saved build records.':repairing?record?.repair_attempts?`Repair attempt ${record.repair_attempts}: revising application files after a failed check.`:'A repair request is saved. Revising application files after a failed check.':generated?'Application files have been saved.':'Generating application files. Waiting for the generation result.',
   built?'Installation, typecheck and build checks passed.':generated?'Application files are saved. Waiting for the next installation and build result.':'Waiting for application files.',
   checked?hasTests?'Saved typecheck and generated tests passed.':'Saved typecheck passed. This candidate declares no generated tests.':built?'Checking your application. Waiting for the generated test result.':'Waiting for build checks to pass.',
   previewChecked?'Preview health check passed. Waiting for atomic publication.':checked?'Starting and checking the isolated preview.':'Waiting for verification.',

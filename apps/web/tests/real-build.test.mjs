@@ -31,13 +31,13 @@ test('real preview URLs fail closed on invalid expiry, cookie host and capabilit
 });
 
 // The states below exercise saved contracts. They do not pretend a Docker worker ran.
-const {observeBuild,buildPulse}=await import('../src/lib/workspace/build-progress.ts');
+const {observeBuild,buildPulse,buildReadUnavailable}=await import('../src/lib/workspace/build-progress.ts');
 const {projectJourney}=await import('../src/lib/workspace/journey.ts');
 const f=await import('./build-observation-fixtures.mjs');
 const {observedRun,acknowledgementObserved}=await import('../src/lib/workspace/command-state.ts');
 const observed=(detail,extras={})=>observeBuild({run:detail.run,detail,events:[],version:null,now:f.now,...extras});
 test('accepted queued command gives immediate activity without completed build checks',()=>{
- const p=observed(f.detail({run:f.run(),phase:'context_resolution'}));assert.equal(p.title,'Build queued');assert.equal(p.animate,true);assert.equal(p.state,'waiting');assert.equal(p.steps[0].state,'complete');assert.ok(p.steps.slice(2).every(s=>s.state==='pending'));assert.ok(!('percent' in p)&&!('eta' in p));
+ const p=observed(f.detail({run:f.run(),phase:'context_resolution'}));assert.equal(p.title,'Build queued');assert.equal(p.animate,true);assert.equal(p.state,'waiting');assert.equal(p.steps[0].state,'complete');assert.match(p.steps[1].description,/Waiting for a worker/);assert.ok(p.steps.slice(2).every(s=>s.state==='pending'));assert.ok(!('percent' in p)&&!('eta' in p));
 });
 test('generation pending and saved source advance only observed stages',()=>{
  const generating=observed(f.detail());assert.equal(generating.stage,1);assert.equal(generating.steps[1].state,'active');assert.match(generating.description,/Generating application files/);
@@ -172,4 +172,11 @@ test('workspace activity never keeps animating a confirmed terminal build or a w
  const waiting=observed(f.detail(),{disconnected:true});assert.equal(buildPulse(waiting).state,'idle');
  const succeeded=observed(f.detail({run:f.run({status:'succeeded'}),phase:'preview_ready'}));assert.equal(buildPulse(succeeded).state,'idle');
  assert.equal(buildPulse(observed(f.detail({run:f.run({status:'succeeded'}),phase:'preview_ready'}),{version:f.version()})),null);
+});
+test('saved build reads remain authoritative when only the event connection is interrupted',()=>{
+ const read={currentRead:true,readError:false,historyError:true,transport:'offline'};
+ assert.equal(buildReadUnavailable(read),false);
+ assert.equal(buildReadUnavailable({...read,readError:true}),true);
+ assert.equal(buildReadUnavailable({...read,currentRead:false}),true);
+ for(const transport of ['session expired','access unavailable'])assert.equal(buildReadUnavailable({...read,transport}),true);
 });
