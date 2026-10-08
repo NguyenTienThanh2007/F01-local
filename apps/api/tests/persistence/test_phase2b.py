@@ -131,6 +131,11 @@ def test_failed_update_preserves_last_good_version(database:Database,configured:
     assert after.current_version==before.current_version and after.current_brain==before.current_brain and after.preview==before.preview
     assert service.detail(database,owner,pid,run.id).run.error_code=='REPAIR_EXHAUSTED'
     assert source.calls==configured.repair_attempts+1 and len(sandbox.names)==1
+    with database.session() as session:
+        job=session.scalar(select(ExecutionJob).where(ExecutionJob.run_id==run.id))
+        assert job is not None and job.container_name is None,'Confirmed deletion must clear the failed container identity.'
+    retry=service.queue(database,configured,owner,pid,plan,'after-confirmed-cleanup',retry_id=run.id)
+    assert retry.retry_of_run_id==run.id and retry.status=='queued'
 
 def test_duplicate_workers_fenced_and_concurrency_bounded(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
     owner,pid,body=setup_build(database,configured,project_plan);service.queue(database,configured,owner,pid,body,'workers')

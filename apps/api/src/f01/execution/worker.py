@@ -169,7 +169,9 @@ class BuildWorker:
                     await asyncio.to_thread(self.record,identifier,token,candidate,evidence)
                     if evidence.exit_code: failed=evidence;break
                 if failed:
-                    await self.sandbox.remove(name);name=None
+                    await self.sandbox.remove(name)
+                    await asyncio.to_thread(self.clear_container,identifier,name)
+                    name=None
                     repair=await asyncio.to_thread(self.prepare_repair,identifier,token,source,failed)
                     source=await self.generate(identifier,token,repair)
                     continue
