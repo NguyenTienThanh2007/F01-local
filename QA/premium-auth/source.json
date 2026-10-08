@@ -1,0 +1,16 @@
+{
+  "baseline_remote_head": "c5ce0f414c1aa1cb9917677b01a9879592a33f29",
+  "tested_product_commit": "98513ee47da88478a169de514e6f05c33170e04c",
+  "branch": "codex/f01-commercial-v1",
+  "main": "449b0588e072cda102144c0c629d776049b4f2d2",
+  "providers": {
+    "identity": "controlled RSA OIDC",
+    "source": "controlled",
+    "deployment": "controlled",
+    "Docker": "real exact accepted image"
+  },
+  "live_google": "not_run",
+  "live_email_delivery": "not_run",
+  "production_auth": "not_run",
+  "fresh_live_vercel": "not_run"
+}

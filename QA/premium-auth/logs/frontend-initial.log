@@ -1,0 +1,131 @@
+$ pnpm --filter @f01/web test
+$ node --conditions=react-server --test tests/config.test.mjs tests/planning.test.mjs tests/projects.test.mjs tests/workspace.test.mjs tests/simulation.test.mjs tests/auth.test.mjs tests/real-build.test.mjs tests/releases.test.mjs
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/src/lib/auth/routes.ts:10
+function savedDestination(request:Request,name:string){const parts=(request.headers.get('cookie')??'').split(';').map(v=>v.trim()).filter(v=>v.startsWith(name+'='));if(parts.length!==1)return '/projects';try{return authDestination(decodeURIComponent(parts[0]!.slice(name.length+1)));}catch{return '/projects';}}
+class LoginFailure extends Error {constructor(public reason:string){super('Login unavailable');}}
+                                                     ^^^^^^^^^^^^^
+async function json(response:Response){const reader=response.body?.getReader();if(!reader)throw Error();let bytes=0;const chunks:Uint8Array[]=[];try{for(;;){const {done,value}=await reader.read();if(done)break;bytes+=value.length;if(bytes>20000)throw Error();chunks.push(value);}}finally{await reader.cancel().catch(()=>{});}const buffer=new Uint8Array(bytes);let offset=0;for(const chunk of chunks){buffer.set(chunk,offset);offset+=chunk.length;}return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(buffer));}
+
+SyntaxError [ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX]: TypeScript parameter property is not supported in strip-only mode
+    at parseTypeScript (node:internal/modules/typescript:68:40)
+    at processTypeScriptCode (node:internal/modules/typescript:146:42)
+    at stripTypeScriptModuleTypes (node:internal/modules/typescript:209:22)
+    at ModuleLoader.<anonymous> (node:internal/modules/esm/translators:645:29)
+    at #translate (node:internal/modules/esm/loader:435:20)
+    at afterLoad (node:internal/modules/esm/loader:491:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:496:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:549:36)
+    at afterResolve (node:internal/modules/esm/loader:597:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:12) {
+  code: 'ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX'
+}
+
+Node.js v24.16.0
+✖ tests/auth.test.mjs (224.305ms)
+✔ development identity cannot run in production (3.964709ms)
+✔ known execution modes do not grant backend execution capabilities (1.090292ms)
+✔ root configuration loads only selected web settings and preserves process overrides (1.696833ms)
+✔ the proxy forwards only the trimmed idea and server credential to the fixed endpoint (33.014792ms)
+✔ rejects cross-origin, missing-origin, and forged-host requests without calling the backend (8.5715ms)
+✔ allows localhost on the configured loopback port (1.193ms)
+✔ binds the origin to the HTTP Host when Next normalizes the internal URL (1.422042ms)
+✔ invalid configuration fails safely before a backend call (1.273375ms)
+✔ validates content type, bounded bodies, JSON and strict idea input before network access (2.677291ms)
+✔ sanitizes AUTHENTICATION_REQUIRED without relaying upstream messages (0.901625ms)
+✔ sanitizes PROVIDER_NOT_CONFIGURED without relaying upstream messages (0.32725ms)
+✔ sanitizes PROVIDER_AUTHENTICATION_FAILED without relaying upstream messages (0.267625ms)
+✔ sanitizes PROVIDER_QUOTA_EXCEEDED without relaying upstream messages (0.382333ms)
+✔ sanitizes PROVIDER_RATE_LIMITED without relaying upstream messages (0.42375ms)
+✔ sanitizes PROVIDER_TIMEOUT without relaying upstream messages (0.286708ms)
+✔ sanitizes PROVIDER_UNAVAILABLE without relaying upstream messages (0.363416ms)
+✔ sanitizes PROVIDER_REFUSED without relaying upstream messages (0.206167ms)
+✔ sanitizes PROVIDER_INCOMPLETE_RESPONSE without relaying upstream messages (1.4575ms)
+✔ sanitizes PROVIDER_ERROR without relaying upstream messages (3.566583ms)
+✔ sanitizes INTERNAL_ERROR without relaying upstream messages (0.702ms)
+✔ sanitizes VALIDATION_ERROR without relaying upstream messages (0.656917ms)
+✔ unknown upstream failures and thrown exceptions use static messages (1.594208ms)
+✔ invalid, oversized and credential-bearing successful responses cannot reach the browser (2.318042ms)
+✔ browser cancellation reaches the upstream signal with no retry (4.33ms)
+✔ generated client gateway forwards trimmed creation, stable key and private identity only (33.593667ms)
+✔ creation accepts the real saved-project contract and rejects unsafe navigation (0.221875ms)
+✔ list forwards validated search, lifecycle, archive and pagination (2.26625ms)
+✔ metadata gateway preserves If-Match and ETag without exposing private headers (1.543625ms)
+✔ write gateway rejects cross-site, unknown fields, invalid keys and invalid metadata without backend access (3.727791ms)
+✔ gateway sanitizes domain conflicts, unknown failures and transport uncertainty (12.074666ms)
+✔ creation validation and unresolved-command receipt respect the recovery window boundary (0.61275ms)
+✔ creation gateway preserves the account assertion and rejects malformed binding (1.175292ms)
+✔ browser harness teardown completes when a child ignores graceful shutdown (174.739833ms)
+✔ unsent creation drafts survive authentication without crossing account ownership (0.474791ms)
+✔ an exited test child releases inherited pipes without waiting for descendants (140.962375ms)
+✔ real build gateway uses generated client and private identity (53.765958ms)
+✔ real build gateway rejects model commands, non-JSON bodies and foreign origins (4.6045ms)
+✔ uncertain real build retains exact idempotency key across replay (1.33875ms)
+✔ trace accepts real provenance and preserves simulation labels (0.137ms)
+✔ browser JSON build reaches the strict gateway without weakening input validation (0.962459ms)
+✔ build receipts remain project-scoped and expired or legacy receipts cannot dispatch (0.168417ms)
+✔ unavailable browser storage never turns a confirmed command into a failed command (0.108542ms)
+✔ real preview URLs fail closed on invalid expiry, cookie host and capability paths (1.293375ms)
+✔ accepted queued command gives immediate activity without completed build checks (3.714042ms)
+✔ generation pending and saved source advance only observed stages (1.027917ms)
+✔ building, verifying, preparing and Ready require candidate checks and atomic publication (0.372625ms)
+✔ repair preserves old immutable evidence but resets checks for the new candidate (0.11425ms)
+✔ prior candidate and foreign trace events never complete a new attempt (1.720917ms)
+✔ quiet stage with a recent heartbeat waits visibly; stale worker and lost connection stop animation (0.429042ms)
+✔ failed, canceled and cancellation requested remain explicit and never reach Ready (0.299708ms)
+✔ journey uses Create Plan Build Preview Deploy Live without treating navigation as evidence (0.397791ms)
+✔ update journey preserves last confirmed Live while rebuild fails or preview is ahead (0.400208ms)
+✔ only the confirmed current release reaches Live; expired preview and session are blocked (0.492125ms)
+✔ demonstration and foreign release records cannot masquerade as Live (0.607708ms)
+✔ newer repair trace invalidates completed checks before the detail poll catches up (0.317792ms)
+✔ a newer generated candidate cannot inherit prior checks during read/stream races (0.370542ms)
+✔ new-candidate check events cannot inherit old checks while the detail read is stale (0.212791ms)
+✔ saved generated events advance a stale generation-pending read without inventing checks (0.277542ms)
+✔ context resolution does not claim the generation request has started (0.065208ms)
+✔ missing detail preserves blocked connectivity and newer terminal state (0.113ms)
+✔ approved plans with unavailable runtime show a blocked Build and a recovery action (0.216292ms)
+✔ publishing preparation, reconciliation, failures and cancellation retain observed states (0.261625ms)
+✔ a failed replacement release keeps its own attention journey beside last confirmed Live (0.506417ms)
+✔ worker recovery invalidates old checks before the detail poll catches up (0.201333ms)
+✔ confirmed cancellation stays visible until a stale running snapshot catches up (0.339625ms)
+✔ an accepted new build is visible ahead of an older snapshot and later reads advance it (0.075959ms)
+✔ workspace activity never keeps animating a confirmed terminal build or a waiting observation (0.283791ms)
+✔ saved build reads remain authoritative when only the event connection is interrupted (0.061458ms)
+✔ release gateway freezes package/config/source/production and keeps credentials server-only (33.442542ms)
+✔ release gateway rejects external destinations, source code, stale-body shape and foreign origins before dispatch (2.816083ms)
+✔ release receipt recovery preserves exact intent and rejects cross-project, expired and malformed state (1.464417ms)
+✔ production links allow only observed HTTPS Vercel application origins (0.356458ms)
+✔ sequence gaps hold later events until ordered recovery; duplicates are ignored (6.457208ms)
+✔ out-of-order batches recover in project sequence and issue repairs stay run scoped (0.209292ms)
+✔ transport validation rejects foreign, unsafe or invalid records; reconnect is bounded (0.304417ms)
+✔ unresolved run receipts preserve exact start/retry/cancel context across reload (0.230458ms)
+✔ run commands use generated fixed routes, private identity and separate stable keys (28.182833ms)
+✔ run gateway rejects fixture flags, cross-origin commands, methods and invalid frozen input (1.199208ms)
+✔ SSE gateway preserves header precedence and forwards unbuffered bytes with abort propagation (3.460584ms)
+✔ change gateway preserves frozen context and idempotency, keeps identity private (28.881375ms)
+✔ workspace gateway rejects foreign writes, invalid bases, execution fields and methods before transport (1.505083ms)
+✔ typed read routes forward revision, event sequence and pagination only (1.36125ms)
+✔ stale and unsupported-schema conflicts survive sanitized gateway errors (0.872375ms)
+✔ change receipts preserve exact command and reject invalid saved references (0.265833ms)
+✔ fixture descriptors cannot open arbitrary URLs or unknown fixture revisions (0.271542ms)
+ℹ tests 86
+ℹ suites 0
+ℹ pass 85
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 607.230833
+
+✖ failing tests:
+
+test at tests/auth.test.mjs:1:1
+✖ tests/auth.test.mjs (224.305ms)
+  'test failed'
+/Users/nguyentienthanh/Downloads/F01-local/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @f01/web@ test: `node --conditions=react-server --test tests/config.test.mjs tests/planning.test.mjs tests/projects.test.mjs tests/workspace.test.mjs tests/simulation.test.mjs tests/auth.test.mjs tests/real-build.test.mjs tests/releases.test.mjs`
+Exit status 1
+[ELIFECYCLE] Command failed with exit code 1.

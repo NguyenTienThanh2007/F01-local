@@ -1,0 +1,224 @@
+{
+  "status": "passed",
+  "provider": "controlled RSA OIDC fixture",
+  "google_live": "not_run",
+  "magic_link_delivery": "not_run",
+  "measurements": [
+    {
+      "state": "signup-methods",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "signup-methods",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "signup-methods",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "signup-methods",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "account-verified",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "account-verified",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "account-verified",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "account-verified",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "profile-reloaded",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "profile-reloaded",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "profile-reloaded",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "profile-reloaded",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "session-expired",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "session-expired",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "session-expired",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "session-expired",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "signed-out",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "signed-out",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "signed-out",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "signed-out",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "verification-required",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "verification-required",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "verification-required",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "verification-required",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "separate-owner",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "separate-owner",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "separate-owner",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "separate-owner",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "expired-link",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "expired-link",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "expired-link",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "expired-link",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "canceled-login",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "canceled-login",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "canceled-login",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "state": "canceled-login",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    }
+  ]
+}

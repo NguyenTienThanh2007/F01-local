@@ -1,0 +1,228 @@
+{
+  "backend": {
+    "log": "logs/backend-final.log",
+    "tail": [
+      "........................................................................ [100%]",
+      "=============================== warnings summary ===============================",
+      ".venv/lib/python3.12/site-packages/fastapi/testclient.py:1",
+      "  /Users/nguyentienthanh/Downloads/F01-local/apps/api/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
+      "    from starlette.testclient import TestClient as TestClient  # noqa",
+      "",
+      "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+      "355 passed, 5 skipped, 1 warning in 26.51s"
+    ]
+  },
+  "mypy": {
+    "log": "logs/mypy-final.log",
+    "tail": [
+      "Success: no issues found in 107 source files"
+    ]
+  },
+  "frontend": {
+    "log": "logs/frontend-final.log",
+    "tail": [
+      "\u2139 tests 96",
+      "\u2139 suites 0",
+      "\u2139 pass 96",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 918.277125"
+    ]
+  },
+  "client": {
+    "log": "logs/client-final.log",
+    "tail": [
+      "\u2139 tests 2",
+      "\u2139 suites 0",
+      "\u2139 pass 2",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 135.319792"
+    ]
+  },
+  "typecheck": {
+    "log": "logs/typecheck-final.log",
+    "tail": [
+      "$ pnpm --filter @f01/api-client typecheck && pnpm --filter @f01/web typecheck",
+      "$ tsc --noEmit",
+      "$ tsc --noEmit"
+    ]
+  },
+  "production_build": {
+    "log": "logs/build-final.log",
+    "tail": [
+      "\u251c \u0192 /projects/new",
+      "\u251c \u0192 /sign-in",
+      "\u2514 \u0192 /sign-up",
+      "",
+      "",
+      "\u25cb  (Static)   prerendered as static content",
+      "\u0192  (Dynamic)  server-rendered on demand",
+      ""
+    ]
+  },
+  "contracts": {
+    "log": "logs/contracts-final.log",
+    "tail": [
+      "OpenAPI contract is current.",
+      "$ node scripts/generate.mjs --check",
+      "Generated TypeScript contract is current."
+    ]
+  },
+  "planning_browser": {
+    "log": "logs/planning-browser-final.log",
+    "tail": [
+      "\u2139 tests 14",
+      "\u2139 suites 0",
+      "\u2139 pass 14",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 33491.03"
+    ]
+  },
+  "creation_browser": {
+    "log": "logs/creation-recovery-final.log",
+    "tail": [
+      "\u2139 tests 7",
+      "\u2139 suites 0",
+      "\u2139 pass 7",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 109570.767416"
+    ]
+  },
+  "session_browser": {
+    "log": "logs/context-session-final.log",
+    "tail": [
+      "\u2139 tests 4",
+      "\u2139 suites 0",
+      "\u2139 pass 4",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 71289.858625"
+    ]
+  },
+  "workspace_browser": {
+    "log": "logs/workspace-recovery-final.log",
+    "tail": [
+      "\u2139 tests 6",
+      "\u2139 suites 0",
+      "\u2139 pass 6",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 96603.415625"
+    ]
+  },
+  "commercial_browser": {
+    "log": "logs/commercial-browser-final.log",
+    "tail": [
+      "\u2139 tests 1",
+      "\u2139 suites 0",
+      "\u2139 pass 1",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 92074.327041"
+    ]
+  },
+  "auth_browser": {
+    "log": "logs/auth-browser-final.log",
+    "tail": [
+      "\u2139 tests 1",
+      "\u2139 suites 0",
+      "\u2139 pass 1",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 10951.574042"
+    ]
+  },
+  "build_observations_browser": {
+    "log": "logs/build-observations-final.log",
+    "tail": [
+      "\u2139 tests 1",
+      "\u2139 suites 0",
+      "\u2139 pass 1",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 65164.774583"
+    ]
+  },
+  "actual_worker_browser": {
+    "log": "logs/actual-worker-final.log",
+    "tail": [
+      "\u2139 tests 1",
+      "\u2139 suites 0",
+      "\u2139 pass 1",
+      "\u2139 fail 0",
+      "\u2139 cancelled 0",
+      "\u2139 skipped 0",
+      "\u2139 todo 0",
+      "\u2139 duration_ms 230878.063542"
+    ]
+  },
+  "docker": {
+    "log": "logs/docker-final.log",
+    "tail": [
+      "  \"docker_journey\": \"passed\",",
+      "  \"model_transport\": \"controlled OpenAI adapter responses\",",
+      "  \"live_provider\": \"not_run\",",
+      "  \"browser_journey\": \"not_run\",",
+      "  \"phase2c_started\": true,",
+      "  \"production_packaging\": \"passed\",",
+      "  \"duration_seconds\": 200.17",
+      "}"
+    ]
+  },
+  "cleanup": {
+    "log": "logs/cleanup-final.log",
+    "tail": [
+      "........                                                                 [100%]",
+      "8 passed in 3.28s"
+    ]
+  },
+  "manual_shutdown": {
+    "log": "logs/manual-shutdown-final.log",
+    "tail": [
+      "Open: http://127.0.0.1:60020",
+      "Use the test sign-in, then try:",
+      "Create -> Plan -> Approve -> Build -> Preview -> Deploy -> Modify -> Redeploy",
+      "Docker execution is real; model and deployment provider are controlled fixtures.",
+      "Press Ctrl+C here when finished.",
+      "Logs: /Users/nguyentienthanh/Downloads/F01-local/.runtime/commercial-local.log",
+      "Disposable runtime cleanup confirmed: 0 containers removed.",
+      "F01 commercial-v1 local test stopped cleanly."
+    ]
+  },
+  "limitations": {
+    "default_skips": 5,
+    "opt_in_docker_ran_separately": 3,
+    "fresh_live_provider_skips": 2,
+    "live_google": "not_run",
+    "live_email_delivery": "not_run",
+    "production_auth": "not_run",
+    "fresh_live_vercel": "not_run",
+    "fresh_live_model": "not_run",
+    "product_axe_passes": 58,
+    "product_loading_axe_not_run": 2,
+    "auth_axe_passes": 36,
+    "build_fixture_axe_passes": 54,
+    "actual_worker_axe_passes": 26
+  }
+}
