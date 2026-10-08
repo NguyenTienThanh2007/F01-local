@@ -16,7 +16,8 @@
     "test:phase2a:e2e": "node --test tests/phase2a.e2e.test.mjs",
     "test:commercial:e2e": "node --test tests/commercial.e2e.test.mjs",
     "test:ux0:e2e": "node --test tests/ux0.e2e.test.mjs",
-    "test:build-experience:e2e": "node --test tests/build-experience.e2e.test.mjs"
+    "test:build-experience:e2e": "node --test tests/build-experience.e2e.test.mjs",
+    "test:real-build-states:e2e": "node --test tests/real-build-states.e2e.test.mjs"
   },
   "dependencies": {
     "@f01/api-client": "workspace:*",

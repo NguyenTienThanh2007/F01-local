@@ -6,12 +6,13 @@ from alembic import command
 from alembic.config import Config
 from sqlalchemy import create_engine
 root = Path(__file__).resolve().parents[1]
-if sys.argv[1:] not in ([], ['--phase1'], ['--phase2a'], ['--ux0'], ['--commercial']):
-    raise SystemExit('Usage: test-m5.py [--phase1|--phase2a|--ux0|--commercial]')
-commercial = sys.argv[1:] == ['--commercial']
+if sys.argv[1:] not in ([], ['--phase1'], ['--phase2a'], ['--ux0'], ['--commercial'], ['--build-states']):
+    raise SystemExit('Usage: test-m5.py [--phase1|--phase2a|--ux0|--commercial|--build-states]')
+build_states=sys.argv[1:]==['--build-states']
+commercial = sys.argv[1:] == ['--commercial'] or build_states
 ux0 = commercial or sys.argv[1:] == ['--ux0']
 phase2 = ux0 or sys.argv[1:] == ['--phase2a']
-suite = 'test:commercial:e2e' if commercial else 'test:ux0:e2e' if ux0 else 'test:phase2a:e2e' if phase2 else 'test:phase1:e2e' if sys.argv[1:] else 'test:simulation:e2e'
+suite = 'test:real-build-states:e2e' if build_states else 'test:commercial:e2e' if commercial else 'test:ux0:e2e' if ux0 else 'test:phase2a:e2e' if phase2 else 'test:phase1:e2e' if sys.argv[1:] else 'test:simulation:e2e'
 from test_database import test_database, free_port
 
 def docker_socket() -> str:
@@ -81,6 +82,7 @@ with test_database(root) as database:
                     SANDBOX_IMAGE_ID=accepted['image_id'], PRODUCTION_IMAGE_ID=accepted['image_id'],
                     SANDBOX_ACCEPTANCE_REPORT=str(root/'.runtime/production-acceptance-report.json'), PRODUCTION_ACCEPTANCE_REPORT=str(root/'.runtime/production-acceptance-report.json'),
                     SANDBOX_SOCKET=docker_socket(), PREVIEW_ORIGIN=f'http://localhost:{preview_port}', FACTORY_ORIGIN=f'http://127.0.0.1:{web_port}')
+                if build_states:api_env.update(F01_BUILD_STATE_ACCEPTANCE='1',PLANNING_DAILY_TOKEN_BUDGET='1000000')
             api_process = subprocess.Popen([str(root/'apps/api/.venv/bin/python'), '-m', 'uvicorn', *(['commercial_browser_fixture:app' if commercial else 'ux0_browser_fixture:app' if ux0 else 'phase2a_browser_fixture:app','--app-dir',str(root/'apps/api/tests')] if phase2 else ['f01.main:app']), '--host', '127.0.0.1', '--port', str(api_port)], cwd=root/'apps/api', env=api_env, stdout=api_log, stderr=api_log)
             import urllib.request
             for _ in range(100):
