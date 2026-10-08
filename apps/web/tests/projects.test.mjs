@@ -54,3 +54,21 @@ test('creation validation and unresolved-command receipt respect the recovery wi
   assert.deepEqual(readAttempt({ getItem: name => { assert.equal(name, ATTEMPT_STORAGE); return JSON.stringify(attempt); } }), attempt); assert.equal(readAttempt({ getItem: () => 'bad' }), null); assert.equal(readAttempt({ getItem: () => { throw new Error('blocked'); } }), null);
   assert.equal(outcomeIsUnknown(503, 'SERVICE_UNAVAILABLE'), true); assert.equal(outcomeIsUnknown(0, 'offline'), true); assert.equal(outcomeIsUnknown(409, 'IDEMPOTENCY_IN_PROGRESS'), true); assert.equal(outcomeIsUnknown(422, 'VALIDATION_ERROR'), false);
 });
+
+test('creation gateway preserves the account assertion and rejects malformed binding',async()=>{
+ const body={brief:'A CRM for estate agents and leads.'};
+ const response=await handleProjectsRequest(request('POST',body,{'Idempotency-Key':key,'X-F01-Expected-Owner':id}),'projects',undefined,env,async req=>{assert.equal(req.headers.get('X-F01-Expected-Owner'),id);return Response.json({error:{code:'CREATION_ACCOUNT_CHANGED'}},{status:409});});
+ assert.equal(response.status,409);assert.equal((await response.json()).error.code,'CREATION_ACCOUNT_CHANGED');
+ assert.equal((await handleProjectsRequest(request('POST',body,{'Idempotency-Key':key,'X-F01-Expected-Owner':'bad'}),'projects',undefined,env,()=>{throw Error('No dispatch');})).status,422);
+ const receipt={key,input:createInput('CRM',body.brief),started:Date.now(),owner:id};
+ assert.deepEqual(readAttempt({getItem:()=>JSON.stringify(receipt)}),receipt);
+ assert.equal(readAttempt({getItem:()=>JSON.stringify({...receipt,owner:'bad'})}),null);
+});
+
+test('browser harness teardown completes when a child ignores graceful shutdown',async()=>{
+ const {spawn}=await import('node:child_process'),{stopBrowserServer}=await import('./browser-process.mjs');
+ const child=spawn(process.execPath,['-e',"process.on('SIGTERM',()=>{});process.stdout.write('ready');setInterval(()=>{},1000)"],{stdio:['ignore','pipe','ignore']});
+ await new Promise(resolve=>child.stdout.once('data',resolve));
+ await stopBrowserServer(child,100);assert.equal(child.signalCode,'SIGKILL');
+ await stopBrowserServer(child,100);
+});

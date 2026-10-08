@@ -66,8 +66,10 @@ export async function handleProjectsRequest(request: Request, target: 'projects'
         if (Object.keys(body).some(key => !['title', 'brief'].includes(key)) || typeof body.brief !== 'string' || (body.title != null && typeof body.title !== 'string')) return fail('VALIDATION_ERROR', 422);
         const data = createInput((body.title as string | null) ?? '', body.brief);
         const key = request.headers.get('idempotency-key');
+        const expectedOwner=request.headers.get('x-f01-expected-owner');
+        if (expectedOwner&&!uuid.test(expectedOwner)) return fail('VALIDATION_ERROR',422);
         if (!data || !key || !/^[A-Za-z0-9._:-]{1,200}$/.test(key)) return fail('VALIDATION_ERROR', 422);
-        result = await client.POST('/v1/projects', { body: data, params: { header: { 'idempotency-key': key } }, signal });
+        result = await client.POST('/v1/projects', { body: data, params: { header: { 'idempotency-key': key, 'x-f01-expected-owner': expectedOwner??undefined } }, signal });
       } else {
         if (!Object.keys(body).length || Object.keys(body).some(key => !['title', 'archived'].includes(key)) || ('title' in body && (typeof body.title !== 'string' || !body.title.trim() || Array.from(body.title.trim()).length > 100)) || ('archived' in body && typeof body.archived !== 'boolean')) return fail('VALIDATION_ERROR', 422);
         const etag = request.headers.get('if-match'); if (!etag || !new RegExp(`^"project-${id}-m[1-9][0-9]*"$`).test(etag)) return fail('METADATA_CONFLICT', 428);

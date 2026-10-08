@@ -4449,6 +4449,23 @@
               "title": "Idempotency-Key",
               "type": "string"
             }
+          },
+          {
+            "in": "header",
+            "name": "x-f01-expected-owner",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-F01-Expected-Owner"
+            }
           }
         ],
         "requestBody": {

@@ -107,6 +107,7 @@ APPLICATION_ERRORS: dict[str, tuple[int, str]] = {
     "RELEASE_URL_INVALID": (422, "The production URL is outside the allowed isolated hosting boundary."),
     "RELEASE_CONFIGURATION_LOCKED": (409, "The production target is already bound. Operator recovery is required to change it."),
     "AUTHENTICATION_REQUIRED": (401, "A valid authenticated session is required."),
+    "CREATION_ACCOUNT_CHANGED": (409, "Sign in with the account that started this saved creation command."),
     "IDENTITY_LINK_CONFLICT": (409, "Identity linking requires operator review; existing ownership was not changed."),
     "AUTH_RATE_LIMITED": (429, "Sign-in attempts are temporarily limited. Try again later."),
     "PLANNING_RATE_LIMITED": (429, "Your planning request allowance is temporarily exhausted."),

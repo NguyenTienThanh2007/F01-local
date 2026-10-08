@@ -2564,6 +2564,7 @@ export interface operations {
             query?: never;
             header: {
                 "idempotency-key": string;
+                "x-f01-expected-owner"?: string | null;
             };
             path?: never;
             cookie?: never;

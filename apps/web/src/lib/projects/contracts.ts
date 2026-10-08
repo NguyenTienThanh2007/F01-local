@@ -13,6 +13,7 @@ export function createInput(title: string, brief: string): CreateInput | null {
   return { title: name || null, brief: text };
 }
 export const errors: Record<string, string> = {
+  CREATION_ACCOUNT_CHANGED: 'Sign in with the account that started this saved creation. Your original command is preserved.',
   ACTIVE_RUN_EXISTS: 'This project has a queued or running build. Wait for it to finish or cancel it in Run details.',
   RUN_NOT_RETRYABLE: 'Only a failed build can be retried. Inspect the current run state.',
   STALE_BRAIN_REVISION: 'The project changed since this draft began. Your text is preserved. Review the current project before recording it.',

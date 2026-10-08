@@ -71,7 +71,12 @@ def create_project(
     idempotency_key: Annotated[
         str, Header(min_length=1, max_length=200, pattern=r"^[A-Za-z0-9._:-]+$")
     ],
+    x_f01_expected_owner: Annotated[UUID | None, Header()] = None,
 ) -> ProjectCreated:
+    # The assertion cannot grant ownership. It only refuses a saved command
+    # when the verified session changed after the browser froze its receipt.
+    if x_f01_expected_owner is not None and x_f01_expected_owner != principal.id:
+        raise ApplicationError("CREATION_ACCOUNT_CHANGED")
     result = service.create_project(database, principal, body, idempotency_key, schedule=settings.simulation_runner_enabled, real=settings.execution_mode == "real")
     response.headers["Location"] = f"/v1/projects/{result.project.id}"
     # A replay's metadata is the saved creation snapshot; read Location for current state.
