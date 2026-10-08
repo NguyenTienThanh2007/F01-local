@@ -7,6 +7,7 @@ manual product testing only; it does not prove live Vercel deployment.
 from __future__ import annotations
 
 import asyncio
+import argparse
 import json
 import os
 from pathlib import Path
@@ -26,8 +27,15 @@ from sqlalchemy import create_engine
 
 from test_database import free_port, test_database
 
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--production', action='store_true', help='Review the existing production build instead of starting Next dev.')
+parser.add_argument('--no-open', action='store_true', help='Print the URL without opening the default browser.')
+args = parser.parse_args()
+
 root = Path(__file__).resolve().parents[1]
 api_root = root / "apps/api"
+sys.path.insert(0,str(api_root))
+from scripts.disposable_runtimes import cleanup_disposable
 report_path = root / ".runtime/production-acceptance-report.json"
 
 
@@ -115,6 +123,8 @@ web_url = f"http://127.0.0.1:{web_port}"
 
 processes: list[subprocess.Popen[bytes] | subprocess.Popen[str]] = []
 stop = threading.Event()
+thread: threading.Thread | None = None
+cleanup_ok = False
 
 with test_database(root) as database:
     config = Config(str(api_root / "alembic.ini"))
@@ -209,7 +219,7 @@ with test_database(root) as database:
                 "pnpm",
                 "--filter",
                 "@f01/web",
-                "dev",
+                "start" if args.production else "dev",
                 "--hostname",
                 "127.0.0.1",
                 "--port",
@@ -242,7 +252,7 @@ with test_database(root) as database:
         print("Docker execution is real; model and deployment provider are controlled fixtures.")
         print("Press Ctrl+C here when finished.")
         print(f"Logs: {runtime / 'commercial-local.log'}")
-        webbrowser.open(web_url)
+        if not args.no_open: webbrowser.open(web_url)
 
         while True:
             time.sleep(1)
@@ -258,6 +268,14 @@ with test_database(root) as database:
         stop.set()
         for process in reversed(processes):
             terminate(process)
+        if thread: thread.join(timeout=5)
+        try:
+            removed=asyncio.run(cleanup_disposable(database,socket_path,image_id))
+            print(f'Disposable runtime cleanup confirmed: {removed} containers removed.')
+            cleanup_ok=True
+        except Exception:
+            print('Disposable runtime cleanup needs attention. No clean-shutdown claim; inspect this test environment.')
         log.close()
 
-print("F01 commercial-v1 local test stopped cleanly.")
+print("F01 commercial-v1 local test stopped cleanly." if cleanup_ok else "F01 local services stopped; runtime cleanup is unconfirmed.")
+if not cleanup_ok:raise SystemExit(1)
