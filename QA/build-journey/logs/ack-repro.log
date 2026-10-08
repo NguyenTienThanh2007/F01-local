@@ -1,0 +1,60 @@
+✖ confirmed cancellation stays visible until a stale running snapshot catches up (4.032833ms)
+✖ an accepted new build is visible ahead of an older snapshot and later reads advance it (0.226416ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 113.883416
+
+✖ failing tests:
+
+test at tests/real-build.test.mjs:160:1
+✖ confirmed cancellation stays visible until a stale running snapshot catches up (4.032833ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  true !== false
+
+      at TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/real-build.test.mjs:162:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at Test.start (node:internal/test_runner/test:1177:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17)
+      at run (node:internal/test_runner/harness:396:12)
+      at test (node:internal/test_runner/harness:405:12)
+      at file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/real-build.test.mjs:160:1 {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/real-build.test.mjs:165:1
+✖ an accepted new build is visible ahead of an older snapshot and later reads advance it (0.226416ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + '30fe5cca-25e1-4f68-b80a-6b281d7b5c22'
+  - '426bd149-0631-45bd-a07f-a2bf70365ec8'
+
+      at TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/real-build.test.mjs:167:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:897:18)
+      at Test.postRun (node:internal/test_runner/test:1447:19)
+      at Test.run (node:internal/test_runner/test:1372:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '30fe5cca-25e1-4f68-b80a-6b281d7b5c22',
+    expected: '426bd149-0631-45bd-a07f-a2bf70365ec8',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+undefined
+/Users/nguyentienthanh/Downloads/F01-local/apps/web:
+[ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL] Command failed with exit code 1: node '--conditions=react-server' --test '--test-name-pattern=confirmed cancellation|accepted new build' tests/real-build.test.mjs

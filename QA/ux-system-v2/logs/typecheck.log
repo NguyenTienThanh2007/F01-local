@@ -1,0 +1,3 @@
+$ pnpm --filter @f01/api-client typecheck && pnpm --filter @f01/web typecheck
+$ tsc --noEmit
+$ tsc --noEmit
