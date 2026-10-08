@@ -1,0 +1,98 @@
+{
+  "product_source_commit": "8c145c823c9806d5086648f28c21861ff61f2db4",
+  "date": "2026-10-08",
+  "branch": "codex/f01-commercial-v1",
+  "checks": [
+    {
+      "name": "backend",
+      "result": "passed",
+      "log": "checks/backend.txt",
+      "sha256": "b83d47b032eabb8eec48c99a33c0301529771e040d4ac655cf4f36bac7a53090"
+    },
+    {
+      "name": "mypy",
+      "result": "passed",
+      "log": "checks/mypy.txt",
+      "sha256": "dc43c4a518c8b02be9b88992ec25413d8e874b5fe64eebf24c6e12d5007d2ccc"
+    },
+    {
+      "name": "frontend",
+      "result": "passed",
+      "log": "checks/frontend.txt",
+      "sha256": "4b11d0b77a0e4775ccb3742eba33c35824b440c7e7902984c6f0ef1d19d2e49a"
+    },
+    {
+      "name": "generated-client",
+      "result": "passed",
+      "log": "checks/generated-client.txt",
+      "sha256": "c98dd4f03593a6d6c9cb45ed0aed4170dc163262878c0006f1ca9b0e1de35c70"
+    },
+    {
+      "name": "api-contract",
+      "result": "passed",
+      "log": "checks/api-contract.txt",
+      "sha256": "b4e0de0363027b15534cd6198814906ba760905d9bcf7b189f812d78cd7f69ac"
+    },
+    {
+      "name": "typecheck",
+      "result": "passed",
+      "log": "checks/typecheck.txt",
+      "sha256": "0beefb5d16257033fc901af497fd66f2509b38d6183db0d19684285396ebd98d"
+    },
+    {
+      "name": "production-build",
+      "result": "passed",
+      "log": "checks/production-build.txt",
+      "sha256": "82f04f7c0c8f7cf6aeafe6741fef6e4bd6d5b6ebbe25cfb58b68f497a76434cc"
+    },
+    {
+      "name": "planning-browser",
+      "result": "passed",
+      "log": "checks/planning-browser.txt",
+      "sha256": "0ab536299fab2579427f3eee7596c6c9e329cf2d3798e3cf2e222d9f29dec265"
+    },
+    {
+      "name": "phase1-browser",
+      "result": "passed",
+      "log": "checks/phase1-browser.txt",
+      "sha256": "f56ec10217ea069c298b278c6feca8a1f996bbc46efabd6aa95bae35fc76539a"
+    },
+    {
+      "name": "phase2a-browser",
+      "result": "passed",
+      "log": "checks/phase2a-browser.txt",
+      "sha256": "2a80cd64c92039d4c729bfb27a715f679a0e2f9b182be86287cdcf48194d1425"
+    },
+    {
+      "name": "ux0-browser",
+      "result": "passed",
+      "log": "checks/ux0-browser.txt",
+      "sha256": "f252d167726722a9d06008fdbd60f13dfba8dc7f8690df92f87b635d3bcb3c9c"
+    },
+    {
+      "name": "commercial-browser",
+      "result": "passed",
+      "log": "checks/commercial-browser.txt",
+      "sha256": "2c3c915cdf058cafce31b1916cf0036e9bd5e7a55f7bfea4e65d0fa8c05d5442"
+    }
+  ],
+  "states": 27,
+  "accessibility_scans": 52,
+  "screenshot_widths": [
+    375,
+    1440
+  ],
+  "additional_reflow_widths": [
+    768,
+    1280
+  ],
+  "short_height_reflow": [
+    720,
+    500
+  ],
+  "docker": "actual accepted sandbox builds, packaging and previews",
+  "identity": "synthetic RSA OIDC fixture",
+  "model": "controlled fixture",
+  "deployment_provider": "controlled fixture",
+  "new_live_vercel_acceptance": "not_run; unchanged provider implementation has prior acceptance in QA/commercial-v1"
+}
