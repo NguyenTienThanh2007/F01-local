@@ -31,7 +31,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
   let browser, page, id, firstVersion, finalVersion, longId;
   const errors = [], measurements = [], evidence = `${webRoot}/test-results/m6`;
   async function scenario(name, fn) {
-    let failure; await t.test(name, async () => { try { await fn(); } catch (error) { failure = error; await page?.screenshot({ path: `${evidence}/failure.png`, fullPage: true }); throw error; } });
+    console.info(`Phase 1 scenario: ${name}`);let failure; await t.test(name, async () => { try { await fn(); } catch (error) { failure = error; await page?.screenshot({ path: `${evidence}/failure.png`, fullPage: true }); throw error; } });
     if (failure) throw failure;
   }
   async function scan(target, label) {
@@ -47,6 +47,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
     await until(async () => (await fetch(base)).ok);
     browser = await launchTestBrowser({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
     page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
+    page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(15000);
     page.on('pageerror', error => errors.push(error.message));
     await mkdir(evidence, { recursive: true });
 

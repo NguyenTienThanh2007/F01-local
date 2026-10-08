@@ -41,6 +41,7 @@ export function RealBuildPanel({onReadyChange,onAttentionChange}:{onReadyChange?
   }finally{busy.current=false;setPending(false);}
  }
  function command(path:string,body:BuildReceipt['body']):BuildReceipt{return {key:crypto.randomUUID(),path,body,created:Date.now()};}
+ if(currentRun?.mode==='simulated')return null;
  if((!session.data?.capabilities?.real_generation||session.data?.capabilities?.execution_mode!=='real')&&!latest&&!receipt&&!active)return <><ResourceState {...session}/>{session.data?.capabilities?.execution_mode==='real'&&<section className="workspace-notice"><h3>Build runtime unavailable</h3><p>Your project and plans are saved. The trusted build runtime must be configured and verified before a build can start.</p><Link className="button button-primary" href={`/projects/${id}/settings`}>Review runtime settings</Link></section>}</>;
  const status=progress?.run.status??active?.status??latest?.run.status;
  const title=pending?'Sending build command…':receipt?'Confirming your saved build':status==='queued'?'Build queued':status==='running'?'Building your application':buildReady?snapshot.current_version?'Ready for the next build':'Ready to build':status==='succeeded'?'Build verified':status==='failed'?'Build needs attention':status==='canceled'?'Build canceled':'Make your first plan';
