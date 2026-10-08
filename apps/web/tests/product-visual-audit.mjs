@@ -8,11 +8,19 @@ export async function productVisualAudit(page, directory) {
   const axe = enabled && process.env.M5_AXE_SCRIPT ? await readFile(process.env.M5_AXE_SCRIPT,'utf8') : null;
   async function capture(name, {scan=true}={}) {
     if (!enabled) return;
+    if (await page.locator('iframe').count()) {
+      await page.getByText('Loading your application preview…',{exact:true}).waitFor({state:'hidden'});
+    }
     for (const width of [1440,375]) {
       await page.setViewportSize({width,height:1000});
-      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        await Promise.all(document.getAnimations().filter(animation => animation.constructor.name === 'CSSTransition').map(animation => animation.finished.catch(() => {})));
+      });
       await page.evaluate(() => scrollTo(0,0));
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth),true,`${name} ${width}: page overflow`);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth ? [] : [...document.querySelectorAll('main *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).map(el=>({tag:el.tagName,class:el.className,text:el.textContent?.slice(0,80)})).slice(-12));
+      assert.deepEqual(overflow,[],`${name} ${width}: page overflow`);
       if (axe && scan) {
         await page.addScriptTag({content:axe});
         assert.deepEqual(await page.evaluate(async()=> (await axe.run(document,{iframes:false,runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}})).violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))),[],`${name} ${width}: accessibility`);

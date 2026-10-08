@@ -99,7 +99,7 @@ select:not(:disabled) { cursor: pointer; }
 .workspace-sync button { font-size: 12px; text-underline-offset: 4px; }
 .workspace-connection { padding-inline: var(--workspace-gutter); background: var(--surface-muted); }
 .workspace-document, .workspace-preview { padding: 36px var(--workspace-gutter) 48px; }
-.workspace-document { max-width: 1120px; }
+.workspace-document { max-width: 1120px; overflow-wrap: anywhere; }
 .document-heading { padding-bottom: 28px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
 .document-heading h2, .planning-heading h2 { font-size: 36px; line-height: 1.15; letter-spacing: -.04em; margin: 14px 0; }
 .document-heading p, .planning-heading p { max-width: 68ch; font-size: 15px; line-height: 1.7; color: var(--muted); }
@@ -153,6 +153,10 @@ select:not(:disabled) { cursor: pointer; }
 .planning-heading { padding-bottom: 24px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
 .planning-heading .meta { color: var(--accent); }
 .planning-context { margin-bottom: 24px; color: var(--muted); }
+.planning-request-editor { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 28px; }
+.planning-request-editor[open] > summary { color: var(--muted); }
+.planning-request-editor > .button { margin-top: 20px; }
+.planning-request-editor .field-hint { font-size: 13px; color: var(--muted); line-height: 1.6; }
 .planning-proposal { background: var(--surface); border: 1px solid var(--line); border-top: 2px solid var(--accent); padding: 32px; margin-block: 32px; }
 .planning-proposal > h2 { font-size: 32px; line-height: 1.2; margin-block: 16px; letter-spacing: -.035em; }
 .planning-proposal > p { max-width: 68ch; line-height: 1.7; }
