@@ -3,6 +3,7 @@ import json
 import re
 import signal
 from dataclasses import dataclass
+from types import FrameType
 from uuid import UUID
 import httpx
 from sqlalchemy import select
@@ -49,9 +50,19 @@ async def cleanup_disposable(database_url: str, socket: str, image: str) -> int:
 
 
 def protect_disposable_cleanup() -> None:
-    """Ignore repeated terminal interrupts during the launcher's bounded cleanup.
+    """Ignore repeated INT/TERM signals during the launcher's bounded cleanup.
 
     Called only after shutdown begins. Popen teardown retains its TERM/KILL
     deadlines; Docker removal still requires recorded database/image/owner labels.
     """
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+
+
+def install_disposable_shutdown_handlers() -> None:
+    """Enter bounded cleanup before package managers repeat INT as TERM."""
+    def begin_shutdown(_signal: int, _frame: FrameType | None) -> None:
+        protect_disposable_cleanup()
+        raise KeyboardInterrupt
+    signal.signal(signal.SIGINT, begin_shutdown)
+    signal.signal(signal.SIGTERM, begin_shutdown)

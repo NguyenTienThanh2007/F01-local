@@ -52,3 +52,53 @@ def test_repeated_interrupt_cannot_abandon_bounded_disposable_cleanup() -> None:
         if process.poll() is None:
             process.kill()
             process.wait(timeout=5)
+
+
+def test_terminal_interrupt_keeps_disposable_database_available_for_cleanup() -> None:
+    import os
+    import signal
+    import subprocess
+    import sys
+    from pathlib import Path
+    script = """from pathlib import Path
+import signal,time,psycopg
+from scripts.test_database import test_database
+with test_database(Path.cwd()) as url:
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    print('database-ready',flush=True)
+    time.sleep(.5)
+    with psycopg.connect(url.replace('postgresql+psycopg://','postgresql://')) as connection:
+        assert connection.execute('SELECT 1').fetchone() == (1,)
+    print('database-available-for-cleanup',flush=True)
+"""
+    process = subprocess.Popen([sys.executable, '-c', script], cwd=Path(__file__).resolve().parents[3], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
+    try:
+        assert process.stdout is not None
+        assert process.stdout.readline().strip() == 'database-ready'
+        os.killpg(process.pid, signal.SIGINT)
+        output, error = process.communicate(timeout=20)
+        assert process.returncode == 0 and 'database-available-for-cleanup' in output, error
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)
+
+
+def test_package_manager_terminate_cannot_abandon_started_cleanup() -> None:
+    import os
+    import signal
+    import subprocess
+    import sys
+    from pathlib import Path
+    script = "from scripts.disposable_runtimes import protect_disposable_cleanup; import time; protect_disposable_cleanup(); print('cleanup-started',flush=True); time.sleep(.4); print('cleanup-confirmed',flush=True)"
+    process = subprocess.Popen([sys.executable, '-c', script], cwd=Path(__file__).resolve().parents[1], stdout=subprocess.PIPE, text=True)
+    try:
+        assert process.stdout is not None
+        assert process.stdout.readline().strip() == 'cleanup-started'
+        os.kill(process.pid, signal.SIGTERM)
+        output, _ = process.communicate(timeout=5)
+        assert process.returncode == 0 and 'cleanup-confirmed' in output
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)

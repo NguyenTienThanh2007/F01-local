@@ -36,7 +36,7 @@ args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
 api_root = root / "apps/api"
 sys.path.insert(0,str(api_root))
-from scripts.disposable_runtimes import cleanup_disposable, protect_disposable_cleanup
+from scripts.disposable_runtimes import cleanup_disposable, protect_disposable_cleanup, install_disposable_shutdown_handlers
 report_path = root / ".runtime/production-acceptance-report.json"
 
 
@@ -174,6 +174,7 @@ with test_database(root) as database:
     runtime.mkdir(exist_ok=True)
     log = (runtime / "commercial-local.log").open("w")
 
+    install_disposable_shutdown_handlers()
     try:
         api = subprocess.Popen(
             [

@@ -36,7 +36,7 @@ def test_database(root: Path) -> Iterator[str]:
         subprocess.run([str(pg_bin / 'initdb'), '-D', str(data), '-U', 'f01_test', '--auth=trust', '--no-locale', '--encoding=UTF8'], env=env, check=True, stdout=subprocess.DEVNULL)
         port = free_port()
         with (runtime / 'test-postgres.log').open('w') as log:
-            pg = subprocess.Popen([str(pg_bin / 'postgres'), '-D', str(data), '-h', '127.0.0.1', '-p', str(port), '-c', 'unix_socket_directories=', '-c', 'jit=off', '-c', 'timezone=UTC'], env=env, stdout=log, stderr=log)
+            pg = subprocess.Popen([str(pg_bin / 'postgres'), '-D', str(data), '-h', '127.0.0.1', '-p', str(port), '-c', 'unix_socket_directories=', '-c', 'jit=off', '-c', 'timezone=UTC'], env=env, stdout=log, stderr=log, start_new_session=True)  # Keep terminal Ctrl+C from stopping the DB before recorded-runtime cleanup.
             try:
                 for _ in range(100):
                     try:
