@@ -29,13 +29,14 @@ from test_database import free_port, test_database
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--production', action='store_true', help='Review the existing production build instead of starting Next dev.')
+parser.add_argument('--auth-methods', action='store_true', help='Show Google/email method choices backed by the controlled test identity provider; no real Google or email delivery.')
 parser.add_argument('--no-open', action='store_true', help='Print the URL without opening the default browser.')
 args = parser.parse_args()
 
 root = Path(__file__).resolve().parents[1]
 api_root = root / "apps/api"
 sys.path.insert(0,str(api_root))
-from scripts.disposable_runtimes import cleanup_disposable
+from scripts.disposable_runtimes import cleanup_disposable, protect_disposable_cleanup
 report_path = root / ".runtime/production-acceptance-report.json"
 
 
@@ -153,6 +154,8 @@ with test_database(root) as database:
         "OIDC_CLIENT_SECRET": "synthetic-fixture-client-secret",
         "OIDC_API_AUDIENCE": "fixture-api",
         "OIDC_REDIRECT_URI": f"{web_url}/api/auth/callback",
+        "OIDC_GOOGLE_CONNECTION": "google-oauth2" if args.auth_methods else "",
+        "OIDC_EMAIL_CONNECTION": "email" if args.auth_methods else "",
         "OPENAI_API_KEY": "synthetic-commercial-local-provider-key",
         "PLANNING_TIMEOUT_SECONDS": "10",
         "PLANNING_REQUESTS_PER_MINUTE": "20",
@@ -265,6 +268,7 @@ with test_database(root) as database:
     except KeyboardInterrupt:
         pass
     finally:
+        protect_disposable_cleanup()
         stop.set()
         for process in reversed(processes):
             terminate(process)

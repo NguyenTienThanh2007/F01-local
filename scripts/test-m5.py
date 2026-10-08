@@ -6,13 +6,14 @@ from alembic import command
 from alembic.config import Config
 from sqlalchemy import create_engine
 root = Path(__file__).resolve().parents[1]
-if sys.argv[1:] not in ([], ['--phase1'], ['--phase2a'], ['--ux0'], ['--commercial'], ['--build-states']):
-    raise SystemExit('Usage: test-m5.py [--phase1|--phase2a|--ux0|--commercial|--build-states]')
+if sys.argv[1:] not in ([], ['--phase1'], ['--phase2a'], ['--ux0'], ['--commercial'], ['--build-states'], ['--auth']):
+    raise SystemExit('Usage: test-m5.py [--phase1|--phase2a|--ux0|--commercial|--build-states|--auth]')
+auth_suite=sys.argv[1:]==['--auth']
 build_states=sys.argv[1:]==['--build-states']
 commercial = sys.argv[1:] == ['--commercial'] or build_states
 ux0 = commercial or sys.argv[1:] == ['--ux0']
-phase2 = ux0 or sys.argv[1:] == ['--phase2a']
-suite = 'test:real-build-states:e2e' if build_states else 'test:commercial:e2e' if commercial else 'test:ux0:e2e' if ux0 else 'test:phase2a:e2e' if phase2 else 'test:phase1:e2e' if sys.argv[1:] else 'test:simulation:e2e'
+phase2 = auth_suite or ux0 or sys.argv[1:] == ['--phase2a']
+suite = 'test:auth:e2e' if auth_suite else 'test:real-build-states:e2e' if build_states else 'test:commercial:e2e' if commercial else 'test:ux0:e2e' if ux0 else 'test:phase2a:e2e' if phase2 else 'test:phase1:e2e' if sys.argv[1:] else 'test:simulation:e2e'
 from test_database import test_database, free_port
 
 def docker_socket() -> str:
@@ -74,6 +75,8 @@ with test_database(root) as database:
                     OIDC_CLIENT_ID='fixture-client', OIDC_CLIENT_SECRET='synthetic-fixture-client-secret', OIDC_API_AUDIENCE='fixture-api',
                     OIDC_REDIRECT_URI=f'http://127.0.0.1:{web_port}/api/auth/callback', OPENAI_API_KEY='synthetic-phase2a-provider-key',
                     PLANNING_TIMEOUT_SECONDS='10', PLANNING_REQUESTS_PER_MINUTE='20')
+            if auth_suite:
+                api_env.update(OIDC_GOOGLE_CONNECTION='google-oauth2', OIDC_EMAIL_CONNECTION='email')
             if commercial:
                 import json
                 accepted = json.loads((root/'.runtime/production-acceptance-report.json').read_text())

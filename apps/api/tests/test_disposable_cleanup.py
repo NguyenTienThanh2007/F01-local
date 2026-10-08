@@ -31,3 +31,24 @@ def test_cleanup_only_removes_matching_recorded_runtime(foreign:str|None)->None:
 def test_cleanup_rejects_non_disposable_database_before_docker_access()->None:
     with pytest.raises(RuntimeError,match='DISPOSABLE_DATABASE_REQUIRED'):
         asyncio.run(cleanup_disposable('postgresql+psycopg://owner@127.0.0.1/production','/unavailable','unused'))
+
+
+def test_repeated_interrupt_cannot_abandon_bounded_disposable_cleanup() -> None:
+    import os
+    import signal
+    import subprocess
+    import sys
+    from pathlib import Path
+    script = "from scripts.disposable_runtimes import protect_disposable_cleanup; import time; protect_disposable_cleanup(); print('cleanup-started',flush=True); time.sleep(.4); print('cleanup-confirmed',flush=True)"
+    process = subprocess.Popen([sys.executable, '-c', script], cwd=Path(__file__).resolve().parents[1], stdout=subprocess.PIPE, text=True)
+    try:
+        assert process.stdout is not None
+        assert process.stdout.readline().strip() == 'cleanup-started'
+        os.kill(process.pid, signal.SIGINT)
+        os.kill(process.pid, signal.SIGINT)
+        output, _ = process.communicate(timeout=5)
+        assert process.returncode == 0 and 'cleanup-confirmed' in output
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)

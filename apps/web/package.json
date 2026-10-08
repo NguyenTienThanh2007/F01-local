@@ -17,6 +17,7 @@
     "test:commercial:e2e": "node --test tests/commercial.e2e.test.mjs",
     "test:ux0:e2e": "node --test tests/ux0.e2e.test.mjs",
     "test:build-experience:e2e": "node --test tests/build-experience.e2e.test.mjs",
+    "test:auth:e2e": "node --test tests/authentication.e2e.test.mjs",
     "test:real-build-states:e2e": "node --test tests/real-build-states.e2e.test.mjs"
   },
   "dependencies": {

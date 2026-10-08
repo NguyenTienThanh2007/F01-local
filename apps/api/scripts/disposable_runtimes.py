@@ -1,6 +1,7 @@
 """Test tooling: cleanup only runtimes recorded in the launcher's disposable database."""
 import json
 import re
+import signal
 from dataclasses import dataclass
 from uuid import UUID
 import httpx
@@ -45,3 +46,12 @@ async def cleanup_disposable(database_url: str, socket: str, image: str) -> int:
         async with httpx.AsyncClient(transport=httpx.AsyncHTTPTransport(uds=socket),base_url='http://docker',trust_env=False,timeout=30) as engine:
             return await remove_recorded(DockerSandbox(engine,image),records)
     finally:database.close()
+
+
+def protect_disposable_cleanup() -> None:
+    """Ignore repeated terminal interrupts during the launcher's bounded cleanup.
+
+    Called only after shutdown begins. Popen teardown retains its TERM/KILL
+    deadlines; Docker removal still requires recorded database/image/owner labels.
+    """
+    signal.signal(signal.SIGINT, signal.SIG_IGN)

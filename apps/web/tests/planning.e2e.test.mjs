@@ -218,7 +218,7 @@ test('production frontend submits, displays, recovers and protects the browser b
       for (const [name, href] of [['Projects', '/projects'], ['Examples', '#templates'], ['Docs', '#docs']]) {
         assert.equal(await navigation.getByRole('link', { name: new RegExp(name) }).getAttribute('href'), href);
       }
-      assert.equal(await page.locator('.os-account').getAttribute('href'), '/account');
+      assert.equal(await page.locator('.os-account').getAttribute('href'), '/sign-in');
       await page.locator('.welcome-advanced > summary').click();
       assert.match(await page.locator('#connections').innerText(), /PLANNED/);
       assert.match(await page.locator('#connections').innerText(), /No connections can be authorized/);
