@@ -2,6 +2,10 @@
 import asyncio
 import json
 import os
+import sys
+import threading
+from types import FrameType
+from typing import TYPE_CHECKING
 from pathlib import Path
 from uuid import UUID
 import httpx
@@ -19,6 +23,8 @@ from f01.execution.worker import BuildWorker
 from f01.main import create_app
 from f01.providers.factory import source_provider
 from f01.providers.openai import OpenAIPlanningProvider
+if TYPE_CHECKING:
+    from _typeshed import TraceFunction
 
 
 def test_live_context_plan_and_verified_source(database: Database, project_settings: Settings) -> None:
@@ -60,9 +66,21 @@ def test_live_context_plan_and_verified_source(database: Database, project_setti
             async def build() -> None:
                 async with httpx.AsyncClient(transport=httpx.AsyncHTTPTransport(uds=settings.sandbox_socket),base_url='http://docker',trust_env=False,timeout=300) as engine, httpx.AsyncClient(trust_env=False,timeout=120) as models:
                     assert await BuildWorker(database,settings,DockerSandbox(engine,image),source_provider(settings,models)).run_once()
-            asyncio.run(build())
+            # Record only exception class and application frame, never values/locals/logs/secrets.
+            exceptions: list[dict[str, str | int]]=[]
+            def observed_exception(frame: FrameType, event: str, arg: object) -> 'TraceFunction':
+                if isinstance(frame,FrameType) and event=='exception' and '/f01/' in frame.f_code.co_filename and isinstance(arg,tuple):
+                    kind=arg[0]
+                    if isinstance(kind,type) and kind.__name__ not in ('StopIteration','StopAsyncIteration','GeneratorExit'):
+                        exceptions.append({'type':kind.__name__,'function':frame.f_code.co_name,'file':frame.f_code.co_filename.split('/f01/')[-1],'line':frame.f_lineno})
+                return observed_exception
+            sys.settrace(observed_exception);threading.settrace_all_threads(observed_exception)
+            try:asyncio.run(build())
+            finally:sys.settrace(None);threading.settrace_all_threads(None)
             state=client.get(f'/v1/projects/{pid}/workspace').json()
             build_record=client.get(f'/v1/projects/{pid}/builds').json()['items'][0]
+            report['observed_build']={'phase':build_record['phase'],'error_code':build_record['run']['error_code'],'candidate_count':len(build_record['candidates']),'evidence_phases':[item['phase'] for item in build_record['evidence']]}
+            if build_record['run']['error_code']=='EXECUTION_FAILED':report['unexpected_exception_frames']=exceptions[-30:]
             assert state['current_version'] is not None, build_record['run']['error_code']
             assert state['current_version']['mode']=='real'
             assert all(item['exit_code']==0 for item in build_record['evidence'] if item['phase'] in ('verification','test'))

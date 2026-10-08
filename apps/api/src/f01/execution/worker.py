@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from f01.application import execution as service
 from f01.application.identity import digest
 from f01.application.planning import lock_owner
-from f01.application.source_artifacts import apply_proposal
+from f01.application.source_artifacts import SourceRejected, apply_proposal
 from f01.config import Settings, get_settings
 from f01.db.models import ExecutionJob, IsolatedPreview, PlanningAttempt, SourceCandidate, VerificationEvidence
 from f01.db.session import Database
@@ -77,7 +77,10 @@ class BuildWorker:
                 result = GenerationResult.model_validate_json((await task).model_dump_json())
             if result.output_tokens is not None and result.output_tokens>self.settings.source_output_tokens or result.input_tokens is not None and result.input_tokens>131072: raise ApplicationError("SOURCE_BUDGET_EXCEEDED")
             service.reject_secrets(self.settings,result.model_dump_json())
-            artifact=apply_proposal(result.proposal,context.lineage,base=context.base_source,forbidden_secrets=service.forbidden(self.settings),candidate_base=bool(context.repair_evidence))
+            try:
+                artifact=apply_proposal(result.proposal,context.lineage,base=context.base_source,forbidden_secrets=service.forbidden(self.settings),candidate_base=bool(context.repair_evidence))
+            except SourceRejected:
+                raise ApplicationError('SOURCE_PROPOSAL_REJECTED') from None
             successful=True
             return artifact
         finally:

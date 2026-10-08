@@ -17,7 +17,13 @@ per-file SHA-256. Preserve unrelated files. Initial source requires app/layout.t
 and app/page.tsx. Do not propose commands, package manifests, dependencies, config,
 secrets, production deployment or claims that tests/builds ran. The application
 owns the scaffold, commands and verification. Repair only issues in observed
-repair evidence. Return exactly the requested schema, without markdown fences."""
+repair evidence. Every proposal must change at least one file; repeating unchanged
+source is rejected, including during repair. Fix the file indicated by the saved
+diagnostic, preserving the other files and using their exact prior hashes.
+The trusted scaffold uses strict TypeScript. Type layout children as ReactNode;
+browser state/hooks require a 'use client' component. Do not fix type errors by
+weakening compiler settings or suppressing checks. Return exactly the requested
+schema, without markdown fences."""
 MAX_OUTPUT_TOKENS = 16000
 MAX_RESPONSE_BYTES = 786432
 

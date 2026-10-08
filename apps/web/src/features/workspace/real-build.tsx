@@ -58,6 +58,7 @@ export function RealBuildPanel({onReadyChange,onAttentionChange}:{onReadyChange?
  </section>;
 }
 function buildFailure(code:string|null){
+ if(code==='SOURCE_PROPOSAL_REJECTED')return 'The proposed source failed the required source-integrity checks. No new candidate or preview was published. Review the saved attempt before retrying.';
  const messages:Record<string,string>={PROVIDER_OUTCOME_UNKNOWN:'The worker stopped while generation was pending. Its provider result is unconfirmed.',BUILD_TIMEOUT:'This build reached its server time limit.',REPAIR_EXHAUSTED:'The saved checks still failed after the allowed repair attempts.',PROVIDER_AUTHENTICATION_FAILED:'The generation provider rejected its configured credentials.',PROVIDER_QUOTA_EXCEEDED:'The generation provider has no remaining allowance.',PROVIDER_TIMEOUT:'The generation provider did not return a result before its deadline.',SOURCE_BUDGET_EXCEEDED:'This attempt reached its configured source-generation allowance.',SOURCE_SECRET_REJECTED:'A security check rejected source or context containing a forbidden credential.',EXECUTION_UNAVAILABLE:'The trusted build runtime is unavailable.'};
  return messages[code??'']??'This attempt did not pass the required checks. Inspect its saved evidence before retrying.';
 }

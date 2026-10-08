@@ -99,6 +99,24 @@ def test_atomic_publication_and_bounded_repair(database:Database,configured:Sett
     assert detail.progress_sequence == workspace(database, owner, pid).last_sequence
     with database.session() as session:assert session.scalar(select(IsolatedPreview.id))
 
+@pytest.mark.parametrize('repair',[False,True])
+def test_rejected_generation_has_actionable_code_and_never_publishes(database:Database,configured:Settings,project_plan:ProjectPlan,repair:bool)->None:
+    owner,pid,body=setup_build(database,configured,project_plan)
+    run=service.queue(database,configured,owner,pid,body,'rejected-source')
+    class RejectedSource(SourceProvider):
+        async def propose_source(self,context:GenerationContext,maximum_output_tokens:int)->GenerationResult:
+            if repair and context.base_source is None:return await super().propose_source(context,maximum_output_tokens)
+            self.calls+=1
+            edits=tuple(PutFile(operation='put',path=f.path,prior_sha256=f.sha256,content=f.content) for f in context.base_source.files) if context.base_source else (PutFile(operation='put',path='app/page.tsx',prior_sha256=None,content='export default function Page(){return <main>Missing layout</main>}'),)
+            return GenerationResult(proposal=SourceProposal(schema_version=1,recipe='next-web-v1',base_digest=context.base_source.digest if context.base_source else None,edits=edits),input_tokens=100,output_tokens=200)
+    provider=RejectedSource(broken=repair);sandbox=ControlledSandbox()
+    assert asyncio.run(BuildWorker(database,configured,sandbox,provider).run_once())
+    detail=service.detail(database,owner,pid,run.id)
+    assert detail.run.status=='failed' and detail.run.error_code=='SOURCE_PROPOSAL_REJECTED'
+    assert workspace(database,owner,pid).current_version is None and not sandbox.names
+    assert len(detail.candidates)==(1 if repair else 0)
+    if repair:assert any(e.exit_code!=0 for e in detail.evidence)
+
 def test_failed_update_preserves_last_good_version(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
     owner,pid,body=setup_build(database,configured,project_plan)
     service.queue(database,configured,owner,pid,body,'first');sandbox=ControlledSandbox()
