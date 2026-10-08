@@ -41,7 +41,7 @@ test('M4 persisted workspace, immutable Brain, changes and isolated preview foun
    await page.getByRole('navigation', { name: 'Project navigation' }).getByRole('link', { name: 'Brief', exact: true }).click(); await page.getByRole('heading', { name: 'Original brief', exact: true }).waitFor(); await page.getByText(original, { exact: true }).first().waitFor(); assert.match(await page.getByRole('main').innerText(), /<script>window.stolen=true<\/script>/);
   });
   await scenario('real request saving recovers a lost response with the same frozen command', async () => {
-   setup('finish', created); await page.getByRole('button', { name: 'Refresh context', exact: true }).click(); await until(async () => (await page.locator('.workspace-sync').innerText()).includes('Saved sequence'));
+   setup('finish', created); await page.locator('.workspace-context-details > summary').click(); await page.getByRole('button', { name: 'Refresh context', exact: true }).click(); await until(async () => (await page.locator('.workspace-sync').innerText()).includes('Saved sequence'));
    await page.getByRole('button', { name: 'Requests', exact: true }).first().click(); const text = page.getByRole('textbox', { name: 'Change request' }); await text.fill('Add a visible priority filter for property leads.');
    const posts = []; let release;
    await page.route('**/api/v1/projects/*/requests', async route => { if (route.request().method() !== 'POST') return route.continue(); posts.push({ key: route.request().headers()['idempotency-key'], body: route.request().postDataJSON() }); const response = await route.fetch(); assert.equal(response.status(), 201); await new Promise(resolve => { release = resolve; }); await route.abort('failed'); });

@@ -8,18 +8,20 @@ import {outcomeIsUnknown} from '@/lib/projects/creation';
 import {readReceipt,saveReceipt} from '@/lib/workspace/receipt-storage';
 import {releaseReceipt,releaseReceiptExpired,productionURL,type ReleaseReceipt} from '@/lib/workspace/release-receipt';
 import {uuid} from '@/lib/workspace/contracts';
-import {useWorkspace,useResource,ResourceState,time} from './workspace';
+import {useWorkspace,ResourceState,time} from './workspace';
+import {useFlow} from './flow';
 type Releases=components['schemas']['ReleaseWorkspace'];
 const terminal=['succeeded','failed','canceled'];
 const stages:Record<string,string>={queued:'Deployment queued',staging:'Staging your package',checking:'Checking the staged app',promoting:'Promoting your release',verifying:'Verifying the public URL',reconciling:'Confirming provider state',restoring:'Restoring the previous release',succeeded:'Deployment verified',failed:'Deployment needs attention',canceled:'Deployment canceled'};
 function PublishOptions({sameVersion,children}:{sameVersion:boolean;children:ReactNode}){return sameVersion?<details className="release-publish-options"><summary>Publish this version again</summary>{children}</details>:children;}
-export function ReleasePanel({historyOnly=false,versionId,secondaryActions=false}:{historyOnly?:boolean;versionId?:string;secondaryActions?:boolean}){
- const {id,snapshot,refresh}=useWorkspace(),result=useResource<Releases>(`/projects/${id}/releases`);
+export function ReleasePanel({historyOnly=false,versionId,secondaryActions=false,onAttentionChange}:{historyOnly?:boolean;versionId?:string;secondaryActions?:boolean;onAttentionChange?:(attention:boolean)=>void}){
+ const {id,snapshot,refresh}=useWorkspace(),{releases:result}=useFlow();
  const [receipt,setReceipt]=useState<ReleaseReceipt|null>(null),[ready,setReady]=useState(false),[pending,setPending]=useState(false),[error,setError]=useState(''),[reviewed,setReviewed]=useState(false),[notice,setNotice]=useState('');
  const busy=useRef(false),receiptName=`f01:release:${id}`;
  useEffect(()=>{setReceipt(readReceipt(receiptName,v=>releaseReceipt(v,id)));setReady(true);},[id,receiptName]);
  const data=result.data,version=snapshot.current_version,config=data?.configuration,current=data?.releases.find(r=>r.id===data.current_release_id),active=data?.releases.find(r=>!terminal.includes(r.state));
  const prep=data?.preparations.find(p=>p.version_id===version?.id&&p.configuration_id===config?.id),artifact=data?.artifacts.find(a=>a.id===prep?.artifact_id&&a.version_id===version?.id&&a.brain_revision_id===snapshot.project.current_brain_revision_id);
+ useEffect(()=>{onAttentionChange?.(Boolean(receipt||error));},[Boolean(receipt),error,onAttentionChange]);
  const setup=data?.hosting_setup;
  const retryRelease=data?.releases.find(r=>['failed','canceled'].includes(r.state)&&r.artifact_id===artifact?.id);
  const waiting=active||prep&&['queued','packaging'].includes(prep.state)||setup&&['queued','creating','reconciling'].includes(setup.state);
@@ -42,7 +44,7 @@ export function ReleasePanel({historyOnly=false,versionId,secondaryActions=false
  const history=data?.releases.filter(r=>!versionId||r.version_id===versionId),liveURL=productionURL(current?.public_url);
  if(!data)return <ResourceState {...result}/>;
  return <section className="workspace-notice production-release" data-state={active?.state??(current?'succeeded':'idle')} aria-label="Production release">
-  <span className="meta">02 / PRODUCTION</span><h3>{active?stages[active.state]:current?'Your product is live':'Deploy your product'}</h3>
+  <span className="meta">PUBLISH</span><h3>{active?stages[active.state]:current?'Your product is live':'Deploy your product'}</h3>
   {current&&<p>Live release from {current.version_id===version?.id?`version ${version.number}`:'an earlier version'}. {liveURL&&<a className="text-action" href={liveURL} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">Open public URL ↗</a>}</p>}
   {current&&version&&current.version_id!==version.id&&<p>Preview version {version.number} is ahead of production. Review and redeploy it when ready.</p>}
   {active&&<p role="status">{active.state==='reconciling'?'The provider outcome is still being confirmed. Your last verified release remains recorded; further changes wait for reconciliation.':active.state==='restoring'?'The update did not pass. F01 is confirming restoration of the previous release.':'Deployment progress is saved. The public link appears after provider and health checks pass.'}</p>}

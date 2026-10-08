@@ -51,7 +51,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
     await mkdir(evidence, { recursive: true });
 
     await scenario('one persisted journey covers lifecycle, Brain, history, cancel and metadata', async () => {
-      await page.goto(`${base}/projects`); await page.getByRole('heading', { name: 'Give your idea a working direction.' }).waitFor();
+      await page.goto(`${base}/projects`); await page.getByRole('heading', { name: /Start with a brief/ }).waitFor();
       await page.getByRole('link', { name: 'New project' }).click();
       await page.getByRole('textbox', { name: /Project title/ }).fill('Phase 1 acceptance');
       const original = 'Build a CRM with property leads, pipeline stages and private notes.';
@@ -104,8 +104,8 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
       await page.getByRole('button', { name: 'Save title', exact: true }).evaluate(button => { button.click(); button.click(); });
       await page.getByRole('heading', { name: 'Phase 1 reviewed', exact: true }).waitFor(); page.off('request', count); assert.equal(patches, 1);
       await page.getByRole('button', { name: 'Archive project', exact: true }).click(); await page.getByRole('button', { name: 'Unarchive project', exact: true }).waitFor();
-      await page.goto(`${base}/projects`); await page.getByRole('heading', { name: 'Give your idea a working direction.' }).waitFor();
-      await page.getByRole('combobox', { name: 'Archive filter' }).selectOption('true'); await page.getByRole('button', { name: 'Apply filters' }).click();
+      await page.goto(`${base}/projects`); await page.getByRole('heading', { name: /Start with a brief/ }).waitFor();
+      await page.locator('.dashboard-filters > summary').click(); await page.getByRole('combobox', { name: 'Archive filter' }).selectOption('true'); await page.getByRole('button', { name: 'Apply filters' }).click();
       await page.getByRole('link', { name: /Phase 1 reviewed/ }).waitFor();
       await page.getByRole('button', { name: 'Project settings', exact: true }).click(); await page.getByRole('button', { name: 'Unarchive project', exact: true }).click();
       await page.getByRole('heading', { name: 'No projects in this view.' }).waitFor(); await page.goto(`${base}/projects`); await page.getByRole('link', { name: /Phase 1 reviewed/ }).waitFor();
