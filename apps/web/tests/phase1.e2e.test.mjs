@@ -182,8 +182,9 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
       await zoom.getByRole('heading', { name: 'Saved execution timeline', exact: true }).waitFor();
       await zoom.getByText('Event connection: live', { exact: true }).waitFor();
       const zoomTrace=zoom.getByLabel('Ordered Build Trace', { exact: true }); await until(async () => zoomTrace.evaluate(element => element.scrollHeight-element.clientHeight-element.scrollTop < 24));
-      const zoomLast=await zoomTrace.locator('li[data-sequence]').last().boundingBox(); assert.ok(zoomLast && zoomLast.y+zoomLast.height <= 500, '200% reflow latest Trace event inside viewport');
-      await zoom.screenshot({ path: `${evidence}/zoom-200.png`, fullPage: true }); await zoom.close();
+      const zoomLast=await zoomTrace.locator('li[data-sequence]').last().boundingBox();
+      await zoom.screenshot({ path: `${evidence}/zoom-200.png`, fullPage: true });
+      assert.ok(zoomLast && zoomLast.y+zoomLast.height <= 500, '200% reflow latest Trace event inside viewport'); await zoom.close();
       await page.goto(base); await page.getByRole('button', { name: 'Play demo', exact: true }).click(); await delay(150);
       assert.deepEqual(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === 'running').map(animation => animation.animationName)), []);
     });

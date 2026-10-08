@@ -186,7 +186,7 @@ test('production frontend submits, displays, recovers and protects the browser b
       const before = calls;
       await page.goto(base);
       assert.match(await page.getByRole('heading', { level: 1 }).innerText(), /Describe the outcome\.\s*Get working software\./);
-      assert.match(await page.locator('.os-hero-grid > div > p').innerText(), /real draft plan or save a project/);
+      assert.match(await page.locator('.os-hero-grid > div > p').innerText(), /Review the plan, follow the build and preview your product before publishing/);
       assert.equal(await page.getByRole('button', { name: 'Play demo' }).count(), 1);
       assert.match(await page.locator('.demo-trace > p').innerText(), /No application, build or deployment is executed/);
       for (const [title, expected, sample] of [

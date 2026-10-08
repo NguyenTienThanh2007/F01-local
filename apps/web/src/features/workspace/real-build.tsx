@@ -12,7 +12,7 @@ type Builds=components['schemas']['BuildList'];
 type Proposals=components['schemas']['ProposalList'];
 type Session=components['schemas']['SessionView'];
 
-export function RealBuildPanel(){
+export function RealBuildPanel({onReadyChange}:{onReadyChange?:(ready:boolean)=>void}={}){
  const {id,snapshot,refresh}=useWorkspace();
  const session=useResource<Session>('/session'),plans=useResource<Proposals>(`/projects/${id}/planning/proposals`),builds=useResource<Builds>(`/projects/${id}/builds`);
  const [pending,setPending]=useState(false),[error,setError]=useState(''),[receipt,setReceipt]=useState<BuildReceipt|null>(null),[ready,setReady]=useState(false),[confirmed,setConfirmed]=useState<Run|null>(null);
@@ -28,6 +28,8 @@ export function RealBuildPanel(){
  },[active?.id,refresh]);
  useEffect(()=>{builds.retry();},[snapshot.last_sequence]);
  const current=plans.data?.items.find(p=>p.reviewed&&p.current_context&&p.brain_revision_id===snapshot.project.current_brain_revision_id&&p.version_id===snapshot.project.current_version_id),latest=builds.data?.items[0];
+ const buildReady=Boolean(current&&!active&&!receipt&&session.data?.capabilities?.real_generation);
+ useEffect(()=>{onReadyChange?.(buildReady);},[buildReady,onReadyChange]);
  const expired=receipt&&buildReceiptExpired(receipt);
  async function perform(command:BuildReceipt){
   if(busy.current||!ready||buildReceiptExpired(command))return;
@@ -46,10 +48,10 @@ export function RealBuildPanel(){
  function command(path:string,body:BuildReceipt['body']):BuildReceipt{return {key:crypto.randomUUID(),path,body,created:Date.now()};}
  if((!session.data?.capabilities?.real_generation||session.data?.capabilities?.execution_mode!=='real')&&!latest&&!receipt)return <><ResourceState {...session}/>{session.data?.capabilities?.execution_mode==='real'&&<section className="workspace-notice"><h3>Build runtime unavailable</h3><p>Your project and plans are saved. The trusted build runtime must be configured and verified before a build can start.</p><Link className="button button-primary" href={`/projects/${id}/planning`}>Review a plan</Link></section>}</>;
  const status=active?.status??latest?.run.status;
- const title=pending?'Sending build command…':receipt?'Confirming your saved build':status==='queued'?'Build queued':status==='running'?'Building your application':status==='succeeded'?'Build verified':status==='failed'?'Build needs attention':status==='canceled'?'Build canceled':'Build your application';
- return <section className="workspace-notice build-command" data-state={status??'idle'} aria-label="Real build">
+ const title=pending?'Sending build command…':receipt?'Confirming your saved build':status==='queued'?'Build queued':status==='running'?'Building your application':buildReady?snapshot.current_version?'Ready for the next build':'Ready to build':status==='succeeded'?'Build verified':status==='failed'?'Build needs attention':status==='canceled'?'Build canceled':'Build your application';
+ return <section className="workspace-notice build-command" data-state={buildReady?'ready':status??'idle'} aria-label="Real build">
   <span className="meta">01 / BUILD</span><h3 aria-live="polite">{title}</h3>
-  <p>{status==='queued'?'Saved and waiting for the build worker. You can leave and return.':status==='running'?'Generating and checking your application. Build Trace follows each observed step.':status==='succeeded'?'Your verified source and preview are saved.':status==='failed'?'This attempt needs attention. Your last successful version stays available.':status==='canceled'?'This attempt was canceled. Your saved context stays available.':'Turn your reviewed plan into an application in the trusted build environment.'}</p>
+  <p>{buildReady?'Your reviewed direction is ready. Build it from the saved project context.':status==='queued'?'Saved and waiting for the build worker. You can leave and return.':status==='running'?'Generating and checking your application. Build Trace follows each observed step.':status==='succeeded'?'Your verified source and preview are saved.':status==='failed'?'This attempt needs attention. Your last successful version stays available.':status==='canceled'?'This attempt was canceled. Your saved context stays available.':'Turn your reviewed plan into an application in the trusted build environment.'}</p>
   {active?.mode==='real'&&<Link className="button button-primary" href={`/projects/${id}?panel=trace`}>Follow Build Trace</Link>}
   {error&&<p role="alert">{error}</p>}
   {receipt?<>{expired?<p role="alert">This command is outside its safe recovery window. Inspect saved build history before starting another build.</p>:<button className="button button-secondary" disabled={pending||!ready} onClick={()=>void perform(receipt)}>Resolve saved build command</button>}</>:<>

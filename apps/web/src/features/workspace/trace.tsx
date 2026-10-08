@@ -14,6 +14,17 @@ function groups(events: BuildEvent[]) {
   }
   return result;
 }
+function followLatest(element: HTMLDivElement) {
+  element.scrollTop = element.scrollHeight;
+  const rows = element.querySelectorAll<HTMLElement>('li[data-sequence]');
+  const last = rows.item(rows.length - 1), body = element.closest<HTMLElement>('.inspector-body');
+  // At short viewport heights the inspector also scrolls. Keep following within
+  // that panel, without moving the product page behind it.
+  if (last && body) {
+    const clipped = last.getBoundingClientRect().bottom - body.getBoundingClientRect().bottom;
+    if (clipped > 0) body.scrollTop += clipped;
+  }
+}
 export function BuildTrace() {
   const { snapshot, events, transport, historyReady, inspectedRunId } = useWorkspace();
   const runId = inspectedRunId ?? snapshot.latest_run?.id;
@@ -21,10 +32,10 @@ export function BuildTrace() {
   const [follow,setFollow] = useState(true), [seen,setSeen] = useState(0);
   const scroll = useRef<HTMLDivElement>(null);
   useEffect(() => { setFollow(true); setSeen(0); },[runId]);
-  useEffect(() => { if (follow && scroll.current) { scroll.current.scrollTop = scroll.current.scrollHeight; setSeen(selected.length); } },[selected.length,follow]);
+  useEffect(() => { if (follow && scroll.current) { followLatest(scroll.current); setSeen(selected.length); } },[selected.length,follow]);
   useEffect(() => {
     const element = scroll.current; if (!element || !follow) return;
-    const observer = new ResizeObserver(() => { element.scrollTop = element.scrollHeight; });
+    const observer = new ResizeObserver(() => followLatest(element));
     observer.observe(element); return () => observer.disconnect();
   }, [follow]);
   const related = issueRelationships(selected);

@@ -52,6 +52,8 @@ select:not(:disabled) { cursor: pointer; }
 .project-filters select { cursor: pointer; }
 .project-filters .button { font-size: 13px; }
 .project-list-state { padding-block: 20px; }
+.project-connection-error { display: flex; flex-wrap: wrap; gap: 12px; }
+.project-connection-error > p { flex-basis: 100%; max-width: 65ch; margin: 0; }
 .project-register-heading { display: grid; grid-template-columns: 28px minmax(150px,1fr) 150px 150px 138px; gap: 20px; padding: 12px 16px; color: var(--muted); font: 12px/18px var(--font-mono); background: var(--surface-muted); border-top: 1px solid var(--line); }
 .saved-project-row { grid-template-columns: 28px minmax(150px,1fr) 150px 150px 138px; padding-block: 28px; }
 .saved-project-title { font-size: 22px; letter-spacing: -.025em; align-items: baseline; }
