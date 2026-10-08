@@ -20,3 +20,16 @@ export function creationTarget(value: unknown): string | null {
   const path = `/projects/${project.id}`;
   return result.project_url === path && typeof result.request_id === 'string' && uuid.test(result.request_id) && typeof result.brain_revision_id === 'string' && uuid.test(result.brain_revision_id) && (result.run_id === null && result.execution_mode === 'real' || typeof result.run_id === 'string' && uuid.test(result.run_id)) ? path : null;
 }
+
+export const DRAFT_STORAGE='f01.project-draft.v1';
+export type CreationDraft={title:string;brief:string;owner:string|null};
+export function readCreationDraft(storage:Pick<Storage,'getItem'>,owner:string|null):CreationDraft|null{
+ try{
+  const draft=JSON.parse(storage.getItem(DRAFT_STORAGE)??'null');
+  if(draft&&typeof draft.title==='string'&&typeof draft.brief==='string'&&Array.from(draft.title).length<=100&&Array.from(draft.brief).length<=10000&&(draft.owner===null||draft.owner===owner))return draft;
+ }catch{}
+ return null;
+}
+export function saveCreationDraft(storage:Pick<Storage,'setItem'|'removeItem'>,draft:CreationDraft|null):void{
+ try{if(draft&&(draft.title||draft.brief))storage.setItem(DRAFT_STORAGE,JSON.stringify(draft));else storage.removeItem(DRAFT_STORAGE);}catch{}
+}

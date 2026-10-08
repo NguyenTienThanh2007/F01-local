@@ -1,11 +1,10 @@
-import {stopBrowserServer} from './browser-process.mjs';
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {mkdir,readFile} from 'node:fs/promises';
 import {setTimeout as delay} from 'node:timers/promises';
-import {chromium} from 'playwright';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 async function until(check){for(let i=0;i<120;i++){if(await check().catch(()=>false))return;await delay(100);}throw Error('Expected core journey state not reached');}
@@ -22,13 +21,18 @@ test('UX0 signed-in real-mode commands (no Docker execution)',{timeout:180000},a
  async function seed(page,title){const r=await page.evaluate(async title=>{const response=await fetch('/api/v1/projects',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({title,brief:'Build a browser-only dashboard with leads and private notes.'})});return {status:response.status,data:await response.json()};},title);assert.equal(r.status,201);assert.equal(r.data.execution_mode,'real');assert.equal(r.data.run_id,null);return r.data.project.id;}
  async function scenario(name,fn){await t.test(name,async()=>{const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));try{await signIn(page);await fn(page);assert.deepEqual(errors,[]);}catch(e){await page.screenshot({path:`${evidence}/${name.split(' ')[0]}-failure.png`,fullPage:true});throw e;}finally{await page.close();}});}
  try{
-  await until(async()=> (await fetch(base)).ok);browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
+  await until(async()=> (await fetch(base)).ok);browser=await launchTestBrowser({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
+  await scenario('first-time brief survives sign-in and reload before any creation',async page=>{
+   await page.goto(`${base}/account`);await page.getByRole('button',{name:'Sign out'}).click();await page.goto(`${base}/projects/new`);await page.getByRole('link',{name:'Sign in to create your project'}).waitFor();
+   const brief='Build a browser-only checklist for a small design studio with tasks and completed work.';
+   await page.getByRole('textbox',{name:'Product brief'}).fill(brief);await page.getByRole('textbox',{name:/Project title/}).fill('Recovered first brief');await page.getByRole('link',{name:'Sign in to create your project'}).click();await signIn(page);await page.goto(`${base}/projects/new`);await page.getByText('Your draft is back. Review it before creating your project.',{exact:true}).waitFor();assert.equal(await page.getByRole('textbox',{name:'Product brief'}).inputValue(),brief);await page.reload();await page.getByText('Your draft is back. Review it before creating your project.',{exact:true}).waitFor();assert.equal(await page.getByRole('textbox',{name:'Product brief'}).inputValue(),brief);assert.equal((await read(page,'/projects?q=Recovered%20first%20brief')).data.items.length,0);await page.getByRole('button',{name:'Create project',exact:true}).click();await page.waitForURL(/\/projects\/[0-9a-f-]{36}$/);assert.equal((await read(page,'/projects?q=Recovered%20first%20brief')).data.items.length,1);await page.goto(`${base}/projects/new`);assert.equal(await page.getByRole('textbox',{name:'Product brief'}).inputValue(),'');
+  });
   await scenario('creation resolves a lost real response with the same receipt after reload',async page=>{
    const commands=[];let lose=true;
    await page.route('**/api/v1/projects',async route=>{if(route.request().method()!=='POST')return route.continue();commands.push({key:route.request().headers()['idempotency-key'],body:route.request().postData()});if(lose){lose=false;await route.fetch();await route.abort('failed');}else await route.continue();});
    await page.goto(`${base}/projects/new`);await page.getByRole('textbox',{name:/Project title/}).fill('UX0 real project');await page.getByRole('textbox',{name:'Product brief'}).fill('Build a browser-only dashboard for a small property agency.');
    await page.locator('form.saved-project-form').evaluate(form=>{form.requestSubmit();form.requestSubmit();});
-   await page.getByRole('button',{name:'Retry project creation'}).waitFor();assert.equal(commands.length,1);await page.reload();await page.getByRole('button',{name:'Retry project creation'}).click();await page.waitForURL(/\/projects\/[0-9a-f-]{36}$/,{timeout:10000});
+   await page.getByRole('button',{name:'Retry project creation'}).waitFor();assert.equal(commands.length,1);assert.equal(await page.getByRole('textbox',{name:'Product brief'}).getAttribute('aria-invalid'),'false');await page.reload();await page.getByRole('button',{name:'Retry project creation'}).click();await page.waitForURL(/\/projects\/[0-9a-f-]{36}$/,{timeout:10000});
    assert.equal(commands.length,2);assert.deepEqual(commands[0],commands[1]);const id=new URL(page.url()).pathname.split('/').at(-1);const snapshot=(await read(page,`/projects/${id}/workspace`)).data;assert.equal(snapshot.active_run,null);assert.equal(snapshot.current_version,null);assert.equal((await read(page,'/projects?q=UX0%20real%20project')).data.items.length,1);await page.reload();await page.getByRole('heading',{name:'UX0 real project',exact:true}).waitFor();
   });
   await scenario('creation recovery cannot replay another account’s saved brief',async page=>{

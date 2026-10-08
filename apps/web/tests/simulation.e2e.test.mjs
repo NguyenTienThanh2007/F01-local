@@ -1,3 +1,4 @@
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
@@ -5,7 +6,6 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { mkdir, readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
 const webRoot=fileURLToPath(new URL('../',import.meta.url));
 const root=fileURLToPath(new URL('../../../',import.meta.url));
 const api=process.env.M5_API_URL, token=process.env.M5_TEST_TOKEN;
@@ -20,7 +20,7 @@ test('M5 real PostgreSQL/API simulation journey, replay, fallback and workspace 
  const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],{cwd:webRoot,env,stdio:'ignore'});let browser;
  async function scenario(name,fn){let failure;await t.test(name,async()=>{try{await fn();}catch(e){failure=e;throw e;}});if(failure)throw failure;}
  try{
-  await until(async()=>(await fetch(base)).ok);browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
+  await until(async()=>(await fetch(base)).ok);browser=await launchTestBrowser({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
   const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await mkdir(`${webRoot}/test-results/m5`,{recursive:true});
   let id,firstVersion,failedRun,secondVersion;
@@ -103,5 +103,5 @@ test('M5 real PostgreSQL/API simulation journey, replay, fallback and workspace 
    const child=page.frames().find(frame=>frame.url().includes('/demo-preview/crm-v1'));assert.ok(child);
    const blocked=await child.evaluate(async()=>{const result={};for(const [name,fn] of [['parent',()=>parent.document],['storage',()=>localStorage.getItem('x')],['cookies',()=>document.cookie]]){try{fn();result[name]=false;}catch{result[name]=true;}}try{await fetch('/api/v1/projects');result.fetch=false;}catch{result.fetch=true;}return result;});assert.deepEqual(blocked,{parent:true,storage:true,cookies:true,fetch:true});assert.deepEqual(errors,[]);
   });
- }finally{await browser?.close();server.kill('SIGTERM');}
+ }finally{await browser?.close();await stopBrowserServer(server);}
 });

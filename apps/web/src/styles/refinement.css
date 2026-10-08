@@ -580,3 +580,20 @@ select:not(:disabled) { cursor: pointer; }
  .planning-proposal > section { padding: 24px 20px; grid-template-columns: minmax(0,1fr); gap: 12px; }
  .planning-proposal > .plan-supporting { padding-inline: 20px; }
 }
+
+/* Keep the current decision visible before supplementary context. */
+.planning-heading { padding-bottom: 20px; margin-bottom: 12px; }
+.planning-heading h2 { font-size: 28px; }
+.planning-heading > p { margin-top: 8px; }
+.planning-request-editor:not([open]) { padding-block: 0; margin-bottom: 20px; }
+.planning-context { margin-bottom: 0; }
+.preview-toolbar-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 16px; }
+.preview-toolbar-actions .button-primary { min-height: 44px; }
+.publish-pane:not([open]) { background: transparent; }
+.publish-pane:not([open]) > summary { padding-inline: 0 !important; }
+@media (max-width: 767px) {
+ .preview-toolbar-actions { width: 100%; justify-content: flex-start; }
+ .preview-toolbar-actions .button-primary { width: 100%; }
+ .planning-heading h2 { font-size: 26px; }
+ .plan-overview { padding: 24px 20px; }
+}

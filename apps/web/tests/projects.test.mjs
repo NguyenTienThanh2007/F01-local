@@ -72,3 +72,26 @@ test('browser harness teardown completes when a child ignores graceful shutdown'
  await stopBrowserServer(child,100);assert.equal(child.signalCode,'SIGKILL');
  await stopBrowserServer(child,100);
 });
+
+test('unsent creation drafts survive authentication without crossing account ownership',async()=>{
+ const {readCreationDraft,saveCreationDraft,DRAFT_STORAGE}=await import('../src/lib/projects/creation.ts');
+ let value=null;const storage={getItem:()=>value,setItem:(name,next)=>{assert.equal(name,DRAFT_STORAGE);value=next;},removeItem:()=>{value=null;}};
+ const anonymous={title:'Draft',brief:'A small browser-only checklist',owner:null};
+ saveCreationDraft(storage,anonymous);assert.deepEqual(readCreationDraft(storage,id),anonymous);
+ const owned={...anonymous,owner:id};saveCreationDraft(storage,owned);assert.deepEqual(readCreationDraft(storage,id),owned);assert.equal(readCreationDraft(storage,key),null);assert.equal(readCreationDraft(storage,null),null);
+ saveCreationDraft(storage,null);assert.equal(readCreationDraft(storage,id),null);
+ assert.doesNotThrow(()=>saveCreationDraft({setItem:()=>{throw Error('blocked');},removeItem:()=>{throw Error('blocked');}},owned));
+});
+
+test('an exited test child releases inherited pipes without waiting for descendants',async()=>{
+ const {spawn}=await import('node:child_process'),{once}=await import('node:events'),{releaseExitedPipes}=await import('./browser-process.mjs');
+ const code="const c=require('node:child_process').spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{detached:true,stdio:['ignore',1,2]});process.stdout.write(String(c.pid)+'\\n');c.unref();setTimeout(()=>process.exit(0),100);";
+ const child=spawn(process.execPath,['-e',code],{stdio:['ignore','pipe','pipe']});
+ const [chunk]=await once(child.stdout,'data');const descendant=Number(String(chunk).trim());
+ assert.ok(Number.isInteger(descendant)&&descendant>0);
+ try{
+  let closed=false;const done=once(child,'close').then(()=>{closed=true;});
+  await once(child,'exit');assert.equal(closed,false,'Inherited pipes keep close pending after the process exits.');
+  releaseExitedPipes(child);await done;assert.equal(closed,true);
+ }finally{process.kill(descendant,'SIGKILL');}
+});

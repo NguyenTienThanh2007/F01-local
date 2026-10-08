@@ -1,3 +1,4 @@
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -6,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import { readdir, readFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
 import { projectPlan } from './fixtures/project-plan.mjs';
 
 const webRoot = fileURLToPath(new URL('../', import.meta.url));
@@ -75,7 +75,7 @@ test('production frontend submits, displays, recovers and protects the browser b
     delete env.OPENAI_API_KEY;
     frontend = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', String(frontendPort)], { cwd: webRoot, env, stdio: 'ignore' });
     await waitUntil(async () => (await fetch(`${base}/projects/new`)).ok);
-    browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
+    browser = await launchTestBrowser({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     const browserPosts = [];
     page.on('request', req => { if (req.method() === 'POST') browserPosts.push(req); });
@@ -290,7 +290,7 @@ test('production frontend submits, displays, recovers and protects the browser b
 
     await run('dashboard exposes a retryable connection error and starters prefill creation', async () => {
       await page.goto(`${base}/projects`);
-      await page.getByRole('button', { name: 'Retry project list' }).waitFor();
+      await page.getByRole('link', { name: 'Sign in to your workspace' }).waitFor();
       assert.equal(await page.getByRole('searchbox', { name: 'Search projects' }).isDisabled(), false);
       await page.locator('.dashboard-filters > summary').click();
       assert.equal(await page.getByRole('combobox', { name: 'Project state' }).isDisabled(), false);
@@ -340,9 +340,9 @@ test('production frontend submits, displays, recovers and protects the browser b
   } finally {
     for (const response of pendingResponses) response.destroy();
     await browser?.close();
-    frontend?.kill('SIGTERM');
+    const stopped=stopBrowserServer(frontend);
     backend.closeAllConnections();
     await new Promise(resolve => backend.close(resolve));
-    if (frontend && frontend.exitCode === null) await new Promise(resolve => frontend.once('exit', resolve));
+    await stopped;
   }
 });

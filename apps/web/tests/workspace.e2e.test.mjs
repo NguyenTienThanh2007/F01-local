@@ -1,3 +1,4 @@
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -5,7 +6,6 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { mkdir, readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
 const webRoot = fileURLToPath(new URL('../', import.meta.url)), root = fileURLToPath(new URL('../../../', import.meta.url));
 const api = process.env.M4_API_URL, database = process.env.M4_TEST_DATABASE_URL, token = process.env.M4_TEST_TOKEN;
 async function until(check) { for (let n = 0; n < 200; n++) { if (await check().catch(() => false)) return; await delay(100); } throw new Error('Expected browser state not reached'); }
@@ -18,7 +18,7 @@ test('M4 persisted workspace, immutable Brain, changes and isolated preview foun
  const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', String(port)], { cwd: webRoot, env, stdio: 'ignore' }); let browser;
  async function scenario(name, fn) { let failure; await t.test(name, async () => { try { await fn(); } catch(e) { failure = e; throw e; } }); if (failure) throw failure; }
  try {
-  await until(async () => (await fetch(base)).ok); browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+  await until(async () => (await fetch(base)).ok); browser = await launchTestBrowser({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
   await mkdir(`${webRoot}/test-results/m4`, { recursive: true });
   const original = 'Build a CRM for property leads. Preserve this <script>window.stolen=true</script> as plain text.';
@@ -97,5 +97,5 @@ test('M4 persisted workspace, immutable Brain, changes and isolated preview foun
    const unknown = await (await direct('/projects', { method: 'POST', headers: { 'Idempotency-Key': 'unknown-schema' }, body: JSON.stringify({ title: 'Unknown schema', brief: 'A safe test fixture for an unsupported Brain schema.' }) })).json(); setup('unknown-schema', unknown); await page.goto(`${base}/projects/${unknown.project.id}/brain`); await page.getByText('This Brain schema is not supported. The saved content has not been changed.', { exact: true }).waitFor();
    await page.route('**/api/v1/projects/*/workspace', route => route.abort('failed')); await page.goto(`${base}/projects/${id}`); await page.getByRole('button', { name: 'Retry workspace' }).waitFor(); await page.unroute('**/api/v1/projects/*/workspace'); await page.getByRole('button', { name: 'Retry workspace' }).click(); await page.getByRole('heading', { name: 'Harbor M4', exact: true }).waitFor();
   });
- } finally { await browser?.close(); server.kill('SIGTERM'); }
+ } finally { await browser?.close(); await stopBrowserServer(server); }
 });

@@ -1,3 +1,4 @@
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -5,7 +6,6 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
 
 const webRoot = fileURLToPath(new URL('../', import.meta.url));
 const root = fileURLToPath(new URL('../../../', import.meta.url));
@@ -45,7 +45,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
   }
   try {
     await until(async () => (await fetch(base)).ok);
-    browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+    browser = await launchTestBrowser({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
     page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     page.on('pageerror', error => errors.push(error.message));
     await mkdir(evidence, { recursive: true });
@@ -185,7 +185,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
       const zoomLast=await zoomTrace.locator('li[data-sequence]').last().boundingBox();
       await zoom.screenshot({ path: `${evidence}/zoom-200.png`, fullPage: true });
       assert.ok(zoomLast && zoomLast.y+zoomLast.height <= 500, '200% reflow latest Trace event inside viewport'); await zoom.close();
-      await page.goto(base); await page.getByRole('button', { name: 'Play demo', exact: true }).click(); await delay(150);
+      await page.goto(base); await page.locator('.welcome-draft > summary').click(); await page.getByRole('button', { name: 'Play demo', exact: true }).click(); await delay(150);
       assert.deepEqual(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === 'running').map(animation => animation.animationName)), []);
     });
 
@@ -232,5 +232,5 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
       assert.deepEqual(errors, []);
     });
     await writeFile(`${evidence}/local-baseline.json`, JSON.stringify({ runtime: 'Production Next.js + FastAPI + disposable PostgreSQL 16 on loopback; Chromium headless; 800ms simulation tick; no live model', zoom: '1440×1000 physical-equivalent viewport → 720×500 CSS px at DPR 2 (200% reflow)', measurements }, null, 2)+'\n');
-  } finally { await browser?.close(); server.kill('SIGTERM'); }
+  } finally { await browser?.close(); await stopBrowserServer(server); }
 });

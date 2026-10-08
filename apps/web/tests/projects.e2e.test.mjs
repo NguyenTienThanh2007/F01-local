@@ -1,3 +1,4 @@
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
@@ -5,7 +6,6 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { mkdir, readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
 const webRoot = fileURLToPath(new URL('../', import.meta.url));
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 const api = process.env.M3_API_URL, database = process.env.M3_TEST_DATABASE_URL, token = process.env.M3_TEST_TOKEN;
@@ -19,7 +19,7 @@ test('M3 real PostgreSQL project create, recover, reload, search and metadata jo
   const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', String(port)], { cwd: webRoot, env, stdio: 'ignore' }); let browser;
   try {
     await until(async () => (await fetch(base)).ok);
-    browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+    browser = await launchTestBrowser({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     await mkdir(`${webRoot}/test-results/m3`, { recursive: true });
     let releaseList;
@@ -82,5 +82,5 @@ test('M3 real PostgreSQL project create, recover, reload, search and metadata jo
       await page.screenshot({ path: `${webRoot}/test-results/m3/${name}-${width}.png`, fullPage: true });
     }
     assert.equal((await (await direct('/projects')).json()).items.length, 1); assert.equal((await (await direct(`/projects/${id}`)).json()).title, 'My preserved title');
-  } finally { await browser?.close(); server.kill('SIGTERM'); }
+  } finally { await browser?.close(); await stopBrowserServer(server); }
 });

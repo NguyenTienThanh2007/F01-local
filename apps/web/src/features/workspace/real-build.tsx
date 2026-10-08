@@ -9,9 +9,6 @@ import type {components} from '@f01/api-client/schema';
 import {projectRequest,ProjectAPIError} from '@/lib/projects/browser';
 import {useResource,useWorkspace,ResourceState} from './workspace';
 import {useFlow} from './flow';
-type Builds=components['schemas']['BuildList'];
-type Proposals=components['schemas']['ProposalList'];
-type Session=components['schemas']['SessionView'];
 
 export function RealBuildPanel({onReadyChange,onAttentionChange}:{onReadyChange?:(ready:boolean)=>void;onAttentionChange?:(attention:boolean)=>void}={}){
  const {id,snapshot,refresh,events}=useWorkspace();
@@ -50,10 +47,10 @@ export function RealBuildPanel({onReadyChange,onAttentionChange}:{onReadyChange?
  function command(path:string,body:BuildReceipt['body']):BuildReceipt{return {key:crypto.randomUUID(),path,body,created:Date.now()};}
  if((!session.data?.capabilities?.real_generation||session.data?.capabilities?.execution_mode!=='real')&&!latest&&!receipt)return <><ResourceState {...session}/>{session.data?.capabilities?.execution_mode==='real'&&<section className="workspace-notice"><h3>Build runtime unavailable</h3><p>Your project and plans are saved. The trusted build runtime must be configured and verified before a build can start.</p><Link className="button button-primary" href={`/projects/${id}/planning`}>Create a plan</Link></section>}</>;
  const status=active?.status??latest?.run.status;
- const title=pending?'Sending build command…':receipt?'Confirming your saved build':status==='queued'?'Build queued':status==='running'?'Building your application':buildReady?snapshot.current_version?'Ready for the next build':'Ready to build':status==='succeeded'?'Build verified':status==='failed'?'Build needs attention':status==='canceled'?'Build canceled':'Build your application';
+ const title=pending?'Sending build command…':receipt?'Confirming your saved build':status==='queued'?'Build queued':status==='running'?'Building your application':buildReady?snapshot.current_version?'Ready for the next build':'Ready to build':status==='succeeded'?'Build verified':status==='failed'?'Build needs attention':status==='canceled'?'Build canceled':'Make your first plan';
  return <section className="workspace-notice build-command" data-state={buildReady?'ready':status??'idle'} aria-label="Real build">
   <span className="meta">BUILD & VERIFY</span><h3 aria-live="polite">{title}</h3>
-  <p>{buildReady?'Your reviewed direction is ready. Build it from the saved project context.':status==='queued'?'Saved and waiting for the build worker. You can leave and return.':status==='running'?'Generating and checking your application. Build Trace follows each observed step.':status==='succeeded'?'Your verified source and preview are saved.':status==='failed'?'This attempt needs attention. Your last successful version stays available.':status==='canceled'?'This attempt was canceled. Your saved context stays available.':'Turn your reviewed plan into an application in the trusted build environment.'}</p>
+  <p>{buildReady?'Your reviewed direction is ready. Build it from the saved project context.':status==='queued'?'Saved and waiting for the build worker. You can leave and return.':status==='running'?'Generating and checking your application. Build Trace follows each observed step.':status==='succeeded'?'Your verified source and preview are saved.':status==='failed'?'This attempt needs attention. Your last successful version stays available.':status==='canceled'?'This attempt was canceled. Your saved context stays available.':'Start with the brief you saved. Make a plan and approve it before a build starts.'}</p>
   {active?.mode==='real'&&<Link className="button button-primary" href={`/projects/${id}?panel=trace`}>Follow Build Trace</Link>}
   {error&&<p role="alert">{error}</p>}
   {receipt?<>{expired?<p role="alert">This command is outside its safe recovery window. Inspect saved build history before starting another build.</p>:<button className="button button-secondary" disabled={pending||!ready} onClick={()=>void perform(receipt)}>Resolve saved build command</button>}</>:<>
