@@ -40,6 +40,11 @@ jobs:
         working-directory: apps/api
       - name: Backend regression and strict types
         run: |
+          command -v initdb || printf 'initdb is outside PATH; using pg_config bindir\n'
+          export F01_TEST_PG_BIN="$(pg_config --bindir)"
+          printf 'Disposable PostgreSQL tools: %s\n' "$F01_TEST_PG_BIN"
+          test -x "$F01_TEST_PG_BIN/initdb"
+          test -x "$F01_TEST_PG_BIN/postgres"
           uv run --locked pytest -q
           uv run --locked mypy src/f01 tests migrations scripts
         working-directory: apps/api
