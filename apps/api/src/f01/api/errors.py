@@ -109,6 +109,8 @@ APPLICATION_ERRORS: dict[str, tuple[int, str]] = {
     "AUTHENTICATION_REQUIRED": (401, "A valid authenticated session is required."),
     "CREATION_ACCOUNT_CHANGED": (409, "Sign in with the account that started this saved creation command."),
     "IDENTITY_LINK_CONFLICT": (409, "Identity linking requires operator review; existing ownership was not changed."),
+    "EMAIL_VERIFICATION_REQUIRED": (403, "Verify your email with your identity provider before signing in."),
+    "AUTH_METHOD_UNAVAILABLE": (503, "This sign-in method is not configured."),
     "AUTH_RATE_LIMITED": (429, "Sign-in attempts are temporarily limited. Try again later."),
     "PLANNING_RATE_LIMITED": (429, "Your planning request allowance is temporarily exhausted."),
     "PLANNING_BUDGET_EXCEEDED": (429, "Your planning token budget is exhausted for this UTC day."),

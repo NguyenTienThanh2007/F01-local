@@ -60,6 +60,6 @@ export function JourneyGuide(){
   {journey.update&&journey.release&&<div className="journey-live-preserved"><span className="live-dot" aria-hidden="true"/><strong>Last confirmed live release</strong><span>{journey.release.version_id===snapshot.current_version?.id?`Version ${snapshot.current_version.number}`:'Earlier version'} stays recorded while this update progresses.</span>{liveURL&&<a href={liveURL} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">Open live product ↗</a>}<details><summary>Release details</summary><p>Version {journey.release.version_id} · Release {journey.release.id}</p></details></div>}
   {journey.step===2&&progress&&['queued','running'].includes(progress.run.status)&&pathname!==`/projects/${id}`&&<details className="journey-build-expanded" open><summary>Build execution · {progress.steps[progress.stage]?.label}</summary><BuildTimeline progress={progress} compact/><Link className="button button-secondary" href={`/projects/${id}?step=build`}>Open active build</Link></details>}
   {snapshot.project.archived_at&&<Link className="text-action" href={`/projects/${id}/settings`}>Open project settings ↗</Link>}
-  {transport==='session expired'&&<Link className="button button-primary" href="/sign-in">Sign in to continue</Link>}
+  {transport==='session expired'&&<Link className="button button-primary" href={`/sign-in?returnTo=${encodeURIComponent(`/projects/${id}`)}`}>Sign in to continue</Link>}
  </section>;
 }

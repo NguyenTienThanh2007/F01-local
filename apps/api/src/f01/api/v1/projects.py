@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, Header, Query, Response, Request
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import text
+from f01.db.models import User
+from f01.domain.projects import AccountProfile, UpdateAccount
 
 from f01.api.dependencies import get_database, get_principal, authenticated_bearer
 from f01.api.stream import replay_cursor, stream_events
@@ -60,6 +62,25 @@ def session(request: Request, principal: PrincipalDependency, settings: Settings
     auth_session = getattr(request.state, "auth_session", None)
     return SessionView(principal=principal, capabilities=Capabilities(external_deployment=settings.release_enabled, simulation_runner=settings.simulation_runner_enabled, execution_mode=settings.execution_mode, real_generation=settings.real_execution_enabled, source_artifacts=settings.real_execution_enabled), expires_at=auth_session.expires_at if auth_session else None)
 
+
+@router.get("/account", response_model=AccountProfile)
+def account(database: DatabaseDependency, principal: PrincipalDependency) -> AccountProfile:
+    with database.session() as session:
+        user = session.get(User, principal.id)
+        if user is None:
+            raise ApplicationError("AUTHENTICATION_REQUIRED")
+        return AccountProfile(display_name=user.display_name, email=user.email,
+            email_verified=bool(user.email) and principal.identity_mode == "oidc", identity_mode=principal.identity_mode)
+
+@router.patch("/account", response_model=AccountProfile)
+def update_account(body: UpdateAccount, database: DatabaseDependency, principal: PrincipalDependency) -> AccountProfile:
+    with database.session() as session, session.begin():
+        user = session.get(User, principal.id, with_for_update=True)
+        if user is None:
+            raise ApplicationError("AUTHENTICATION_REQUIRED")
+        user.display_name = body.display_name
+        return AccountProfile(display_name=user.display_name, email=user.email,
+            email_verified=bool(user.email) and principal.identity_mode == "oidc", identity_mode=principal.identity_mode)
 
 @router.post("/projects", response_model=ProjectCreated, status_code=201)
 def create_project(

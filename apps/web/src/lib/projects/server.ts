@@ -38,11 +38,11 @@ export async function input(request: Request): Promise<unknown> {
   return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(result));
 }
 export const object = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
-export async function handleProjectsRequest(request: Request, target: 'projects' | 'session' | 'usage', id: string | undefined, env: Environment, send: typeof fetch = fetch): Promise<Response> {
+export async function handleProjectsRequest(request: Request, target: 'projects' | 'session' | 'usage' | 'account', id: string | undefined, env: Environment, send: typeof fetch = fetch): Promise<Response> {
   let config: ReturnType<typeof configuration>;
   try { config = configuration(env); } catch { return fail('PROJECTS_NOT_CONFIGURED', 503); }
   const method = request.method;
-  if ((target !== 'projects' && method !== 'GET') || (target === 'projects' && !['GET', id ? 'PATCH' : 'POST'].includes(method))) return fail('REQUEST_FORBIDDEN', 405);
+  if ((target !== 'projects' && target !== 'account' && method !== 'GET') || (target === 'account' && !['GET','PATCH'].includes(method)) || (target === 'projects' && !['GET', id ? 'PATCH' : 'POST'].includes(method))) return fail('REQUEST_FORBIDDEN', 405);
   if (id && !uuid.test(id)) return fail('NOT_FOUND', 404);
   if (method !== 'GET' && !sameOrigin(request, config.origin, config.local)) return fail('REQUEST_FORBIDDEN', 403);
 
@@ -51,7 +51,13 @@ export async function handleProjectsRequest(request: Request, target: 'projects'
   const actor = await backendCredentials(request,config,send);
     const client = createBackendClient({ baseUrl: config.base.origin, bearerToken: actor.token, headers: actor.headers, fetch: send });
     let result;
-    if (target === 'session') result = await client.GET('/v1/session', { signal });
+    if (target === 'account') {
+      if(method==='GET')result=await client.GET('/v1/account',{signal});
+      else {let body:unknown;try{body=await input(request);}catch{return fail('VALIDATION_ERROR',422);}
+       if(!object(body)||Object.keys(body).length!==1||typeof body.display_name!=='string'||!body.display_name.trim()||Array.from(body.display_name.trim()).length>100)return fail('VALIDATION_ERROR',422);
+       result=await client.PATCH('/v1/account',{body:{display_name:body.display_name.trim()},signal});}
+    }
+    else if (target === 'session') result = await client.GET('/v1/session', { signal });
     else if (target === 'usage') result = await client.GET('/v1/planning/usage', { signal });
     else if (method === 'GET' && id) result = await client.GET('/v1/projects/{project_id}', { params: { path: { project_id: id } }, signal });
     else if (method === 'GET') {

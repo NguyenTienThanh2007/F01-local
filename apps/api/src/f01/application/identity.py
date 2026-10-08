@@ -10,7 +10,7 @@ from hmac import compare_digest
 from threading import Lock
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 import jwt
@@ -127,6 +127,8 @@ class OIDCVerifier:
                 raise ApplicationError("AUTHENTICATION_REQUIRED")
         name = claims.get("name", "Signed-in owner")
         email = claims.get("email") if claims.get("email_verified") is True else None
+        if self.settings.oidc_require_verified_email and (not isinstance(email, str) or not 3 <= len(email) <= 320 or "@" not in email):
+            raise ApplicationError("EMAIL_VERIFICATION_REQUIRED")
         return VerifiedIdentity(verified.issuer, verified.subject,
             min(verified.expires_at, datetime.fromtimestamp(claims["exp"], UTC)),
             name[:100] if isinstance(name, str) and name else "Signed-in owner",
@@ -154,12 +156,18 @@ def resolve_identity(database: Database, identity: VerifiedIdentity, *, existing
             user = User(id=uid, identity_issuer="oidc", identity_subject=str(uid), display_name=identity.display_name, email=identity.email, created_at=datetime.now(UTC))
             session.add(user); session.flush()
         assert user is not None
+        # Only verified login claims populate email; never use email to find/link an owner.
+        if identity.email is not None:
+            user.email = identity.email
         if external is None:
             session.add(ExternalIdentity(id=uuid4(), user_id=user.id, issuer=identity.issuer, subject=identity.subject, created_at=datetime.now(UTC)))
         return Principal(id=user.id, display_name=user.display_name, identity_mode="oidc")
 
 
-def start_login(database: Database, settings: Settings) -> dict[str, str]:
+def start_login(database: Database, settings: Settings, method: Literal["hosted", "google", "email"] = "hosted", intent: Literal["sign-in", "sign-up"] = "sign-in") -> dict[str, str]:
+    connection = {"hosted": "", "google": settings.oidc_google_connection, "email": settings.oidc_email_connection}[method]
+    if method != "hosted" and not connection:
+        raise ApplicationError("AUTH_METHOD_UNAVAILABLE")
     now = datetime.now(UTC)
     state, binding, nonce, verifier = (secrets.token_urlsafe(32) for _ in range(4))
     with database.session() as session, session.begin():
@@ -170,9 +178,16 @@ def start_login(database: Database, settings: Settings) -> dict[str, str]:
         session.add(AuthFlow(id=uuid4(), state_hash=digest(state), binding_hash=digest(binding), nonce_hash=digest(nonce),
             verifier_encrypted=seal(settings, verifier), created_at=now, expires_at=now+timedelta(minutes=5)))
     challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b"=").decode()
-    url = settings.oidc_authorization_url + "?" + urlencode({"response_type": "code", "client_id": settings.oidc_client_id,
+    parameters = {"response_type": "code", "client_id": settings.oidc_client_id,
         "redirect_uri": settings.oidc_redirect_uri, "scope": "openid profile email", "state": state, "nonce": nonce,
-        "code_challenge": challenge, "code_challenge_method": "S256", "audience": settings.oidc_api_audience})
+        "code_challenge": challenge, "code_challenge_method": "S256", "audience": settings.oidc_api_audience}
+    if connection:
+        parameters["connection"] = connection
+    if intent == "sign-up":
+        parameters["screen_hint"] = "signup"
+    # Explicit reauthentication after local logout/expiry; never silently restore provider SSO.
+    parameters["prompt"] = "login"
+    url = settings.oidc_authorization_url + "?" + urlencode(parameters)
     return {"authorization_url": url, "binding": binding}
 
 
@@ -198,6 +213,8 @@ async def finish_login(database: Database, settings: Settings, verifier: OIDCVer
         tokens = json.loads(body)
         if tokens.get("token_type", "").lower() != "bearer": raise ValueError()
         identity = await asyncio.to_thread(verifier.login, tokens["access_token"], tokens["id_token"], nonce_hash)
+    except ApplicationError:
+        raise
     except Exception:
         raise ApplicationError("AUTHENTICATION_REQUIRED") from None
     principal = resolve_identity(database, identity)

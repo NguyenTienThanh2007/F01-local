@@ -232,6 +232,15 @@ class Principal(Contract):
     identity_mode: Literal["development", "oidc"] = "development"
 
 
+class AccountProfile(Contract):
+    display_name: str
+    email: str | None = None
+    email_verified: bool = False
+    identity_mode: Literal["development", "oidc"]
+
+class UpdateAccount(Contract):
+    display_name: str = Field(min_length=1, max_length=100)
+
 class Capabilities(Contract):
     execution_mode: Literal["simulated", "real"] = "simulated"
     real_generation: bool = False

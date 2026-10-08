@@ -24,6 +24,7 @@ key=rsa.generate_private_key(public_exponent=65537,key_size=2048)
 pending:dict[str,dict[str,str]]={}
 codes:dict[str,dict[str,str]]={}
 control={'mode':'success','calls':0}
+auth_control={'verified':True}
 
 @app.get('/oidc/jwks')
 def jwks() -> dict[str,object]:
@@ -54,7 +55,7 @@ async def exchange(request: Request) -> JSONResponse:
     if values is None or values['code_challenge']!=challenge or form.get('redirect_uri')!=[settings.oidc_redirect_uri] or form.get('client_secret')!=[settings.oidc_client_secret.get_secret_value()]:return JSONResponse({'error':'invalid_grant'},status_code=400)
     now=int(time.time());claims={'iss':settings.oidc_issuer,'sub':values['subject'],'aud':settings.oidc_api_audience,'iat':now,'exp':now+900}
     access=jwt.encode(claims,key,algorithm='RS256',headers={'kid':'fixture-rsa'})
-    identity=jwt.encode({**claims,'aud':settings.oidc_client_id,'nonce':values['nonce'],'name':'Test owner '+values['subject'][-1].upper()},key,algorithm='RS256',headers={'kid':'fixture-rsa'})
+    identity=jwt.encode({**claims,'aud':settings.oidc_client_id,'nonce':values['nonce'],'name':'Test owner '+values['subject'][-1].upper(),'email':values['subject']+'@example.test','email_verified':auth_control['verified']},key,algorithm='RS256',headers={'kid':'fixture-rsa'})
     return JSONResponse({'token_type':'Bearer','access_token':access,'id_token':identity})
 
 async def model(request: httpx.Request) -> httpx.Response:
@@ -88,3 +89,23 @@ async def set_mode(request: Request) -> JSONResponse:
 def state(request: Request) -> JSONResponse:
     if request.headers.get('authorization')!='Bearer '+settings.auth_gateway_token.get_secret_value():return JSONResponse({},status_code=401)
     return JSONResponse(control)
+
+
+@app.post('/test/auth-state')
+async def auth_state(request: Request) -> JSONResponse:
+    if request.headers.get('authorization')!='Bearer '+settings.auth_gateway_token.get_secret_value():
+        return JSONResponse({},status_code=401)
+    body=await request.json()
+    if body.get('kind')=='unverified':
+        auth_control['verified']=False
+    elif body.get('kind')=='verified':
+        auth_control['verified']=True
+    elif body.get('kind')=='expire':
+        from datetime import UTC, datetime, timedelta
+        from sqlalchemy import update
+        from f01.db.models import AuthSession
+        with app.state.database.session() as session, session.begin():
+            session.execute(update(AuthSession).values(expires_at=datetime.now(UTC)-timedelta(seconds=1)))
+    else:
+        return JSONResponse({},status_code=422)
+    return JSONResponse({'fixture':'controlled OIDC only; no Google account or email delivery'})

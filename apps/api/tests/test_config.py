@@ -66,3 +66,18 @@ def test_configuration_validation_does_not_echo_credentials() -> None:
             _env_file=None,
         )
     assert credential not in str(failure.value)
+
+
+def test_production_oidc_requires_confidential_client_and_verified_email() -> None:
+    from cryptography.fernet import Fernet
+    from pydantic import ValidationError
+    values = dict(_env_file=None, app_env='production', auth_mode='oidc', database_url='postgresql+psycopg://f01:test@127.0.0.1/f01',
+        auth_gateway_token='synthetic-'+'g'*32, session_encryption_key=Fernet.generate_key().decode(),
+        oidc_issuer='https://identity.example.test/', oidc_authorization_url='https://identity.example.test/authorize',
+        oidc_token_url='https://identity.example.test/token', oidc_jwks_url='https://identity.example.test/jwks',
+        oidc_client_id='test-client', oidc_api_audience='test-api', oidc_redirect_uri='https://factory.example.test/api/auth/callback')
+    with pytest.raises(ValidationError, match='confidential'):
+        Settings(**values)
+    with pytest.raises(ValidationError, match='verified email'):
+        Settings(**values, oidc_client_secret='synthetic-private-client', oidc_require_verified_email=False)
+    assert Settings(**values, oidc_client_secret='synthetic-private-client', oidc_google_connection='google-oauth2').auth_mode=='oidc'

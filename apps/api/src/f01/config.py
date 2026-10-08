@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     oidc_client_secret: SecretStr = SecretStr("")
     oidc_api_audience: str = ""
     oidc_redirect_uri: str = ""
+    oidc_google_connection: str = ""
+    oidc_email_connection: str = ""
+    oidc_require_verified_email: bool = True
     session_ttl_seconds: int = Field(default=3600, ge=60, le=86400)
     session_idle_seconds: int = Field(default=900, ge=60, le=3600)
     planning_requests_per_minute: int = Field(default=5, ge=1, le=30)
@@ -112,6 +115,14 @@ class Settings(BaseSettings):
                 Fernet(self.session_encryption_key.get_secret_value().encode())
             except Exception:
                 raise ValueError("A valid session encryption key is required.") from None
+            import re
+            for connection in (self.oidc_google_connection, self.oidc_email_connection):
+                if connection and not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", connection):
+                    raise ValueError("Identity connections must be fixed provider connection names.")
+            if self.app_env == "production" and not self.oidc_client_secret.get_secret_value():
+                raise ValueError("Production login requires the private confidential OIDC client credential.")
+            if self.app_env == "production" and not self.oidc_require_verified_email:
+                raise ValueError("Production login requires a verified email claim.")
             if not self.oidc_client_id or not self.oidc_api_audience:
                 raise ValueError("Configure the OIDC client and API audience.")
             for url in (self.oidc_issuer, self.oidc_authorization_url, self.oidc_token_url, self.oidc_jwks_url, self.oidc_redirect_uri):
