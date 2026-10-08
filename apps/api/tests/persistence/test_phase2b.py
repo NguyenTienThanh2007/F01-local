@@ -92,6 +92,11 @@ def test_atomic_publication_and_bounded_repair(database:Database,configured:Sett
     assert {d.provenance.source for d in saved.current_brain.content.design_decisions}>={'model_proposed','generated','verified','published'}
     assert saved.current_brain.content.product.summary.provenance.source=='user_request'
     assert any(e.exit_code==1 for e in detail.evidence)
+    # Repair history remains immutable; progress cannot reuse the old candidate's checks.
+    assert detail.current_candidate_evidence and all(e.exit_code == 0 for e in detail.current_candidate_evidence)
+    assert {e.phase for e in detail.current_candidate_evidence} >= {"materialization", "install", "typecheck", "build", "verification"}
+    assert detail.progress_updated_at and detail.progress_updated_at >= detail.candidates[-1].created_at
+    assert detail.progress_sequence == workspace(database, owner, pid).last_sequence
     with database.session() as session:assert session.scalar(select(IsolatedPreview.id))
 
 def test_failed_update_preserves_last_good_version(database:Database,configured:Settings,project_plan:ProjectPlan)->None:

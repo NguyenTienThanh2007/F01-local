@@ -924,10 +924,19 @@ export interface components {
             cancel_requested: boolean;
             /** Candidates */
             candidates: components["schemas"]["CandidateMetadata"][];
+            /** Current Candidate Evidence */
+            current_candidate_evidence?: components["schemas"]["CommandEvidence"][];
             /** Evidence */
             evidence: components["schemas"]["CommandEvidence"][];
             /** Phase */
             phase: string;
+            /**
+             * Progress Sequence
+             * @default 0
+             */
+            progress_sequence: number;
+            /** Progress Updated At */
+            progress_updated_at?: string | null;
             /** Repair Attempts */
             repair_attempts: number;
             run: components["schemas"]["RunRecord"];

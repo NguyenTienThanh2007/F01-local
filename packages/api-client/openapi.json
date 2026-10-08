@@ -519,6 +519,13 @@
             "title": "Candidates",
             "type": "array"
           },
+          "current_candidate_evidence": {
+            "items": {
+              "$ref": "#/components/schemas/CommandEvidence"
+            },
+            "title": "Current Candidate Evidence",
+            "type": "array"
+          },
           "evidence": {
             "items": {
               "$ref": "#/components/schemas/CommandEvidence"
@@ -529,6 +536,24 @@
           "phase": {
             "title": "Phase",
             "type": "string"
+          },
+          "progress_sequence": {
+            "default": 0,
+            "maximum": 2147483647.0,
+            "minimum": 0.0,
+            "title": "Progress Sequence",
+            "type": "integer"
+          },
+          "progress_updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Progress Updated At"
           },
           "repair_attempts": {
             "title": "Repair Attempts",

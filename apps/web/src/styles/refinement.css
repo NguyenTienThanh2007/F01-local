@@ -597,3 +597,107 @@ select:not(:disabled) { cursor: pointer; }
  .planning-heading h2 { font-size: 26px; }
  .plan-overview { padding: 24px 20px; }
 }
+
+/* Observed execution: one factory activity surface, never a simulated progress meter. */
+.journey-v3 { grid-template-columns: minmax(0,1fr); gap: 24px; padding-block: 24px; }
+.journey-v3 .journey-current strong { font-size: 24px; }
+.journey-v3 ol { width: 100%; display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 8px; }
+.journey-v3 li { min-width: 0; display: grid; grid-template-columns: auto minmax(0,1fr); column-gap: 10px; row-gap: 5px; text-align: left; border-top: 4px solid var(--line); padding-top: 12px; }
+.journey-v3 li > span { grid-row: 1 / 3; margin: 0; border: 0; background: none; width: 28px; height: 32px; }
+.journey-v3 li > strong { font: 500 14px/18px var(--font-sans); }
+.journey-v3 li > small { font-size: 11px; line-height: 16px; font-weight: 400; }
+.journey-v3 li[data-state=complete] { border-top-color: var(--success); }
+.journey-v3 li[data-state=complete] > span { color: var(--success); }
+.journey-v3 li[aria-current=step] { border-top-color: var(--accent); color: var(--ink); }
+.journey-v3 li[aria-current=step] > span { color: var(--accent); font-weight: 600; }
+.journey-v3 li[data-state=failed],.journey-v3 li[data-state=blocked] { border-top-color: var(--error); }
+.journey-v3 li[data-state=failed] small,.journey-v3 li[data-state=blocked] small { color: var(--error); }
+.journey-live-preserved { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.7; }
+.live-dot { align-self: center; width: 7px; height: 7px; background: var(--success); border-radius: 50%; }
+.journey-live-preserved > span:not(.live-dot) { color: var(--muted); }
+.journey-live-preserved a { text-decoration: underline; text-underline-offset: 4px; }
+.journey-live-preserved details { margin-left: auto; }
+.journey-build-expanded { border-top: 1px solid var(--line); padding-top: 12px; }
+.journey-build-expanded .build-timeline { max-width: 850px; }
+.build-activity { display: grid; grid-template-columns: 64px minmax(0,1fr) auto; align-items: center; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.build-activity .meta { color: var(--accent); font-size: 11px; }
+.build-activity h3 { margin-block: 8px 10px; font-weight: 600; }
+.build-activity p { font-size: 15px; line-height: 1.7; color: var(--muted); max-width: 66ch; }
+.activity-state { font: 12px/18px var(--font-mono); border: 1px solid var(--line); padding: 7px 10px; color: var(--muted); }
+.factory-activity { position: relative; display: flex; align-items: center; justify-content: center; gap: 5px; width: 64px; height: 64px; color: var(--accent); }
+.factory-activity i { display: block; width: 5px; height: 20px; background: currentColor; transform-origin: center; }
+.factory-activity i:nth-child(2) { height: 32px; }
+.factory-activity i:nth-child(3) { height: 24px; }
+.factory-activity b { position: absolute; inset: 0; border: 1px solid var(--line); border-top: 2px solid currentColor; border-radius: 50%; }
+.build-activity[data-animated=true] .factory-activity b { animation: factory-orbit 1.8s linear infinite; }
+.build-activity[data-animated=true] .factory-activity i { animation: factory-observing 1.6s ease-in-out infinite; }
+.build-activity[data-animated=true] .factory-activity i:nth-child(2) { animation-delay: .2s; }
+.build-activity[data-animated=true] .factory-activity i:nth-child(3) { animation-delay: .4s; }
+.build-activity[data-state=blocked] .factory-activity,.build-activity[data-state=failed] .factory-activity { color: var(--error); }
+.build-activity[data-state=complete] .factory-activity { color: var(--success); }
+@keyframes factory-orbit { to { transform: rotate(360deg); } }
+@keyframes factory-observing { 50% { transform: scaleY(.65); opacity: .55; } }
+.build-timeline { margin-block: 24px; }
+.build-timeline ol { list-style: none; padding: 0; margin: 0; }
+.build-timeline li { display: grid; grid-template-columns: 36px minmax(0,1fr); gap: 20px; position: relative; padding: 0 0 24px; }
+.build-timeline li:not(:last-child)::after { content: ''; position: absolute; left: 17px; top: 40px; bottom: 7px; width: 1px; background: var(--line); }
+.build-step-marker { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--line); color: var(--muted); background: var(--surface); font: 12px/18px var(--font-mono); border-radius: 50%; }
+.build-step-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 36px; }
+.build-step-heading h4 { font-size: 18px; font-weight: 500; margin: 0; text-wrap: wrap; }
+.build-step-heading > span { font: 11px/18px var(--font-mono); color: var(--muted); }
+.build-timeline li p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.build-timeline li[data-state=pending] h4 { color: var(--muted); font-weight: 400; }
+.build-timeline li[data-state=complete] .build-step-marker { color: var(--success); border-color: var(--success); }
+.build-timeline li[aria-current=step] .build-step-marker { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.build-timeline li[aria-current=step] h4 { font-weight: 600; }
+.build-timeline li[data-state=failed] .build-step-marker,.build-timeline li[data-state=blocked] .build-step-marker { color: var(--error); border-color: var(--error); box-shadow: none; }
+.build-wait-notice,.build-failure { padding: 20px; border-left: 3px solid var(--accent); background: var(--accent-soft); margin-block: 12px 24px; font-size: 14px; line-height: 1.7; }
+.build-wait-notice p,.build-failure p { margin-top: 8px; }
+.build-failure { border-left-color: var(--error); }
+.build-observation { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 11px/18px var(--font-mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+.build-live-actions { display: flex; align-items: center; gap: 24px; margin-bottom: 16px; }
+.build-live-actions p { color: var(--muted); font-size: 13px; line-height: 1.7; max-width: 50ch; }
+.preview-surface.preserved-preview > summary { padding: 20px 24px !important; font-size: 15px; font-weight: 500; }
+.preview-surface > summary[hidden],.preview-surface[hidden] { display: none !important; }
+.restored-draft { border-left: 2px solid var(--success); padding-left: 12px; margin-bottom: 20px; font-size: 14px; line-height: 1.7; }
+@media (max-width: 1023px) {
+ .journey-v3 li { grid-template-columns: minmax(0,1fr); text-align: center; }
+ .journey-v3 li > span { grid-row: auto; margin: auto; }
+ .journey-v3 li > small { font-size: 10px; }
+}
+@media (max-width: 767px) {
+ .journey-v3 { gap: 20px; }
+ .journey-v3 .journey-current strong { font-size: 22px; }
+ .journey-v3 ol { gap: 5px; }
+ .journey-v3 li { padding-top: 8px; }
+ .journey-v3 li > strong { font-size: 11px; }
+ .journey-v3 li > small { font-size: 9px; overflow-wrap: anywhere; }
+ .journey-live-preserved { display: block; }
+ .journey-live-preserved > * { margin-right: 8px; }
+ .journey-live-preserved details { margin-top: 8px; }
+ .build-activity { grid-template-columns: 48px minmax(0,1fr); gap: 16px; padding-bottom: 20px; }
+ .factory-activity { width: 48px; height: 48px; }
+ .factory-activity i { width: 4px; }
+ .build-activity .activity-state { grid-column: 2; justify-self: start; }
+ .build-activity h3 { font-size: 23px !important; }
+ .build-timeline li { grid-template-columns: 32px minmax(0,1fr); gap: 16px; }
+ .build-timeline li:not(:last-child)::after { left: 15px; }
+ .build-step-marker { width: 32px; height: 32px; }
+ .build-step-heading { display: block; }
+ .build-step-heading h4 { font-size: 17px; }
+ .build-step-heading > span { display: block; margin-top: 4px; }
+ .build-live-actions { display: block; }
+ .build-live-actions .button { width: 100%; }
+ .build-live-actions p { margin-top: 12px; }
+ .build-wait-notice,.build-failure { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+ .build-activity .factory-activity * { animation: none !important; }
+}
+@media (max-width: 479px) {
+ .journey-v3 ol { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px 12px; }
+ .journey-v3 li { grid-template-columns: 18px minmax(0,1fr); gap: 4px 8px; text-align: left; }
+ .journey-v3 li > span { grid-row: 1 / 3; margin: 0; align-self: center; }
+ .journey-v3 li > strong { font-size: 12px; }
+ .journey-v3 li > small { font-size: 11px; }
+}

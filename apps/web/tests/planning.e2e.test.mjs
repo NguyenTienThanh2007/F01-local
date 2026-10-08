@@ -301,7 +301,8 @@ test('production frontend submits, displays, recovers and protects the browser b
       assert.equal(await page.getByRole('button', { name: /Fewer missed appointments/ }).getAttribute('aria-pressed'), 'true');
       assert.equal(calls, before);
       await page.goto(`${base}/projects/new?starter=unknown`);
-      assert.equal(await page.getByRole('textbox', { name: 'Product brief' }).inputValue(), '');
+      await page.getByText('Your draft is back. Review it before creating your project.',{exact:true}).waitFor();
+      assert.match(await page.getByRole('textbox', { name: 'Product brief' }).inputValue(), /missed appointments/);
     });
 
     await run('all redesigned surfaces fit target widths and mobile navigation restores keyboard focus', async () => {
