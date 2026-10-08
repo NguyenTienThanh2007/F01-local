@@ -8,5 +8,6 @@ import '@/styles/experience.css';
 import '@/styles/operating-entry.css';
 import '@/styles/project-management.css';
 import '@/styles/workspace.css';
+import '@/styles/refinement.css';
 export const metadata: Metadata = { title: { default: 'F01 — Software, with a next chapter', template: '%s · F01' }, description: 'Start with a product plan. A workspace built toward creating, running, managing and evolving software.', icons: { icon: '/favicon.svg' } };
 export default function RootLayout({ children }: { children: React.ReactNode }) { return <html lang="en"><body>{children}</body></html>; }

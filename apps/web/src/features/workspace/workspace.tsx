@@ -29,7 +29,7 @@ export function useResource<T>(path: string | null) {
   const retry = useCallback(() => setAttempt(n => n + 1), []);
   return { ...selected, retry };
 }
-export function ResourceState({ pending, error, retry }: { pending: boolean; error: string; retry: () => void }) { return <>{pending && <p role="status">Loading saved records…</p>}{error && <div className="workspace-notice"><p role="alert">{error}</p><button className="button button-secondary" onClick={retry}>Retry records</button></div>}</>; }
+export function ResourceState({ pending, error, retry }: { pending: boolean; error: string; retry: () => void }) { return <>{pending && <p className="resource-loading" role="status">Loading saved records…</p>}{error && <div className="workspace-notice"><p role="alert">{error}</p><button className="button button-secondary" onClick={retry}>Retry records</button></div>}</>; }
 const sections = [['', 'Preview'], ['/brief', 'Brief'], ['/brain', 'Brain'], ['/planning', 'Planning'], ['/activity', 'Activity'], ['/versions', 'Versions'], ['/settings', 'Settings']] as const;
 const utilities = ['trace', 'run', 'files', 'logs', 'deployment', 'runtime'] as const;
 type Panel = typeof utilities[number] | 'requests' | null;
