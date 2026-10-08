@@ -36,11 +36,18 @@ select:not(:disabled) { cursor: pointer; }
 .account-link small { margin-top: 6px; line-height: 1.5; }
 .mobile-header { min-height: 72px; }
 .mobile-header > a { letter-spacing: -.04em; font-size: 24px; }
+.sign-in { border-block: 1px solid var(--line-strong); border-top: 2px solid var(--accent); background: var(--surface); padding: 40px; }
+.sign-in > .meta { color: var(--accent); font-size: 11px; margin-bottom: 16px; }
+.sign-in h1 { font-size: 40px; line-height: 1.15; letter-spacing: -.04em; }
+.sign-in p { line-height: 1.7; max-width: 52ch; }
+.narrow-page .detail-section { padding: 28px; background: var(--surface); border-left: 2px solid var(--line-strong); border-top: 0; }
+.detail-section form { margin-top: 24px; }
 
 /* Project register: rows, columns and an unmistakable title. */
 .project-filters { margin-top: 40px; padding-bottom: 20px; gap: 12px; }
 .project-filters .workspace-search { max-width: none; }
 .project-filters .workspace-search input, .project-filters select { color: var(--ink); background: var(--surface); font-size: 13px; min-height: 44px; border-color: var(--line); }
+.project-filters select { width: auto; min-width: 154px; }
 .project-filters .workspace-search input { cursor: text; }
 .project-filters select { cursor: pointer; }
 .project-filters .button { font-size: 13px; }
@@ -242,6 +249,9 @@ select:not(:disabled) { cursor: pointer; }
   .page-heading { align-items: flex-start; }
   .page-eyebrow { margin-bottom: 24px; font-size: 11px; }
   .page-eyebrow > span:last-child { font-size: 11px; }
+  .sign-in { margin: 40px 20px; padding: 28px 24px; }
+  .sign-in h1 { font-size: 32px; }
+  .narrow-page .detail-section { padding: 24px 20px; }
   .saved-project-row { grid-template-columns: 20px minmax(0,1fr); padding: 24px 4px; gap: 12px; }
   .saved-project-row > button { margin-left: -8px; }
   .saved-project-title { font-size: 23px; }
