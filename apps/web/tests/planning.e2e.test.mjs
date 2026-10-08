@@ -185,8 +185,8 @@ test('production frontend submits, displays, recovers and protects the browser b
     await run('homepage starters change the brief and labeled sample without making a backend request', async () => {
       const before = calls;
       await page.goto(base);
-      assert.match(await page.getByRole('heading', { level: 1 }).innerText(), /Your idea\.\s*Working software\./);
-      assert.match(await page.locator('.welcome-promise > p').innerText(), /preview the result before you publish/);
+      assert.match(await page.getByRole('heading', { level: 1 }).innerText(), /Big idea\.\s*Real application\./);
+      assert.match(await page.locator('.welcome-promise > p').innerText(), /Try it before you publish/);
       await page.locator('.welcome-draft > summary').click();
       assert.equal(await page.getByRole('button', { name: 'Play demo' }).count(), 1);
       assert.match(await page.locator('.demo-trace > p').innerText(), /No application, build or deployment is executed/);

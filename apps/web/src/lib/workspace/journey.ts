@@ -1,7 +1,7 @@
 import type {components} from '@f01/api-client/schema';
 import type {Snapshot} from './contracts.ts';
 import type {BuildProgress,ObservedState} from './build-progress.ts';
-export const journeySteps=['Create','Plan','Build','Preview','Deploy','Live'] as const;
+export const journeySteps=['Describe','Plan','Build','Preview','Deploy','Live'] as const;
 type Plans=components['schemas']['ProposalList'];
 type Releases=components['schemas']['ReleaseWorkspace'];
 export function projectJourney({snapshot,plans,releases,progress,deploySelected=false,changeSelected=false,blocked=false,runtimeAvailable,now}:{snapshot:Snapshot;plans:Plans|null;releases:Releases|null;progress:BuildProgress|null;deploySelected?:boolean;changeSelected?:boolean;blocked?:boolean;runtimeAvailable?:boolean;now:number}){

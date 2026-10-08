@@ -80,8 +80,8 @@ test('failed, canceled and cancellation requested remain explicit and never reac
  const cancel=observed(f.detail({cancel_requested:true}));assert.equal(cancel.title,'Cancellation requested');assert.equal(cancel.animate,false);assert.match(cancel.description,/confirm cancellation/);
  assert.throws(()=>observeBuild({run:f.run({mode:'simulated'}),detail:null,events:[],version:null,now:f.now}),/real provenance/);
 });
-test('journey uses Create Plan Build Preview Deploy Live without treating navigation as evidence',()=>{
- const input={snapshot:f.snapshot(),plans:null,releases:null,progress:null,now:f.now};const first=projectJourney({...input,deploySelected:true});assert.equal(first.step,1);assert.deepEqual(first.steps.map(s=>s.label),['Create','Plan','Build','Preview','Deploy','Live']);assert.equal(first.steps[0].state,'complete');assert.equal(first.steps[5].state,'pending');
+test('journey uses Describe Plan Build Preview Deploy Live without treating navigation as evidence',()=>{
+ const input={snapshot:f.snapshot(),plans:null,releases:null,progress:null,now:f.now};const first=projectJourney({...input,deploySelected:true});assert.equal(first.step,1);assert.deepEqual(first.steps.map(s=>s.label),['Describe','Plan','Build','Preview','Deploy','Live']);assert.equal(first.steps[0].state,'complete');assert.equal(first.steps[5].state,'pending');
  const review=projectJourney({...input,plans:{items:[f.proposal()]}});assert.equal(review.step,1);assert.match(review.title,/Review/);
  const approved=projectJourney({...input,plans:{items:[f.proposal({reviewed:true})]}});assert.equal(approved.step,2);assert.equal(approved.steps[1].state,'complete');assert.equal(approved.steps[3].state,'pending');
  const queued=f.detail({run:f.run(),phase:'context_resolution'}),building=projectJourney({...input,snapshot:f.snapshot({active_run:queued.run,latest_run:queued.run}),progress:observed(queued)});assert.equal(building.step,2);assert.equal(building.state,'waiting');
