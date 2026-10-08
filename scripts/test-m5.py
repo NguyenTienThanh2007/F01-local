@@ -13,6 +13,47 @@ ux0 = commercial or sys.argv[1:] == ['--ux0']
 phase2 = ux0 or sys.argv[1:] == ['--phase2a']
 suite = 'test:commercial:e2e' if commercial else 'test:ux0:e2e' if ux0 else 'test:phase2a:e2e' if phase2 else 'test:phase1:e2e' if sys.argv[1:] else 'test:simulation:e2e'
 from test_database import test_database, free_port
+
+def docker_socket() -> str:
+    explicit = os.environ.get('F01_DOCKER_SOCKET')
+    candidates = [
+        Path(explicit).expanduser() if explicit else None,
+        Path.home()/'.docker/run/docker.sock',
+        Path('/var/run/docker.sock'),
+    ]
+    for candidate in candidates:
+        if candidate and candidate.exists():
+            return str(candidate)
+    return explicit or '/var/run/docker.sock'
+
+def browser_executable() -> str | None:
+    explicit = os.environ.get('PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH')
+    if explicit and Path(explicit).exists():
+        return explicit
+    bundled = root/'.runtime/browser/extracted/chromium'
+    if bundled.exists():
+        return str(bundled)
+    mac = Path('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
+    if mac.exists():
+        return str(mac)
+    cache = Path.home()/'Library/Caches/ms-playwright'
+    if cache.exists():
+        patterns = [
+            'chromium-*/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing',
+            'chromium-*/chrome-mac/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing',
+            'chromium-*/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+            'chromium-*/chrome-linux/chrome',
+        ]
+        for pattern in patterns:
+            matches = sorted(cache.glob(pattern), reverse=True)
+            if matches:
+                return str(matches[0])
+    for candidate in ('google-chrome', 'chromium', 'chromium-browser'):
+        found = shutil.which(candidate)
+        if found:
+            return found
+    return None
+
 api_port, web_port = free_port(), free_port()
 token = 'synthetic-m5-browser-token-12345678901234567890'
 api_process = None
@@ -39,7 +80,7 @@ with test_database(root) as database:
                 api_env.update(EXECUTION_MODE='real', REAL_EXECUTION_ENABLED='true', RELEASE_ENABLED='true',
                     SANDBOX_IMAGE_ID=accepted['image_id'], PRODUCTION_IMAGE_ID=accepted['image_id'],
                     SANDBOX_ACCEPTANCE_REPORT=str(root/'.runtime/production-acceptance-report.json'), PRODUCTION_ACCEPTANCE_REPORT=str(root/'.runtime/production-acceptance-report.json'),
-                    SANDBOX_SOCKET=os.environ.get('F01_DOCKER_SOCKET','/var/run/docker.sock'), PREVIEW_ORIGIN=f'http://localhost:{preview_port}', FACTORY_ORIGIN=f'http://127.0.0.1:{web_port}')
+                    SANDBOX_SOCKET=docker_socket(), PREVIEW_ORIGIN=f'http://localhost:{preview_port}', FACTORY_ORIGIN=f'http://127.0.0.1:{web_port}')
             api_process = subprocess.Popen([str(root/'apps/api/.venv/bin/python'), '-m', 'uvicorn', *(['commercial_browser_fixture:app' if commercial else 'ux0_browser_fixture:app' if ux0 else 'phase2a_browser_fixture:app','--app-dir',str(root/'apps/api/tests')] if phase2 else ['f01.main:app']), '--host', '127.0.0.1', '--port', str(api_port)], cwd=root/'apps/api', env=api_env, stdout=api_log, stderr=api_log)
             import urllib.request
             for _ in range(100):
@@ -52,8 +93,8 @@ with test_database(root) as database:
                 preview_process = subprocess.Popen([str(root/'apps/api/.venv/bin/python'), '-m', 'uvicorn', 'f01.execution.preview_gateway:app', '--host', '127.0.0.1', '--port', str(preview_port)], cwd=root/'apps/api', env={**api_env, 'F01_PREVIEW_PORT':str(preview_port)}, stdout=api_log, stderr=api_log)
             test_env = dict(os.environ, M5_API_URL=f'http://127.0.0.1:{api_port}', M5_TEST_DATABASE_URL=database, M5_TEST_TOKEN=token)
             if phase2: test_env.update(P2A_WEB_PORT=str(web_port), AUTH_GATEWAY_TOKEN=api_env['AUTH_GATEWAY_TOKEN'], AUTH_MODE='oidc')
-            browser = root/'.runtime/browser/extracted/chromium'
-            if browser.exists(): test_env['PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH'] = str(browser)
+            browser = browser_executable()
+            if browser: test_env['PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH'] = browser
             axe = root/'.runtime/a11y/node_modules/axe-core/axe.min.js'
             if axe.exists(): test_env['M5_AXE_SCRIPT'] = str(axe)
             result = subprocess.run(['pnpm', '--filter', '@f01/web', suite], cwd=root, env=test_env)
