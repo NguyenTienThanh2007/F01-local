@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-09",
+  "production_recovery_commit": "f935206f4801bda27d76b4609ab98cc222c7a6c4",
+  "live_guard_commit": "13b292c16781799281d35d5729808dcf7b132451",
+  "keyboard_fix_commit": "073881165a5db5fc3e20b21355c79a39f283dc8e",
+  "initial_commercial_worker_auth_build_state_captures": "before keyboard-only semantic fix; same backend/API/Docker/theme behavior",
+  "phase1_and_conversation_final": "after keyboard region fix, rebuilt production frontend",
+  "prior_design_evidence": "QA/editorial-pro records original d3ad86e capture provenance; not overwritten",
+  "default_browser": "Chrome for Testing145.0.7632.6",
+  "m5_selected_browser": "Mac Google Chrome154.0.8037.98",
+  "live_openai": "one real model scenario run before extraction of the equivalent guard helper; helper dispatch-denial coverage passed in 368-test suite",
+  "credentials_recorded": false,
+  "final_commercial_and_product_captures": "after keyboard fix on production frontend; final exact protected commercial journey rerun passed"
+}

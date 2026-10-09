@@ -1,0 +1,18 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+$ node --test tests/authentication.e2e.test.mjs
+✔ provider-method integration, account ownership, expiry and browser recovery with controlled RSA OIDC (15598.249083ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15657.476541

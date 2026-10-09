@@ -1,0 +1,11 @@
+{
+  "baseline_commit": "2fe82d394628872d9a4bb272cafaa1428373e18f",
+  "implementation_commit": "d3ad86e7e738d17a943721f70b6316768e94ad39",
+  "branch": "codex/f01-commercial-v1",
+  "date": "2026-10-09",
+  "before_dark_support": false,
+  "browser": "Google Chrome Chromium, production Next.js build",
+  "application_state": "real disposable PostgreSQL, accepted real Docker, controlled OIDC/models/publishing provider",
+  "generated_app": "Minimal controlled test source; genuine Docker build and isolated runtime, no forced F01 theme",
+  "account_theme_sync": "browser-local only; existing profile API has no appearance field"
+}

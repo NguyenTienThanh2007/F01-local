@@ -1,0 +1,4 @@
+$ cd apps/api && uv run --locked python scripts/export_openapi.py --check && cd ../.. && pnpm --filter @f01/api-client check
+OpenAPI contract is current.
+$ node scripts/generate.mjs --check
+Generated TypeScript contract is current.
