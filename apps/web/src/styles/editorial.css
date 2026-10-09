@@ -24,3 +24,9 @@ body{background:var(--canvas);color:var(--ink)}button,input,textarea,select{colo
 /* Optional demonstrations share the same surface/contrast semantics. */
 .lifecycle-demo{background:var(--surface-muted);color:var(--ink)}.lifecycle-demo :focus-visible{outline-color:var(--accent)}.demo-disclosure,.demo-workspace-heading .pulse-strokes,.os-entry .pulse-instrument .pulse-mark,.trace-current,.trace-current .trace-status,.trace-current .trace-phase,.trace-current .evidence-row,.trace-control:hover,.sample-size-control:hover,.sample-view-switch button:hover,.sample-view-switch button[aria-pressed=true]{color:var(--ink)}.sample-view-switch button[aria-pressed=true],.trace-current .evidence-index{border-color:var(--accent)}.evidence-row:hover{background:var(--surface-raised);color:var(--ink)}.conversation-message.user-message>p{max-height:180px;overflow:auto}.page-footer{color:var(--muted)}
 .page-footer{opacity:1;font-size:11px}
+.journey-v3 ol{max-width:none}
+.project-cover-live{position:absolute;inset:0 auto auto 0;width:312.5%;height:312.5%}.project-cover-fallback{position:relative;background-color:var(--surface-muted)}
+/* Switch semantic colors together; interpolated surfaces briefly lose contrast. */
+.saved-project,.rail-nav a,.workspace-navigation nav a,.project-form textarea,.starter-row,.artifact-visual,.evidence-row{transition-property:border-color,transform,box-shadow}
+
+.conversation-heading{list-style:none;cursor:pointer}.conversation-heading::-webkit-details-marker{display:none}.conversation-heading::after{content:'−';margin-left:auto;color:var(--muted)}.conversation-panel details:not([open])>.conversation-heading{border-bottom:0;padding-bottom:0}.conversation-panel details:not([open])>.conversation-heading::after{content:'+'}

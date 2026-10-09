@@ -15,6 +15,6 @@
   }
   window.f01Theme = { get: function () { return preference; }, set: function (value) { apply(value, true); } };
   media.addEventListener('change', function () { if (preference === 'system') apply(preference, false); });
-  window.addEventListener('storage', function (event) { if (event.key === key || event.key === null) apply(event.newValue, false); });
+  window.addEventListener('storage', function (event) { if (event.storageArea) { try { if (event.storageArea !== localStorage) return; } catch (_) { return; } } if (event.key === key || event.key === null) apply(event.newValue, false); });
   apply(preference, false);
 }());
