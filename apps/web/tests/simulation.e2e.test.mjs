@@ -25,7 +25,7 @@ test('M5 real PostgreSQL/API simulation journey, replay, fallback and workspace 
   await mkdir(`${webRoot}/test-results/m5`,{recursive:true});
   let id,firstVersion,failedRun,secondVersion;
   await scenario('create → simulated success → change → failed update → replay-safe retry → success',async()=>{
-   await page.goto(`${base}/projects/new`);await page.getByRole('textbox',{name:/Project title/}).fill('Harbor M5');await page.getByRole('textbox',{name:'Product brief'}).fill('Build a CRM with property leads, notes and a sales pipeline.');
+   await page.goto(`${base}/projects/new`);await page.locator('.creation-title-details > summary').click();await page.getByRole('textbox',{name:/Project title/}).fill('Harbor M5');await page.getByRole('textbox',{name:'Product brief'}).fill('Build a CRM with property leads, notes and a sales pipeline.');
    await page.getByRole('button',{name:'Create demo project'}).click();await page.waitForURL(/\/projects\/[0-9a-f-]{36}$/);id=new URL(page.url()).pathname.split('/').at(-1);
    await page.getByRole('heading',{name:'Harbor M5',exact:true}).waitFor();await until(async()=>(await saved(id)).latest_run.status==='succeeded');await page.getByRole('heading',{name:'Demo version 1',exact:true}).waitFor();
    const initial=await saved(id);firstVersion=initial.current_version.id;assert.equal(initial.current_brain.revision,2);assert.equal(initial.project.lifecycle,'live');

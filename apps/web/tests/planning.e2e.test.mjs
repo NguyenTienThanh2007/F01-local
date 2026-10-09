@@ -225,7 +225,7 @@ test('production frontend submits, displays, recovers and protects the browser b
       await navigation.getByRole('link', { name: 'Examples', exact: true }).click();
       await page.locator('#templates').waitFor();
       assert.match(await page.locator('#templates').innerText(), /Choose a brief/);
-      assert.equal(await page.locator('.welcome-promise').getByRole('link',{name:/Create a project/}).getAttribute('href'),'/projects/new');
+      assert.equal(await page.locator('.welcome-promise').getByRole('button',{name:/Create a project/}).getAttribute('type'),null);
       const before = calls;
       await page.setViewportSize({ width: 375, height: 1000 });
       const menu = page.getByRole('button', { name: 'Open global navigation' });

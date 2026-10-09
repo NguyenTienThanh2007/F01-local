@@ -11,9 +11,19 @@ export async function productVisualAudit(page, directory) {
     if (await page.locator('iframe').count()) {
       await page.getByText('Loading your application preview…',{exact:true}).waitFor({state:'hidden'});
     }
+    if (process.env.F01_EDITORIAL_BASELINE==='1' && ['start','sign-in','projects','preview-verified'].includes(name)) {
+      for (const colorScheme of ['light','dark']) for (const width of [1440,375]) {
+        await page.emulateMedia({colorScheme,reducedMotion:'reduce'});
+        await page.setViewportSize({width,height:1000});
+        await page.screenshot({path:`${directory}/before-${colorScheme}-${name}-${width}.png`,fullPage:true});
+      }
+      await page.emulateMedia({colorScheme:'light',reducedMotion:'no-preference'});
+    }
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     // Stabilize pixels without waiting on transitions belonging to collapsed details.
     if (!reduced) await page.emulateMedia({reducedMotion:'reduce'});
+    for (const theme of process.env.F01_EDITORIAL_AUDIT==='1'?['light','dark']:[null]) {
+    if(theme){await page.getByRole('combobox',{name:'Color theme',exact:true}).selectOption(theme);assert.equal(await page.locator('html').getAttribute('data-theme'),theme);}
     for (const width of [1440,375]) {
       await page.setViewportSize({width,height:1000});
       await page.evaluate(async () => {
@@ -29,17 +39,19 @@ export async function productVisualAudit(page, directory) {
       if (await page.locator('.workspace-preview').count()) assert.ok(await page.locator('.workspace-preview .button-primary:visible:not(:disabled)').count()<=1,`${name}: one primary workspace action`);
       if (axe && scan) {
         await page.addScriptTag({content:axe});
-        assert.deepEqual(await page.evaluate(async()=> (await axe.run(document,{iframes:false,runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}})).violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))),[],`${name} ${width}: accessibility`);
+        assert.deepEqual(await page.evaluate(async()=> (await axe.run(document,{iframes:false,runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}})).violations.map(v=>({id:v.id,targets:v.nodes.map(n=>({target:n.target,reason:n.failureSummary}))}))),[],`${name} ${width} ${theme??'default'}: accessibility`);
       }
-      await page.screenshot({path:`${directory}/${name}-${width}.png`,fullPage:true});
-      await page.screenshot({path:`${directory}/${name}-${width}-viewport.png`});
-      measurements.push({reflowWidths:[320,720,768,1280],route:new URL(page.url()).pathname,state:name,width,overflow:false,accessibility:axe&&scan?'passed':'not_run'});
+      await page.screenshot({path:`${directory}/${theme?theme+'-':''}${name}-${width}.png`,fullPage:true});
+      await page.screenshot({path:`${directory}/${theme?theme+'-':''}${name}-${width}-viewport.png`});
+      measurements.push({theme,reflowWidths:[320,720,768,1280],route:new URL(page.url()).pathname,state:name,width,overflow:false,accessibility:axe&&scan?'passed':'not_run'});
     }
     for (const width of [320,720,768,1280]) {
       await page.setViewportSize({width,height:width===720?500:1000});
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`${name} ${width}: page overflow`);
     }
     await page.setViewportSize({width:1440,height:1000});
+    }
+    if(process.env.F01_EDITORIAL_AUDIT==='1')await page.getByRole('combobox',{name:'Color theme',exact:true}).selectOption('light');
     if (!reduced) await page.emulateMedia({reducedMotion:'no-preference'});
   }
   return {capture, finish:async()=>{if(enabled)await writeFile(`${directory}/audit.json`,JSON.stringify({measurements},null,2));}};

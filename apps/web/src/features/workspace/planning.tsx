@@ -1,6 +1,8 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
+import {useSearchParams} from 'next/navigation';
+import {readIntentDraft,intentKey} from '@/lib/workspace/intent-draft';
 import type {components} from '@f01/api-client/schema';
 import {projectRequest,ProjectAPIError} from '@/lib/projects/browser';
 import {planningErrors} from '@/lib/planning/contracts';
@@ -31,17 +33,19 @@ function ProposalView({record,onReview,busy,changing}:{record:Proposal;onReview:
 }
 export function PlanningView(){
  const {id,snapshot,refresh,generation}=useWorkspace(),path=`/projects/${id}/planning`,storage=`f01-context-plan:${id}`;
- const {plans:history}=useFlow();
+ const {plans:history,session}=useFlow(),query=useSearchParams(),draftApplied=useRef(false);
+
  const usage=useResource<components['schemas']['UsageView']>('/planning/usage');
  const [intent,setIntent]=useState(''),[receipt,setReceipt]=useState<Receipt|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[attempt,setAttempt]=useState<Attempt|null>(null),[ready,setReady]=useState(false),[editorOpen,setEditorOpen]=useState(true);
  const [bases,setBases]=useState({brain:snapshot.project.current_brain_revision_id,version:snapshot.project.current_version_id});
  const busyRef=useRef(false),pollRef=useRef<AbortController|null>(null);
  const shownProposal=useRef<string|null>(null);
- useEffect(()=>{const proposal=history.data?.items[0];if(proposal&&proposal.id!==shownProposal.current){shownProposal.current=proposal.id;if(proposal.current_context)setEditorOpen(false);}},[history.data?.items]);
+ useEffect(()=>{const owner=session.data?.principal.id;if(!owner||draftApplied.current||!ready||receipt||query.get('change')!=='1')return;draftApplied.current=true;try{const draft=readIntentDraft(sessionStorage,id,owner);if(draft){setIntent(draft.text);setBases({brain:draft.brain,version:draft.version});setEditorOpen(true);}}catch{}},[session.data?.principal.id,ready,receipt,id,query]);
+ useEffect(()=>{const proposal=history.data?.items[0];if(proposal&&proposal.id!==shownProposal.current){shownProposal.current=proposal.id;if(proposal.current_context&&query.get('change')!=='1')setEditorOpen(false);}},[history.data?.items]);
  useEffect(()=>{const stored=readReceipt(storage,value=>parseReceipt(JSON.stringify(value)));if(stored){setReceipt(stored);setIntent(stored.intent);setBases({brain:stored.input.base_brain_revision_id,version:stored.input.base_version_id});}setReady(true);return()=>pollRef.current?.abort();},[storage]);
  function save(r:Receipt|null){setReceipt(r);saveReceipt(storage,r);}
  const stale=bases.brain!==snapshot.project.current_brain_revision_id||bases.version!==snapshot.project.current_version_id;
- async function finish(value:Attempt){setAttempt(value);if(value.status==='pending')return false;save(null);if(value.status!=='succeeded')setError(value.error_code&&value.error_code in planningErrors?planningErrors[value.error_code as keyof typeof planningErrors].message:errorMessage(value.error_code??'INTERNAL_ERROR'));await refresh();history.retry();return true;}
+ async function finish(value:Attempt){setAttempt(value);if(value.status==='pending')return false;save(null);if(value.status==='succeeded'){try{sessionStorage.removeItem(intentKey(id));}catch{}}if(value.status!=='succeeded')setError(value.error_code&&value.error_code in planningErrors?planningErrors[value.error_code as keyof typeof planningErrors].message:errorMessage(value.error_code??'INTERNAL_ERROR'));await refresh();history.retry();return true;}
  async function run(kind:'initial'|'change'){
   if(busyRef.current||!ready)return;busyRef.current=true;pollRef.current=null;setBusy(true);setError('');setAttempt(null);
   let r=receipt;

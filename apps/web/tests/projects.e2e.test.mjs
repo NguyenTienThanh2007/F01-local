@@ -28,6 +28,7 @@ test('M3 real PostgreSQL project create, recover, reload, search and metadata jo
     await until(async () => Boolean(releaseList)); releaseList();
     await page.getByRole('heading', { name: /Start with a brief/ }).waitFor(); await page.unroute('**/api/v1/projects?**'); await page.screenshot({ path: `${webRoot}/test-results/m3/empty.png`, fullPage: true });
     await page.getByRole('link', { name: 'New project' }).click();
+    await page.locator('.creation-title-details > summary').click();
     const title = page.getByRole('textbox', { name: /Project title/ }), brief = page.getByRole('textbox', { name: 'Product brief' });
     await page.getByRole('button', { name: 'Create demo project' }).click(); await page.getByRole('main').getByRole('alert').waitFor(); assert.equal((await (await direct('/projects')).json()).items.length, 0);
     await title.fill('x'.repeat(101)); await brief.fill('Build a CRM for a small real estate agency with leads, pipeline, notes and analytics.');

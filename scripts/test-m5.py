@@ -75,7 +75,7 @@ with test_database(root) as database:
                     OIDC_CLIENT_ID='fixture-client', OIDC_CLIENT_SECRET='synthetic-fixture-client-secret', OIDC_API_AUDIENCE='fixture-api',
                     OIDC_REDIRECT_URI=f'http://127.0.0.1:{web_port}/api/auth/callback', OPENAI_API_KEY='synthetic-phase2a-provider-key',
                     PLANNING_TIMEOUT_SECONDS='10', PLANNING_REQUESTS_PER_MINUTE='20')
-            if auth_suite:
+            if auth_suite or os.environ.get('F01_EDITORIAL_AUDIT') == '1':
                 api_env.update(OIDC_GOOGLE_CONNECTION='google-oauth2', OIDC_EMAIL_CONNECTION='email')
             if commercial:
                 import json

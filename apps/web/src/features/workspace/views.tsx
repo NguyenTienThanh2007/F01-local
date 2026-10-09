@@ -10,6 +10,7 @@ import { RequestHistory, RequestCard } from './requests';
 import { ReleasePanel } from './releases';
 import { RealBuildPanel } from './real-build';
 import { PreviewFrame, ViewportControl } from './preview';
+import {ConversationPanel} from './conversation';
 import {useFlow,useJourney,useBuildProgress} from './flow';
 export function PreviewView() {
   const {id,snapshot,viewport,setViewport,setInspectedVersion}=useWorkspace(),journey=useJourney(),flow=useFlow(),progress=useBuildProgress(),query=useSearchParams(),router=useRouter();
@@ -31,7 +32,7 @@ export function PreviewView() {
   function publishing(open:boolean){setPublishOpen(open);const params=new URLSearchParams(query.toString());if(open)params.set('step','deploy');else params.delete('step');router.replace(`/projects/${id}${params.size?'?'+params:''}`,{scroll:false});}
   const buildPane=!versionId&&<details key="build" className={`build-pane ${buildPrimary?'focus-pane':''}`} open={buildOpen} onToggle={e=>setBuildOpen(e.currentTarget.open)}><summary>{activeRun?'Build in progress':buildReady?'Ready to build':buildAttention?'Build needs attention':version?'Build details':'Start your project'}</summary><RealBuildPanel onReadyChange={setBuildReady} onAttentionChange={setBuildAttention}/>{snapshot.active_run?.mode==='simulated'&&<div className="workspace-notice"><h2>Demonstration in progress</h2><p>Saved demonstration steps are running. This does not generate an application.</p><Link className="button button-primary" href={`/projects/${id}?panel=trace`}>Follow Build Trace</Link></div>}</details>;
   const publishPane=!versionId&&version?.mode==='real'&&<details key="publish" className={`publish-pane ${focus==='deploy'?'focus-pane':''}`} open={publishOpen} onToggle={e=>{if(e.currentTarget.open!==publishOpen)publishing(e.currentTarget.open);}}><summary className={!publishOpen&&!buildPrimary?'publish-entry':''}>{journey.activeRelease?'Publishing progress':journey.currentLive?'Live release & publishing':'Publish this version'}</summary><ReleasePanel secondaryActions={buildPrimary&&focus!=='deploy'} onAttentionChange={setReleaseAttention}/></details>;
-  return <section className="workspace-preview" aria-labelledby={buildingReal&&!versionId&&!version?undefined:'preview-title'} aria-label={buildingReal&&!versionId&&!version?'Build workspace':undefined}>
+  return <div className="editorial-workspace"><ConversationPanel/><section className="workspace-preview" aria-labelledby={buildingReal&&!versionId&&!version?undefined:'preview-title'} aria-label={buildingReal&&!versionId&&!version?'Build workspace':undefined}>
     {buildPrimary&&buildPane}
     {publishOpen&&publishPane}
     <details className={`preview-surface ${buildingReal?'preserved-preview':''}`} hidden={buildingReal&&!version&&!versionId} open={previewOpen||Boolean(versionId)} onToggle={e=>setPreviewOpen(e.currentTarget.open)}><summary hidden={!buildingReal}>{version?`Last good preview · version ${version.number}`:'Preview will appear after verification'}</summary><div className="preview-toolbar"><div><span className="meta">{versionId?'VERSION HISTORY':version?.mode==='real'?'VERIFIED APPLICATION':'PRODUCT PREVIEW'}</span><h2 id="preview-title">{version?`${version.mode==='real'?'Version':'Demo version'} ${version.number}`:'Preview pending.'}</h2></div>{version&&<div className="preview-toolbar-actions"><ViewportControl value={viewport} onChange={setViewport}/>{!versionId&&version.mode==='real'&&!buildPrimary&&!publishOpen&&!journey.currentLive&&<Link className="button button-primary" href={`/projects/${id}?step=deploy`}>Continue to publish</Link>}</div>}</div>
@@ -43,7 +44,7 @@ export function PreviewView() {
     {versionId&&<ReleasePanel historyOnly versionId={versionId}/>}
     {!buildPrimary&&buildPane}
     {!publishOpen&&publishPane}
-  </section>;
+  </section></div>;
 }
 export function BriefView() {
   const { id, openRequests } = useWorkspace(); const result = useResource<Brain>(`/projects/${id}/brain`); const original = result.data?.context.requests.find(r => r.kind === 'initial');

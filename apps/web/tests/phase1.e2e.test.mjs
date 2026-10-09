@@ -54,6 +54,7 @@ test('M6 final Phase 1 acceptance and product quality', { timeout: 300000 }, asy
     await scenario('one persisted journey covers lifecycle, Brain, history, cancel and metadata', async () => {
       await page.goto(`${base}/projects`); await page.getByRole('heading', { name: /Start with a brief/ }).waitFor();
       await page.getByRole('link', { name: 'New project' }).click();
+      await page.locator('.creation-title-details > summary').click();
       await page.getByRole('textbox', { name: /Project title/ }).fill('Phase 1 acceptance');
       const original = 'Build a CRM with property leads, pipeline stages and private notes.';
       await page.getByRole('textbox', { name: 'Product brief' }).fill(original);
