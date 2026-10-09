@@ -6,10 +6,10 @@ import {authDestination} from '../src/lib/auth/navigation.ts';
 import {readIntentDraft,saveIntentDraft,intentKey} from '../src/lib/workspace/intent-draft.ts';
 const source=readFileSync(new URL('../public/theme-init.js',import.meta.url),'utf8');
 function boot({stored=null,dark=false,blocked=false}={}){
- const callbacks={},mediaCallbacks={},values=new Map(stored===null?[]:[['f01.theme.v1',stored]]),root={dataset:{},style:{}},media={matches:dark,addEventListener:(type,fn)=>{mediaCallbacks[type]=fn;}};
+ const controls=[],observations=[],callbacks={},mediaCallbacks={},values=new Map(stored===null?[]:[['f01.theme.v1',stored]]),root={dataset:{},style:{}},media={matches:dark,addEventListener:(type,fn)=>{mediaCallbacks[type]=fn;}};
  const storage={getItem:key=>{if(blocked)throw Error('blocked');return values.get(key)??null;},setItem:(key,value)=>{if(blocked)throw Error('blocked');values.set(key,value);}};
  const window={matchMedia:()=>media,dispatchEvent:()=>{},addEventListener:(type,fn)=>{callbacks[type]=fn;}};
- vm.runInNewContext(source,{window,document:{documentElement:root},localStorage:storage,Event:class{constructor(type){this.type=type;}}});return {window,root,values,media,mediaCallbacks,callbacks};
+ vm.runInNewContext(source,{window,document:{documentElement:root,readyState:'loading',querySelectorAll:()=>controls},MutationObserver:class{constructor(callback){this.callback=callback;observations.push(this);}observe(){}disconnect(){this.disconnected=true;}},localStorage:storage,Event:class{constructor(type){this.type=type;}}});return {window,root,values,media,mediaCallbacks,callbacks,controls,observations};
 }
 test('new users default to light even on a dark system; stored preferences apply synchronously',()=>{
  assert.equal(boot({dark:true}).root.dataset.theme,'light');assert.equal(boot({stored:'dark'}).root.dataset.theme,'dark');assert.equal(boot({stored:'system',dark:true}).root.dataset.theme,'dark');assert.equal(boot({stored:'invalid',dark:true}).root.dataset.theme,'light');
@@ -28,3 +28,5 @@ test('conversational draft handoff is project/owner bound and retains its exact 
 test('login recovery retains the recognized change handoff without allowing arbitrary return queries',()=>{
  const route=`/projects/${project}/planning?change=1`;assert.equal(authDestination(route),route);assert.equal(authDestination(`/projects/${project}?change=1`),'/projects');assert.equal(authDestination(`/projects/${project}/planning?change=2`),'/projects');assert.equal(authDestination(`/projects/${project}/planning?change=1&change=2`),'/projects');assert.equal(authDestination('https://elsewhere.invalid/planning?change=1'),'/projects');
 });
+
+test('streamed appearance controls match the stored preference before hydration',()=>{const b=boot({stored:'dark'});b.controls.push({value:'light'});b.observations[0].callback();assert.equal(b.controls[0].value,'dark');b.callbacks.DOMContentLoaded();assert.equal(b.observations[0].disconnected,true);b.window.f01Theme.set('system');assert.equal(b.controls[0].value,'system');});
