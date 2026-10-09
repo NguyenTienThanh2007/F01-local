@@ -30,3 +30,5 @@ body{background:var(--canvas);color:var(--ink)}button,input,textarea,select{colo
 .saved-project,.rail-nav a,.workspace-navigation nav a,.project-form textarea,.starter-row,.artifact-visual,.evidence-row{transition-property:border-color,transform,box-shadow}
 
 .conversation-heading{list-style:none;cursor:pointer}.conversation-heading::-webkit-details-marker{display:none}.conversation-heading::after{content:'−';margin-left:auto;color:var(--muted)}.conversation-panel details:not([open])>.conversation-heading{border-bottom:0;padding-bottom:0}.conversation-panel details:not([open])>.conversation-heading::after{content:'+'}
+
+.conversation-composer .form-error{color:var(--error)}

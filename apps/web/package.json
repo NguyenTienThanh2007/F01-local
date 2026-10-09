@@ -19,7 +19,8 @@
     "test:build-experience:e2e": "node --test tests/build-experience.e2e.test.mjs",
     "test:auth:e2e": "node --test tests/authentication.e2e.test.mjs",
     "test:real-build-states:e2e": "node --test tests/real-build-states.e2e.test.mjs",
-    "test:theme:e2e": "node --test tests/theme-bootstrap.e2e.test.mjs"
+    "test:theme:e2e": "node --test tests/theme-bootstrap.e2e.test.mjs",
+    "test:conversation:e2e": "node --test tests/conversation-recovery.e2e.test.mjs"
   },
   "dependencies": {
     "@f01/api-client": "workspace:*",
