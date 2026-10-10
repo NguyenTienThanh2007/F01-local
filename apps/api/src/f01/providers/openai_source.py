@@ -22,7 +22,17 @@ source is rejected, including during repair. Fix the file indicated by the saved
 diagnostic, preserving the other files and using their exact prior hashes.
 The trusted scaffold uses strict TypeScript. Type layout children as ReactNode;
 browser state/hooks require a 'use client' component. Do not fix type errors by
-weakening compiler settings or suppressing checks. Return exactly the requested
+weakening compiler settings or suppressing checks.
+The scaffold has no Tailwind compiler or UI/icon packages. Use actual plain CSS,
+CSS modules or inline styles; utility class names alone do not provide styling.
+The embedded preview is sandboxed: forms cannot submit and native confirm/alert
+dialogs are blocked. Use type='button' with onClick for local form actions and
+in-application confirmation UI for deletion, never depend on onSubmit or confirm.
+Browser storage may be unavailable in the embedded preview. Guard access with
+try/catch inside client effects, retain usable in-memory state, and never write
+empty initial state over saved data before loading it. Preserve existing storage
+keys and backward-compatible records when adding features to an existing app.
+Return exactly the requested
 schema, without markdown fences."""
 MAX_OUTPUT_TOKENS = 16000
 MAX_RESPONSE_BYTES = 786432

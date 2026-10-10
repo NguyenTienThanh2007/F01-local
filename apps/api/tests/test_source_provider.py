@@ -37,6 +37,14 @@ def test_source_adapter_strict_contract_usage_and_no_tools(project_plan: Project
         assert body["text"]["format"]["schema"] == SourceProposal.model_json_schema()
         assert body["text"]["format"]["strict"] is True
         assert body["input"] == context.model_dump_json()
+        # Real browser acceptance found invisible utility styling, blocked form
+        # events and unavailable opaque-origin storage. Every real generation
+        # dispatch must receive the scaffold/browser constraints (not user data).
+        policy = body["instructions"]
+        assert "no Tailwind compiler" in policy and "actual plain CSS" in policy
+        assert "never depend on onSubmit or confirm" in policy
+        assert "never write" in policy and "before loading it" in policy
+        assert "Preserve existing storage" in policy
         assert "tools" not in body and "OpenAI" not in str(SourceProposal.model_json_schema())
         return httpx.Response(200, json={**response_body(), "usage": {"input_tokens": 100, "output_tokens": 200}})
     async def run() -> None:
