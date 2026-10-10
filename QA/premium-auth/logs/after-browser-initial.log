@@ -1,0 +1,44 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+$ node --test tests/commercial.e2e.test.mjs
+Closing test browser
+Stopping test server
+Teardown complete
+✖ signed-in commercial journey with accepted Docker and controlled deployment provider (8405.267292ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8476.846875
+
+✖ failing tests:
+
+test at tests/commercial.e2e.test.mjs:11:1
+✖ signed-in commercial journey with accepted Docker and controlled deployment provider (8405.267292ms)
+  AssertionError [ERR_ASSERTION]: create 768: page overflow
+  
+  false !== true
+  
+      at Object.capture (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/product-visual-audit.mjs:40:14)
+      at async TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/commercial.e2e.test.mjs:26:43)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+/Users/nguyentienthanh/Downloads/F01-local/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @f01/web@ test:commercial:e2e: `node --test tests/commercial.e2e.test.mjs`
+Exit status 1

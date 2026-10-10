@@ -1,0 +1,190 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_quiet_event_stream_confirms_transport_promptly_without_progress _____
+
+fut = <async_generator_asend object at 0x10aa37140>, timeout = 1
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+
+        Coroutine will be wrapped in Task.
+
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+
+        If the wait is cancelled, the task is also cancelled.
+
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+
+        This function is a coroutine.
+        """
+        # The special case for timeout <= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+
+
+        if timeout is not None and timeout <= 0:
+            fut = ensure_future(fut)
+
+            if fut.done():
+                return fut.result()
+
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+
+        async with timeouts.timeout(timeout):
+>           return await fut
+                   ^^^^^^^^^
+
+../../../../.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/asyncio/tasks.py:520:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/f01/api/stream.py:63: in stream_events
+    await asyncio.sleep(poll_seconds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+delay = 0.25, result = None
+
+    async def sleep(delay, result=None):
+        """Coroutine that completes after a given time (in seconds)."""
+        if delay <= 0:
+            await __sleep0()
+            return result
+
+        loop = events.get_running_loop()
+        future = loop.create_future()
+        h = loop.call_later(delay,
+                            futures._set_result_unless_cancelled,
+                            future, result)
+        try:
+>           return await future
+                   ^^^^^^^^^^^^
+E           asyncio.exceptions.CancelledError
+
+../../../../.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/asyncio/tasks.py:665: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+database = <f01.db.session.Database object at 0x10a64a1b0>
+client = <starlette.testclient.TestClient object at 0x10a808ec0>
+project_settings = Settings(app_env='test', auth_mode='development', execution_mode='simulated', real_execution_enabled=False, release_en...=1000, simulation_runner_enabled=False, simulation_change_scenario='auto', dev_token_expires_at=None, log_level='INFO')
+
+    def test_quiet_event_stream_confirms_transport_promptly_without_progress(database:Database,client:TestClient,project_settings:Settings)->None:
+        created=create(client);pid=UUID(created['project']['id']);uid=owner(database,created)
+        before=workspace(database,uid,pid)
+        async def connected()->bool:return False
+        async def check()->None:
+            generator=stream_events(database,uid,pid,before.last_sequence,project_settings,project_settings.dev_api_token.get_secret_value(),connected)
+            try:assert await asyncio.wait_for(anext(generator),timeout=1)==': connected\n\n'
+            finally:await generator.aclose()
+>       asyncio.run(check())
+
+tests/persistence/test_m5.py:356:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../../../.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/persistence/test_m5.py:354: in check
+    try:assert await asyncio.wait_for(anext(generator),timeout=1)==': connected\n\n'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/asyncio/tasks.py:519: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Timeout [expired]>
+exc_type = <class 'asyncio.exceptions.CancelledError'>
+exc_val = CancelledError(), exc_tb = <traceback object at 0x10ba8acc0>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+
+            if self._task.uncancel() <= self._cancelling and exc_type is exceptions.CancelledError:
+                # Since there are no new cancel requests, we're
+                # handling this.
+>               raise TimeoutError from exc_val
+E               TimeoutError
+
+../../../../.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/asyncio/timeouts.py:115: TimeoutError
+---------------------------- Captured stdout setup -----------------------------
+No new upgrade operations detected.
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0006_release_hardening -> 0005_release_target, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Running downgrade 0005_release_target -> 0004_phase2c, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running downgrade 0004_phase2c -> 0003_phase2b, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running downgrade 0003_phase2b -> 0002_phase2a, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running downgrade 0002_phase2a -> 0001_phase1, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0001_phase1 -> , Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/nguyentienthanh/Downloads/F01-local/apps/api/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/persistence/test_m5.py::test_quiet_event_stream_confirms_transport_promptly_without_progress
+1 failed, 18 deselected, 1 warning in 1.70s

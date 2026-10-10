@@ -1,0 +1,9 @@
+{
+  "errors": [],
+  "console": [],
+  "checks": [
+    "Embedded sandbox and original shared cookie host preserved",
+    "Real generated app operates inside opaque embedded preview"
+  ],
+  "step": "Project journey \u00b7 Step 4 of 6\n\nReview your preview\nTry the verified version, then continue to publishing.\n\n\u2713\nDescribe\nConfirmed\n\u2713\nPlan\nConfirmed\n\u2713\nBuild\nConfirmed\n04\nPreview\nWaiting\n05\nDeploy\nPending\n06\nLive\nPending"
+}

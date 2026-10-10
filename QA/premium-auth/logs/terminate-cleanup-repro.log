@@ -1,0 +1,25 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_package_manager_terminate_cannot_abandon_started_cleanup _________
+
+    def test_package_manager_terminate_cannot_abandon_started_cleanup() -> None:
+        import os
+        import signal
+        import subprocess
+        import sys
+        from pathlib import Path
+        script = "from scripts.disposable_runtimes import protect_disposable_cleanup; import time; protect_disposable_cleanup(); print('cleanup-started',flush=True); time.sleep(.4); print('cleanup-confirmed',flush=True)"
+        process = subprocess.Popen([sys.executable, '-c', script], cwd=Path(__file__).resolve().parents[1], stdout=subprocess.PIPE, text=True)
+        try:
+            assert process.stdout is not None
+            assert process.stdout.readline().strip() == 'cleanup-started'
+            os.kill(process.pid, signal.SIGTERM)
+            output, _ = process.communicate(timeout=5)
+>           assert process.returncode == 0 and 'cleanup-confirmed' in output
+E           AssertionError: assert (-15 == 0)
+E            +  where -15 = <Popen: returncode: -15 args: ['/Users/nguyentienthanh/Downloads/F01-local/a...>.returncode
+
+apps/api/tests/test_disposable_cleanup.py:100: AssertionError
+=========================== short test summary info ============================
+FAILED apps/api/tests/test_disposable_cleanup.py::test_package_manager_terminate_cannot_abandon_started_cleanup
+1 failed, 7 deselected in 0.52s

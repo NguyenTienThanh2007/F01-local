@@ -1,0 +1,41 @@
+"""Provider-independent release boundary and safe errors."""
+from dataclasses import dataclass
+from typing import Protocol
+from f01.db.models import ReleaseArtifact, ReleaseConfiguration
+
+
+class ReleaseProviderError(Exception):
+    def __init__(self, code: str, *, uncertain: bool = False, retryable: bool = False) -> None:
+        self.code, self.uncertain, self.retryable = code, uncertain, retryable
+        super().__init__(code)
+
+
+@dataclass(frozen=True)
+class StagedDeployment:
+    id: str
+    url: str
+    state: str
+
+
+class ReleaseProvider(Protocol):
+    async def upload(self, config: ReleaseConfiguration, artifact: ReleaseArtifact) -> None: ...
+    async def stage(self, config: ReleaseConfiguration, artifact: ReleaseArtifact, operation: str) -> StagedDeployment: ...
+    async def find(self, config: ReleaseConfiguration, artifact: ReleaseArtifact, operation: str) -> StagedDeployment | None: ...
+    async def observe(self, config: ReleaseConfiguration, artifact: ReleaseArtifact, operation: str, deployment: str) -> StagedDeployment: ...
+    async def routing(self, config: ReleaseConfiguration) -> str | None: ...
+    async def promote(self, config: ReleaseConfiguration, deployment: str) -> None: ...
+    async def cancel(self, config: ReleaseConfiguration, deployment: str) -> None: ...
+    async def clear(self, config: ReleaseConfiguration, deployment: str) -> None: ...
+    async def health(self, url: str, artifact: ReleaseArtifact) -> None: ...
+
+
+@dataclass(frozen=True)
+class ProvisionedTarget:
+    project_id: str
+    public_url: str
+    team_id: str | None
+
+
+class TargetProvider(Protocol):
+    async def find_target(self, name: str) -> ProvisionedTarget | None: ...
+    async def create_target(self, name: str) -> ProvisionedTarget: ...

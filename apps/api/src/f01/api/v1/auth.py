@@ -1,6 +1,6 @@
 """Private BFF endpoints. Credentials and provider tokens never go to browser JSON."""
 from hmac import compare_digest
-from typing import Annotated
+from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, ConfigDict, Field
@@ -30,9 +30,19 @@ class SessionInput(BaseModel):
 DB = Annotated[Database, Depends(get_database)]
 Config = Annotated[Settings, Depends(get_settings)]
 
+class LoginStart(BaseModel):
+    model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
+    method: Literal["hosted", "google", "email"] = "hosted"
+    intent: Literal["sign-in", "sign-up"] = "sign-in"
+
+@router.get("/options", dependencies=[Depends(gateway)])
+def options(settings: Config) -> dict[str, bool]:
+    return {"google": bool(settings.oidc_google_connection), "email": bool(settings.oidc_email_connection)}
+
 @router.post("/start", dependencies=[Depends(gateway)])
-def start(database: DB, settings: Config) -> dict[str, str]:
-    return start_login(database, settings)
+def start(database: DB, settings: Config, body: LoginStart | None = None) -> dict[str, str]:
+    selected = body or LoginStart()
+    return start_login(database, settings, selected.method, selected.intent)
 
 @router.post("/callback", dependencies=[Depends(gateway)])
 async def callback(body: Callback, request: Request, database: DB, settings: Config) -> dict[str, str]:

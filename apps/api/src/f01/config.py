@@ -20,11 +20,17 @@ class Settings(BaseSettings):
     auth_mode: Literal["development", "oidc"] = "development"
     execution_mode: Literal["simulated", "real"] = "simulated"
     real_execution_enabled: bool = False
+    release_enabled: bool = False
+    production_image_id: str = ""
+    production_acceptance_report: str = ""
+    release_concurrency: int = Field(default=1, ge=1, le=4)
+    release_timeout_seconds: int = Field(default=600, ge=60, le=1200)
     sandbox_image_id: str = ""
     sandbox_acceptance_report: str = ""
     sandbox_socket: str = "/var/run/docker.sock"
     preview_origin: str = "http://127.0.0.1:3031"
     factory_origin: str = "http://localhost:3000"
+    local_browser_preview_enabled: bool = False
     build_concurrency: int = Field(default=1, ge=1, le=4)
     build_timeout_seconds: int = Field(default=600, ge=60, le=1200)
     repair_attempts: int = Field(default=2, ge=0, le=3)
@@ -43,6 +49,9 @@ class Settings(BaseSettings):
     oidc_client_secret: SecretStr = SecretStr("")
     oidc_api_audience: str = ""
     oidc_redirect_uri: str = ""
+    oidc_google_connection: str = ""
+    oidc_email_connection: str = ""
+    oidc_require_verified_email: bool = True
     session_ttl_seconds: int = Field(default=3600, ge=60, le=86400)
     session_idle_seconds: int = Field(default=900, ge=60, le=3600)
     planning_requests_per_minute: int = Field(default=5, ge=1, le=30)
@@ -66,6 +75,24 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def private_identity_only(self) -> Self:
+        if self.local_browser_preview_enabled:
+            preview, factory = urlsplit(self.preview_origin), urlsplit(self.factory_origin)
+            if not (self.real_execution_enabled and self.app_env in ("development", "test")
+                    and preview.scheme == factory.scheme == "http"
+                    and preview.hostname == "localhost" and factory.hostname == "127.0.0.1"):
+                raise ValueError("Local browser previews require real execution and separate localhost/127.0.0.1 development origins.")
+        if self.release_enabled:
+            import json
+            import re
+            if not re.fullmatch(r"sha256:[a-f0-9]{64}", self.production_image_id):
+                raise ValueError("An exact production packaging image is required.")
+            try:
+                acceptance = json.loads(Path(self.production_acceptance_report).read_text())
+                passed = acceptance.get('image_id') == self.production_image_id and all(acceptance.get(k) == 'passed' for k in ('docker_containment', 'docker_journey', 'production_packaging'))
+            except (OSError, ValueError):
+                passed = False
+            if not passed:
+                raise ValueError("Passing containment, journey and production packaging acceptance for the exact image is required.")
         if self.real_execution_enabled:
             import re
             if not re.fullmatch(r"sha256:[a-f0-9]{64}", self.sandbox_image_id):
@@ -95,6 +122,14 @@ class Settings(BaseSettings):
                 Fernet(self.session_encryption_key.get_secret_value().encode())
             except Exception:
                 raise ValueError("A valid session encryption key is required.") from None
+            import re
+            for connection in (self.oidc_google_connection, self.oidc_email_connection):
+                if connection and not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", connection):
+                    raise ValueError("Identity connections must be fixed provider connection names.")
+            if self.app_env == "production" and not self.oidc_client_secret.get_secret_value():
+                raise ValueError("Production login requires the private confidential OIDC client credential.")
+            if self.app_env == "production" and not self.oidc_require_verified_email:
+                raise ValueError("Production login requires a verified email claim.")
             if not self.oidc_client_id or not self.oidc_api_audience:
                 raise ValueError("Configure the OIDC client and API audience.")
             for url in (self.oidc_issuer, self.oidc_authorization_url, self.oidc_token_url, self.oidc_jwks_url, self.oidc_redirect_uri):

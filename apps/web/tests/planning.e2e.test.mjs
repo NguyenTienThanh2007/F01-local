@@ -1,3 +1,4 @@
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -6,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import { readdir, readFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
 import { projectPlan } from './fixtures/project-plan.mjs';
 
 const webRoot = fileURLToPath(new URL('../', import.meta.url));
@@ -75,7 +75,7 @@ test('production frontend submits, displays, recovers and protects the browser b
     delete env.OPENAI_API_KEY;
     frontend = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', String(frontendPort)], { cwd: webRoot, env, stdio: 'ignore' });
     await waitUntil(async () => (await fetch(`${base}/projects/new`)).ok);
-    browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
+    browser = await launchTestBrowser({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined });
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     const browserPosts = [];
     page.on('request', req => { if (req.method() === 'POST') browserPosts.push(req); });
@@ -185,8 +185,9 @@ test('production frontend submits, displays, recovers and protects the browser b
     await run('homepage starters change the brief and labeled sample without making a backend request', async () => {
       const before = calls;
       await page.goto(base);
-      assert.match(await page.getByRole('heading', { level: 1 }).innerText(), /Describe the outcome\.\s*Get working software\./);
-      assert.match(await page.locator('.os-hero-grid > div > p').innerText(), /real draft plan or save a project/);
+      assert.match(await page.getByRole('heading', { level: 1 }).innerText(), /Big idea\.\s*Real application\./);
+      assert.match(await page.locator('.welcome-promise > p').innerText(), /Try it before you publish/);
+      await page.locator('.welcome-draft > summary').click();
       assert.equal(await page.getByRole('button', { name: 'Play demo' }).count(), 1);
       assert.match(await page.locator('.demo-trace > p').innerText(), /No application, build or deployment is executed/);
       for (const [title, expected, sample] of [
@@ -214,23 +215,23 @@ test('production frontend submits, displays, recovers and protects the browser b
       await page.setViewportSize({ width: 1440, height: 1000 });
       await page.goto(base);
       const navigation = page.getByRole('navigation', { name: 'Global navigation' }).first();
-      for (const [name, href] of [['Projects', '/projects'], ['Templates', '#templates'], ['Connections', '#connections'], ['Docs', '#docs']]) {
+      for (const [name, href] of [['Projects', '/projects'], ['Examples', '#templates'], ['Docs', '#docs']]) {
         assert.equal(await navigation.getByRole('link', { name: new RegExp(name) }).getAttribute('href'), href);
       }
-      assert.equal(await page.locator('.os-account').getAttribute('href'), '/account');
+      assert.equal(await page.locator('.os-account').getAttribute('href'), '/sign-in');
+      await page.locator('.welcome-advanced > summary').click();
       assert.match(await page.locator('#connections').innerText(), /PLANNED/);
       assert.match(await page.locator('#connections').innerText(), /No connections can be authorized/);
-      await navigation.getByRole('link', { name: 'Templates', exact: true }).click();
+      await navigation.getByRole('link', { name: 'Examples', exact: true }).click();
       await page.locator('#templates').waitFor();
-      assert.match(await page.locator('#templates').innerText(), /Starter briefs are available now/);
-      await page.getByRole('button', { name: 'Start a brief', exact: false }).click();
-      await waitUntil(() => page.getByRole('textbox', { name: 'Product brief' }).evaluate(element => element === document.activeElement));
+      assert.match(await page.locator('#templates').innerText(), /Choose a brief/);
+      assert.equal(await page.locator('.welcome-promise').getByRole('button',{name:/Create a project/}).getAttribute('type'),null);
       const before = calls;
       await page.setViewportSize({ width: 375, height: 1000 });
       const menu = page.getByRole('button', { name: 'Open global navigation' });
       await menu.focus(); await page.keyboard.press('Enter');
       await page.getByRole('dialog', { name: 'Explore F01' }).waitFor();
-      assert.equal(await page.getByRole('dialog').getByRole('link', { name: /Connections/ }).count(), 1);
+      assert.equal(await page.getByRole('dialog').getByRole('link', { name: /Examples/ }).count(), 1);
       await page.keyboard.press('Escape');
       await page.getByRole('dialog').waitFor({ state: 'hidden' });
       assert.equal(await menu.evaluate(element => element === document.activeElement), true);
@@ -241,6 +242,7 @@ test('production frontend submits, displays, recovers and protects the browser b
       await page.setViewportSize({ width: 1440, height: 1000 });
       await page.goto(base);
       const before = calls;
+      await page.locator('.welcome-draft > summary').click();
       await page.getByRole('button', { name: 'Blueprint', exact: true }).click();
       assert.match(await page.locator('.sample-frame').innerText(), /SAMPLE BLUEPRINT \/ NOT GENERATED/);
       assert.match(await page.locator('.sample-blueprint').innerText(), /shared lead register/);
@@ -261,6 +263,7 @@ test('production frontend submits, displays, recovers and protects the browser b
 
     await run('demo can pause and replay and is static by default with reduced motion', async () => {
       await page.goto(base);
+      await page.locator('.welcome-draft > summary').click();
       const pulse = page.locator('.demo-workspace-heading .project-pulse');
       assert.match(await pulse.innerText(), /Understanding/);
       await delay(2100);
@@ -278,6 +281,7 @@ test('production frontend submits, displays, recovers and protects the browser b
       await page.getByRole('button', { name: 'Pause demo' }).click();
       await page.emulateMedia({ reducedMotion: 'no-preference' });
       await page.goto(base);
+      await page.locator('.welcome-draft > summary').click();
       await page.getByRole('button', { name: 'Pause demo' }).waitFor();
       await waitUntil(async () => (await pulse.innerText()).includes('Planning'));
       await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -286,16 +290,19 @@ test('production frontend submits, displays, recovers and protects the browser b
 
     await run('dashboard exposes a retryable connection error and starters prefill creation', async () => {
       await page.goto(`${base}/projects`);
-      await page.getByRole('button', { name: 'Retry project list' }).waitFor();
+      await page.getByRole('link', { name: 'Sign in to your workspace' }).waitFor();
       assert.equal(await page.getByRole('searchbox', { name: 'Search projects' }).isDisabled(), false);
+      await page.locator('.dashboard-filters > summary').click();
       assert.equal(await page.getByRole('combobox', { name: 'Project state' }).isDisabled(), false);
+      await page.locator('.dashboard-starters > summary').click();
       const before = calls;
       await page.getByRole('link', { name: /Fewer missed appointments/ }).click();
-      assert.match(await page.getByRole('textbox', { name: 'Product brief' }).inputValue(), /reduce missed appointments/);
+      assert.match(await page.getByRole('textbox', { name: 'Product brief' }).inputValue(), /missed appointments/);
       assert.equal(await page.getByRole('button', { name: /Fewer missed appointments/ }).getAttribute('aria-pressed'), 'true');
       assert.equal(calls, before);
       await page.goto(`${base}/projects/new?starter=unknown`);
-      assert.equal(await page.getByRole('textbox', { name: 'Product brief' }).inputValue(), '');
+      await page.getByText('Your draft is back. Review it before creating your project.',{exact:true}).waitFor();
+      assert.match(await page.getByRole('textbox', { name: 'Product brief' }).inputValue(), /missed appointments/);
     });
 
     await run('all redesigned surfaces fit target widths and mobile navigation restores keyboard focus', async () => {
@@ -334,9 +341,9 @@ test('production frontend submits, displays, recovers and protects the browser b
   } finally {
     for (const response of pendingResponses) response.destroy();
     await browser?.close();
-    frontend?.kill('SIGTERM');
+    const stopped=stopBrowserServer(frontend);
     backend.closeAllConnections();
     await new Promise(resolve => backend.close(resolve));
-    if (frontend && frontend.exitCode === null) await new Promise(resolve => frontend.once('exit', resolve));
+    await stopped;
   }
 });

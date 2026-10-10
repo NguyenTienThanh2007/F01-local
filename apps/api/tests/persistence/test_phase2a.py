@@ -48,7 +48,7 @@ def oidc_settings(settings: Settings) -> Settings:
 
 def token(settings: Settings,key: rsa.RSAPrivateKey,subject: str="owner-a",**overrides: Any) -> str:
     now=int(time.time())
-    claims={"iss":settings.oidc_issuer,"sub":subject,"aud":settings.oidc_api_audience,"iat":now,"exp":now+600,**overrides}
+    claims={"iss":settings.oidc_issuer,"sub":subject,"aud":settings.oidc_api_audience,"iat":now,"exp":now+600,"email":"verified@example.test","email_verified":True,**overrides}
     return jwt.encode(claims,key,algorithm="RS256",headers={"kid":"test-key"})
 
 def verifier(settings: Settings,key: rsa.RSAPrivateKey) -> OIDCVerifier:
@@ -154,6 +154,8 @@ def test_bounded_context_and_immutable_proposal_do_not_advance_brain_or_versions
     assert context['requirements'][0]['provenance']['source']=='user_request';assert 'synthetic-provider-credential' not in prompt
     assert context['stack']['frontend']['provenance']['source']=='template'
     assert context['current_plan'][0]['status']=='proposed'
+    assert context['runtime_capabilities']['real_build_available'] is False
+    assert 'Phase 2A' not in context['source']['reason']
     published=planning.finish(database,project_settings,uid,attempt.id,result(project_plan));assert published.proposal
     after=client.get(f'/v1/projects/{pid}/workspace').json()
     assert after['current_brain']==before['current_brain'];assert after['current_version']==before['current_version'];assert after['project']['lifecycle']==before['project']['lifecycle']
@@ -313,3 +315,63 @@ def test_planning_locks_allow_existing_fk_writes_and_expired_replay_cancel(clien
         replay=pool.submit(planning.reserve,database,project_settings,uid,key,'lock-order',pid,body)
         cancel=pool.submit(planning.read_attempt,database,uid,pid,saved.id,True)
         assert replay.result(timeout=5)[0].status=='abandoned' and cancel.result(timeout=5).status=='abandoned'
+
+@pytest.mark.parametrize('method,connection', [('google','google-oauth2'),('email','email')])
+def test_provider_methods_preserve_pkce_nonce_audience_and_signup(database: Database,project_settings: Settings,method: Any,connection: str) -> None:
+    configured=oidc_settings(project_settings).model_copy(update={'oidc_google_connection':'google-oauth2','oidc_email_connection':'email'})
+    query=parse_qs(urlparse(start_login(database,configured,method,'sign-up')['authorization_url']).query)
+    assert query['connection']==[connection] and query['screen_hint']==['signup'] and query['prompt']==['login']
+    assert query['code_challenge_method']==['S256'] and query['audience']==[configured.oidc_api_audience]
+    assert all(len(query[k][0])>=40 for k in ('state','nonce','code_challenge'))
+    with pytest.raises(ApplicationError,match='AUTH_METHOD_UNAVAILABLE'):start_login(database,oidc_settings(project_settings),method)
+
+@pytest.mark.parametrize('claims',[{'email_verified':False},{'email_verified':None},{'email':None},{'email':''}])
+def test_unverified_email_cannot_create_authenticated_login(settings: Settings,rsa_key: rsa.RSAPrivateKey,claims: dict[str,Any]) -> None:
+    configured=oidc_settings(settings)
+    with pytest.raises(ApplicationError,match='EMAIL_VERIFICATION_REQUIRED'):
+        verifier(configured,rsa_key).login(token(configured,rsa_key),token(configured,rsa_key,aud=configured.oidc_client_id,nonce='bound',**claims),digest('bound'))
+
+def test_later_verified_login_updates_email_without_merging_owner(database: Database,settings: Settings,rsa_key: rsa.RSAPrivateKey) -> None:
+    configured=oidc_settings(settings)
+    earlier=resolve_identity(database,verifier(configured,rsa_key).access(token(configured,rsa_key)))
+    identity=VerifiedIdentity(configured.oidc_issuer,'owner-a',datetime.now(UTC)+timedelta(minutes=10),'Verified name','verified@example.test')
+    assert resolve_identity(database,identity).id==earlier.id
+    with database.session() as session:
+        user=session.get(User,earlier.id);assert user and user.email=='verified@example.test'
+    other=resolve_identity(database,VerifiedIdentity(configured.oidc_issuer,'owner-b',identity.expires_at,'Other',identity.email))
+    assert other.id!=earlier.id
+
+def test_account_profile_owned_update_never_changes_email_or_another_owner(project_settings: Settings,database: Database,rsa_key: rsa.RSAPrivateKey) -> None:
+    configured=oidc_settings(project_settings);app=create_app(configured)
+    with TestClient(app) as client:
+        app.state.oidc_verifier=verifier(configured,rsa_key)
+        headers,_=login_headers(database,configured,rsa_key);client.headers.update(headers)
+        assert client.patch('/v1/account',json={'display_name':'Mira'}).status_code==200
+        assert client.get('/v1/session').json()['principal']['display_name']=='Mira'
+        assert client.patch('/v1/account',json={'display_name':'Mira','email':'other@example.test'}).status_code==422
+        assert client.patch('/v1/account',json={'display_name':'Other'},headers={'X-F01-CSRF':'wrong'}).status_code==401
+        other,_=login_headers(database,configured,rsa_key,'other');client.headers.update(other)
+        assert client.get('/v1/account').json()['display_name']!='Mira'
+        client.headers.update(headers);assert client.get('/v1/account').json()['display_name']=='Mira'
+
+
+def test_initial_real_plan_receives_current_capabilities_without_fabricating_source(
+    client: TestClient, database: Database, project_settings: Settings,
+) -> None:
+    from f01.providers.prompts import CONTEXT_INSTRUCTIONS
+    created = create(client)
+    uid = UUID(client.get('/v1/session').json()['principal']['id'])
+    configured = project_settings.model_copy(update={'execution_mode': 'real', 'real_execution_enabled': True})
+    _, prompt = planning.reserve(database, configured, uid, str(uuid4()), 'real-context',
+                                  UUID(created['project']['id']), input_for(client, created))
+    assert prompt is not None
+    context = json.loads(prompt)
+    assert context['runtime_capabilities'] == {
+        'execution_mode': 'real', 'real_build_available': True, 'recipe': 'next-web-v1',
+        'application_scope': 'Next.js/React/TypeScript and plain CSS/CSS modules with browser state; no Tailwind compiler, application backend, external database or additional packages.',
+        'production_release_available': False,
+    }
+    assert context['source']['available'] is False and context['version'] is None
+    assert 'No real build is confirmed' in context['execution']
+    assert 'historical Phase 1/2A template limitations must not override' in CONTEXT_INSTRUCTIONS
+    assert context['stack']['frontend']['provenance']['source'] == 'template'

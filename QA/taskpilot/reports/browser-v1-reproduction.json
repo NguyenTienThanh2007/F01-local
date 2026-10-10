@@ -1,0 +1,40 @@
+{
+  "log": [
+    {
+      "url": "http://f01-d81470009d8642f08deb4a1e174f57f1.localhost:57470/p/ecb5f9cc-7a55-4c01-9070-9fddb21160f3/<local-preview-capability>/",
+      "status": 200
+    },
+    {
+      "console": "warning",
+      "message": "An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing."
+    },
+    {
+      "url": "http://f01-d81470009d8642f08deb4a1e174f57f1.localhost:57470/p/ecb5f9cc-7a55-4c01-9070-9fddb21160f3/<local-preview-capability>/_next/static/chunks/84f30f6c-27740f4c8b60a473.js",
+      "status": 200
+    },
+    {
+      "url": "http://f01-d81470009d8642f08deb4a1e174f57f1.localhost:57470/p/ecb5f9cc-7a55-4c01-9070-9fddb21160f3/<local-preview-capability>/_next/static/chunks/app/page-d315150909d0c6ef.js",
+      "status": 200
+    },
+    {
+      "url": "http://f01-d81470009d8642f08deb4a1e174f57f1.localhost:57470/p/ecb5f9cc-7a55-4c01-9070-9fddb21160f3/<local-preview-capability>/_next/static/chunks/110-edf83d5a17d79b2d.js",
+      "status": 200
+    },
+    {
+      "url": "http://f01-d81470009d8642f08deb4a1e174f57f1.localhost:57470/p/ecb5f9cc-7a55-4c01-9070-9fddb21160f3/<local-preview-capability>/_next/static/chunks/webpack-22d8a2f2d76af891.js",
+      "status": 200
+    },
+    {
+      "url": "http://f01-d81470009d8642f08deb4a1e174f57f1.localhost:57470/p/ecb5f9cc-7a55-4c01-9070-9fddb21160f3/<local-preview-capability>/_next/static/chunks/main-app-0c6d73486b5ce73e.js",
+      "status": 200
+    },
+    {
+      "console": "error",
+      "message": "Blocked form submission to '' because the form's frame is sandboxed and the 'allow-forms' permission is not set."
+    }
+  ],
+  "text": "TaskPilot\n\nManage your tasks with ease.\n\nAll Statuses\nTodo\nIn Progress\nDone\nAll Priorities\nLow\nMedium\nHigh\nNew Task\nTitle *\nDescription\nStatus\nTodo\nIn Progress\nDone\nPriority\nLow\nMedium\nHigh\nAdd Task\nTodo (0)\n\nNo tasks\n\nIn Progress (0)\n\nNo tasks\n\nDone (0)\n\nNo tasks\n\nNo tasks available. Start by adding a new task above.",
+  "storage": {
+    "taskpilot_tasks_v1": "[]"
+  }
+}

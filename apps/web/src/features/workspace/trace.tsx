@@ -14,6 +14,17 @@ function groups(events: BuildEvent[]) {
   }
   return result;
 }
+function followLatest(element: HTMLDivElement) {
+  element.scrollTop = element.scrollHeight;
+  const rows = element.querySelectorAll<HTMLElement>('li[data-sequence]');
+  const last = rows.item(rows.length - 1), body = element.closest<HTMLElement>('.inspector-body');
+  // At short viewport heights the inspector also scrolls. Keep following within
+  // that panel, without moving the product page behind it.
+  if (last && body) {
+    const clipped = last.getBoundingClientRect().bottom - body.getBoundingClientRect().bottom;
+    if (clipped > 0) body.scrollTop += clipped;
+  }
+}
 export function BuildTrace() {
   const { snapshot, events, transport, historyReady, inspectedRunId } = useWorkspace();
   const runId = inspectedRunId ?? snapshot.latest_run?.id;
@@ -21,10 +32,10 @@ export function BuildTrace() {
   const [follow,setFollow] = useState(true), [seen,setSeen] = useState(0);
   const scroll = useRef<HTMLDivElement>(null);
   useEffect(() => { setFollow(true); setSeen(0); },[runId]);
-  useEffect(() => { if (follow && scroll.current) { scroll.current.scrollTop = scroll.current.scrollHeight; setSeen(selected.length); } },[selected.length,follow]);
+  useEffect(() => { if (follow && scroll.current) { followLatest(scroll.current); setSeen(selected.length); } },[selected.length,follow]);
   useEffect(() => {
     const element = scroll.current; if (!element || !follow) return;
-    const observer = new ResizeObserver(() => { element.scrollTop = element.scrollHeight; });
+    const observer = new ResizeObserver(() => followLatest(element));
     observer.observe(element); return () => observer.disconnect();
   }, [follow]);
   const related = issueRelationships(selected);
@@ -71,5 +82,5 @@ export function RunDetails() {
 }
 export function DeploymentDetails() {
   const {id}=useWorkspace(); const [cursor,setCursor]=useState(''); const records=useResource<Deployments>(`/projects/${id}/deployments${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`);
-  return <><span className="meta">DEPLOYMENT / SIMULATION</span><h2>Internal fixture records</h2><ResourceState {...records} />{records.data?.items.map(record => <article className="request-record" key={record.id}><strong>Simulation · {record.status}</strong><dl><dt>Target</dt><dd>Internal fixture</dd><dt>Version</dt><dd>{record.version_id}</dd><dt>Record</dt><dd>{record.id}</dd><dt>Published</dt><dd>{time(record.created_at)}</dd></dl></article>)}{records.data?.items.length===0 && <p>No simulated deployment records.</p>}<div className="record-pagination">{cursor && <button onClick={() => setCursor('')}>Latest records</button>}{records.data?.next_cursor && <button onClick={() => setCursor(records.data!.next_cursor!)}>Older records</button>}</div><p>No external application deployment, hosting, domain or release controls are connected.</p></>;
+  return <><span className="meta">DEPLOYMENT / SIMULATION</span><h2>Internal fixture records</h2><ResourceState {...records} />{records.data?.items.map(record => <article className="request-record" key={record.id}><strong>Simulation · {record.status}</strong><dl><dt>Target</dt><dd>Internal fixture</dd><dt>Version</dt><dd>{record.version_id}</dd><dt>Record</dt><dd>{record.id}</dd><dt>Published</dt><dd>{time(record.created_at)}</dd></dl></article>)}{records.data?.items.length===0 && <p>No simulated deployment records.</p>}<div className="record-pagination">{cursor && <button onClick={() => setCursor('')}>Latest records</button>}{records.data?.next_cursor && <button onClick={() => setCursor(records.data!.next_cursor!)}>Older records</button>}</div><p>These are internal simulation records. Verified production releases appear in Preview and Versions.</p><Link className="text-action" href={`/projects/${id}/versions`}>Inspect production release history ↗</Link></>;
 }

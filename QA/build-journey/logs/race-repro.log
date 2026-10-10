@@ -1,0 +1,184 @@
+$ pnpm --filter @f01/web test
+$ node --conditions=react-server --test tests/config.test.mjs tests/planning.test.mjs tests/projects.test.mjs tests/workspace.test.mjs tests/simulation.test.mjs tests/auth.test.mjs tests/real-build.test.mjs tests/releases.test.mjs
+✔ production OIDC gateway never accepts claimed browser identity or forwards it (62.472084ms)
+✔ context planning gateway accepts only frozen JSON intent and fixed routes (2.807709ms)
+✔ missing or expired session returns no data and never falls back to development owner (0.9875ms)
+✔ sign-in/callback use secure HttpOnly bound cookies and return no provider token (1.658083ms)
+✔ sign-out requires same-origin POST and revokes the server session before clearing cookies (0.367334ms)
+✔ development identity cannot run in production (2.092792ms)
+✔ known execution modes do not grant backend execution capabilities (1.006583ms)
+✔ root configuration loads only selected web settings and preserves process overrides (0.804917ms)
+✔ the proxy forwards only the trimmed idea and server credential to the fixed endpoint (34.592208ms)
+✔ rejects cross-origin, missing-origin, and forged-host requests without calling the backend (5.26675ms)
+✔ allows localhost on the configured loopback port (1.236708ms)
+✔ binds the origin to the HTTP Host when Next normalizes the internal URL (3.4295ms)
+✔ invalid configuration fails safely before a backend call (2.535375ms)
+✔ validates content type, bounded bodies, JSON and strict idea input before network access (4.997166ms)
+✔ sanitizes AUTHENTICATION_REQUIRED without relaying upstream messages (0.820333ms)
+✔ sanitizes PROVIDER_NOT_CONFIGURED without relaying upstream messages (0.691417ms)
+✔ sanitizes PROVIDER_AUTHENTICATION_FAILED without relaying upstream messages (0.354375ms)
+✔ sanitizes PROVIDER_QUOTA_EXCEEDED without relaying upstream messages (0.289541ms)
+✔ sanitizes PROVIDER_RATE_LIMITED without relaying upstream messages (0.541834ms)
+✔ sanitizes PROVIDER_TIMEOUT without relaying upstream messages (0.73175ms)
+✔ sanitizes PROVIDER_UNAVAILABLE without relaying upstream messages (0.651334ms)
+✔ sanitizes PROVIDER_REFUSED without relaying upstream messages (0.28125ms)
+✔ sanitizes PROVIDER_INCOMPLETE_RESPONSE without relaying upstream messages (0.22275ms)
+✔ sanitizes PROVIDER_ERROR without relaying upstream messages (0.194ms)
+✔ sanitizes INTERNAL_ERROR without relaying upstream messages (0.194292ms)
+✔ sanitizes VALIDATION_ERROR without relaying upstream messages (0.168209ms)
+✔ unknown upstream failures and thrown exceptions use static messages (0.42625ms)
+✔ invalid, oversized and credential-bearing successful responses cannot reach the browser (5.851667ms)
+✔ browser cancellation reaches the upstream signal with no retry (4.93475ms)
+✔ generated client gateway forwards trimmed creation, stable key and private identity only (43.860541ms)
+✔ creation accepts the real saved-project contract and rejects unsafe navigation (0.630334ms)
+✔ list forwards validated search, lifecycle, archive and pagination (13.677167ms)
+✔ metadata gateway preserves If-Match and ETag without exposing private headers (24.605125ms)
+✔ write gateway rejects cross-site, unknown fields, invalid keys and invalid metadata without backend access (8.273417ms)
+✔ gateway sanitizes domain conflicts, unknown failures and transport uncertainty (1.708292ms)
+✔ creation validation and unresolved-command receipt respect the recovery window boundary (0.207625ms)
+✔ creation gateway preserves the account assertion and rejects malformed binding (0.60175ms)
+✔ browser harness teardown completes when a child ignores graceful shutdown (136.557292ms)
+✔ unsent creation drafts survive authentication without crossing account ownership (0.679125ms)
+✔ an exited test child releases inherited pipes without waiting for descendants (138.757042ms)
+✔ real build gateway uses generated client and private identity (40.6575ms)
+✔ real build gateway rejects model commands, non-JSON bodies and foreign origins (9.10375ms)
+✔ uncertain real build retains exact idempotency key across replay (2.0875ms)
+✔ trace accepts real provenance and preserves simulation labels (0.131625ms)
+✔ browser JSON build reaches the strict gateway without weakening input validation (3.42825ms)
+✔ build receipts remain project-scoped and expired or legacy receipts cannot dispatch (0.164292ms)
+✔ unavailable browser storage never turns a confirmed command into a failed command (0.113125ms)
+✔ real preview URLs fail closed on invalid expiry, cookie host and capability paths (2.541959ms)
+✔ accepted queued command gives immediate activity without completed build checks (1.010709ms)
+✔ generation pending and saved source advance only observed stages (0.768875ms)
+✔ building, verifying, preparing and Ready require candidate checks and atomic publication (0.823917ms)
+✔ repair preserves old immutable evidence but resets checks for the new candidate (1.755958ms)
+✔ prior candidate and foreign trace events never complete a new attempt (0.473167ms)
+✔ quiet stage with a recent heartbeat waits visibly; stale worker and lost connection stop animation (0.325ms)
+✔ failed, canceled and cancellation requested remain explicit and never reach Ready (0.387416ms)
+✔ journey uses Create Plan Build Preview Deploy Live without treating navigation as evidence (0.5915ms)
+✔ update journey preserves last confirmed Live while rebuild fails or preview is ahead (0.244375ms)
+✔ only the confirmed current release reaches Live; expired preview and session are blocked (0.122ms)
+✔ demonstration and foreign release records cannot masquerade as Live (0.102542ms)
+✔ newer repair trace invalidates completed checks before the detail poll catches up (0.097667ms)
+✔ a newer generated candidate cannot inherit prior checks during read/stream races (0.07575ms)
+✖ new-candidate check events cannot inherit old checks while the detail read is stale (0.936167ms)
+✖ saved generated events advance a stale generation-pending read without inventing checks (0.366333ms)
+✖ context resolution does not claim the generation request has started (0.212333ms)
+✖ missing detail preserves blocked connectivity and newer terminal state (0.369875ms)
+✔ release gateway freezes package/config/source/production and keeps credentials server-only (41.410208ms)
+✔ release gateway rejects external destinations, source code, stale-body shape and foreign origins before dispatch (1.8305ms)
+✔ release receipt recovery preserves exact intent and rejects cross-project, expired and malformed state (0.304916ms)
+✔ production links allow only observed HTTPS Vercel application origins (0.156ms)
+✔ sequence gaps hold later events until ordered recovery; duplicates are ignored (8.222125ms)
+✔ out-of-order batches recover in project sequence and issue repairs stay run scoped (0.193625ms)
+✔ transport validation rejects foreign, unsafe or invalid records; reconnect is bounded (0.276209ms)
+✔ unresolved run receipts preserve exact start/retry/cancel context across reload (0.207709ms)
+✔ run commands use generated fixed routes, private identity and separate stable keys (30.243541ms)
+✔ run gateway rejects fixture flags, cross-origin commands, methods and invalid frozen input (4.077666ms)
+✔ SSE gateway preserves header precedence and forwards unbuffered bytes with abort propagation (2.052333ms)
+✔ change gateway preserves frozen context and idempotency, keeps identity private (14.054209ms)
+✔ workspace gateway rejects foreign writes, invalid bases, execution fields and methods before transport (1.225792ms)
+✔ typed read routes forward revision, event sequence and pagination only (1.158792ms)
+✔ stale and unsupported-schema conflicts survive sanitized gateway errors (0.738167ms)
+✔ change receipts preserve exact command and reject invalid saved references (0.252583ms)
+✔ fixture descriptors cannot open arbitrary URLs or unknown fixture revisions (0.241333ms)
+ℹ tests 82
+ℹ suites 0
+ℹ pass 78
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 583.536458
+
+✖ failing tests:
+
+test at tests/real-build.test.mjs:119:1
+✖ new-candidate check events cannot inherit old checks while the detail read is stale (0.936167ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  4 !== 2
+
+      at TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/real-build.test.mjs:122:46)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:897:18)
+      at Test.postRun (node:internal/test_runner/test:1447:19)
+      at Test.run (node:internal/test_runner/test:1372:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/real-build.test.mjs:124:1
+✖ saved generated events advance a stale generation-pending read without inventing checks (0.366333ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  1 !== 2
+
+      at TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/real-build.test.mjs:127:46)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:897:18)
+      at Test.postRun (node:internal/test_runner/test:1447:19)
+      at Test.run (node:internal/test_runner/test:1372:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/real-build.test.mjs:129:1
+✖ context resolution does not claim the generation request has started (0.212333ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  1 !== 0
+
+      at TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/real-build.test.mjs:130:66)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:897:18)
+      at Test.postRun (node:internal/test_runner/test:1447:19)
+      at Test.run (node:internal/test_runner/test:1372:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/real-build.test.mjs:132:1
+✖ missing detail preserves blocked connectivity and newer terminal state (0.369875ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'waiting'
+  - 'blocked'
+
+      at TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/real-build.test.mjs:134:114)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:897:18)
+      at Test.postRun (node:internal/test_runner/test:1447:19)
+      at Test.run (node:internal/test_runner/test:1372:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'waiting',
+    expected: 'blocked',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+/Users/nguyentienthanh/Downloads/F01-local/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @f01/web@ test: `node --conditions=react-server --test tests/config.test.mjs tests/planning.test.mjs tests/projects.test.mjs tests/workspace.test.mjs tests/simulation.test.mjs tests/auth.test.mjs tests/real-build.test.mjs tests/releases.test.mjs`
+Exit status 1
+[ELIFECYCLE] Command failed with exit code 1.

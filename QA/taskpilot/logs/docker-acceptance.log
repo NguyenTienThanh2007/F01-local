@@ -1,0 +1,18 @@
+..                                                                       [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/nguyentienthanh/Downloads/F01-local/apps/api/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 1 warning in 39.35s
+{
+  "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+  "docker_containment": "passed",
+  "docker_journey": "passed",
+  "model_transport": "controlled OpenAI adapter responses",
+  "live_provider": "not_run",
+  "browser_journey": "not_run",
+  "phase2c_started": false,
+  "duration_seconds": 40.53
+}

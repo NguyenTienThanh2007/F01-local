@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, Header, Query, Response, Request
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import text
+from f01.db.models import User
+from f01.domain.projects import AccountProfile, UpdateAccount
 
 from f01.api.dependencies import get_database, get_principal, authenticated_bearer
 from f01.api.stream import replay_cursor, stream_events
@@ -58,8 +60,27 @@ def metadata_headers(response: Response, project: ProjectSummary) -> None:
 @router.get("/session", response_model=SessionView)
 def session(request: Request, principal: PrincipalDependency, settings: SettingsDependency) -> SessionView:
     auth_session = getattr(request.state, "auth_session", None)
-    return SessionView(principal=principal, capabilities=Capabilities(simulation_runner=settings.simulation_runner_enabled, execution_mode=settings.execution_mode, real_generation=settings.real_execution_enabled, source_artifacts=settings.real_execution_enabled), expires_at=auth_session.expires_at if auth_session else None)
+    return SessionView(principal=principal, capabilities=Capabilities(external_deployment=settings.release_enabled, simulation_runner=settings.simulation_runner_enabled, execution_mode=settings.execution_mode, real_generation=settings.real_execution_enabled, source_artifacts=settings.real_execution_enabled), expires_at=auth_session.expires_at if auth_session else None)
 
+
+@router.get("/account", response_model=AccountProfile)
+def account(database: DatabaseDependency, principal: PrincipalDependency) -> AccountProfile:
+    with database.session() as session:
+        user = session.get(User, principal.id)
+        if user is None:
+            raise ApplicationError("AUTHENTICATION_REQUIRED")
+        return AccountProfile(display_name=user.display_name, email=user.email,
+            email_verified=bool(user.email) and principal.identity_mode == "oidc", identity_mode=principal.identity_mode)
+
+@router.patch("/account", response_model=AccountProfile)
+def update_account(body: UpdateAccount, database: DatabaseDependency, principal: PrincipalDependency) -> AccountProfile:
+    with database.session() as session, session.begin():
+        user = session.get(User, principal.id, with_for_update=True)
+        if user is None:
+            raise ApplicationError("AUTHENTICATION_REQUIRED")
+        user.display_name = body.display_name
+        return AccountProfile(display_name=user.display_name, email=user.email,
+            email_verified=bool(user.email) and principal.identity_mode == "oidc", identity_mode=principal.identity_mode)
 
 @router.post("/projects", response_model=ProjectCreated, status_code=201)
 def create_project(
@@ -71,8 +92,13 @@ def create_project(
     idempotency_key: Annotated[
         str, Header(min_length=1, max_length=200, pattern=r"^[A-Za-z0-9._:-]+$")
     ],
+    x_f01_expected_owner: Annotated[UUID | None, Header()] = None,
 ) -> ProjectCreated:
-    result = service.create_project(database, principal, body, idempotency_key, schedule=settings.simulation_runner_enabled, real=settings.real_execution_enabled)
+    # The assertion cannot grant ownership. It only refuses a saved command
+    # when the verified session changed after the browser froze its receipt.
+    if x_f01_expected_owner is not None and x_f01_expected_owner != principal.id:
+        raise ApplicationError("CREATION_ACCOUNT_CHANGED")
+    result = service.create_project(database, principal, body, idempotency_key, schedule=settings.simulation_runner_enabled, real=settings.execution_mode == "real")
     response.headers["Location"] = f"/v1/projects/{result.project.id}"
     # A replay's metadata is the saved creation snapshot; read Location for current state.
     metadata_headers(response, result.project)
@@ -173,7 +199,7 @@ def ready(database: DatabaseDependency) -> dict[str, str]:
         versions = connection.scalars(
             text("SELECT version_num FROM alembic_version")
         ).all()
-        if versions != ["0003_phase2b"]:
+        if versions != ["0006_release_hardening"]:
             raise ApplicationError("DATABASE_NOT_READY")
     return {"status": "ready"}
 

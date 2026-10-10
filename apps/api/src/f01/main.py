@@ -16,6 +16,7 @@ from f01.application.identity import OIDCVerifier
 from f01.api.v1.context_plans import router as context_router
 from f01.application.usage import DevelopmentBudget
 from f01.api.v1.builds import router as builds_router
+from f01.api.v1.releases import router as releases_router
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -56,6 +57,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(auth_router)
     app.include_router(context_router)
     app.include_router(builds_router)
+    app.include_router(releases_router)
 
     @app.get("/v1/health/live")
     def live() -> dict[str, str]:

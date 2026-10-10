@@ -1,5 +1,23 @@
 // Generated from FastAPI OpenAPI. Run pnpm api:generate; do not edit.
 export interface paths {
+    "/v1/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Account */
+        get: operations["account_v1_account_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Account */
+        patch: operations["update_account_v1_account_patch"];
+        trace?: never;
+    };
     "/v1/auth/access": {
         parameters: {
             query?: never;
@@ -45,6 +63,23 @@ export interface paths {
         put?: never;
         /** Logout */
         post: operations["logout_v1_auth_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Options */
+        get: operations["options_v1_auth_options_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -414,6 +449,160 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/projects/{project_id}/release-artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Prepare */
+        post: operations["prepare_v1_projects__project_id__release_artifacts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/release-artifacts/{artifact_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historical Artifact */
+        get: operations["historical_artifact_v1_projects__project_id__release_artifacts__artifact_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/release-artifacts/{preparation_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry Preparation */
+        post: operations["retry_preparation_v1_projects__project_id__release_artifacts__preparation_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/release-target": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Setup Target */
+        post: operations["setup_target_v1_projects__project_id__release_target_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/releases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Workspace */
+        get: operations["workspace_v1_projects__project_id__releases_get"];
+        put?: never;
+        /** Promote */
+        post: operations["promote_v1_projects__project_id__releases_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/releases/{release_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historical Release */
+        get: operations["historical_release_v1_projects__project_id__releases__release_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/releases/{release_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_v1_projects__project_id__releases__release_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/releases/{release_id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resume Release */
+        post: operations["resume_release_v1_projects__project_id__releases__release_id__resume_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/projects/{project_id}/releases/{release_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry Release */
+        post: operations["retry_release_v1_projects__project_id__releases__release_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projects/{project_id}/requests": {
         parameters: {
             query?: never;
@@ -590,6 +779,23 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AccountProfile */
+        AccountProfile: {
+            /** Display Name */
+            display_name: string;
+            /** Email */
+            email?: string | null;
+            /**
+             * Email Verified
+             * @default false
+             */
+            email_verified: boolean;
+            /**
+             * Identity Mode
+             * @enum {string}
+             */
+            identity_mode: "development" | "oidc";
+        };
         /** Architecture */
         Architecture: {
             /** Component Relationships */
@@ -601,6 +807,42 @@ export interface components {
             evidence: "proposed" | "simulated";
             overview: components["schemas"]["Statement"];
             rationale: components["schemas"]["Statement"];
+        };
+        /** ArtifactPreparation */
+        ArtifactPreparation: {
+            /** Artifact Id */
+            artifact_id: string | null;
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /** Created At */
+            created_at: string;
+            /** Error Code */
+            error_code: string | null;
+            /** Evidence */
+            evidence: components["schemas"]["CommandEvidence"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "packaging" | "succeeded" | "failed" | "canceled";
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
         };
         /** AttemptRecord */
         AttemptRecord: {
@@ -734,10 +976,19 @@ export interface components {
             cancel_requested: boolean;
             /** Candidates */
             candidates: components["schemas"]["CandidateMetadata"][];
+            /** Current Candidate Evidence */
+            current_candidate_evidence?: components["schemas"]["CommandEvidence"][];
             /** Evidence */
             evidence: components["schemas"]["CommandEvidence"][];
             /** Phase */
             phase: string;
+            /**
+             * Progress Sequence
+             * @default 0
+             */
+            progress_sequence: number;
+            /** Progress Updated At */
+            progress_updated_at?: string | null;
             /** Repair Attempts */
             repair_attempts: number;
             run: components["schemas"]["RunRecord"];
@@ -798,9 +1049,8 @@ export interface components {
             /**
              * External Deployment
              * @default false
-             * @constant
              */
-            external_deployment: false;
+            external_deployment: boolean;
             /**
              * Real Generation
              * @default false
@@ -1067,12 +1317,47 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HostingSetup */
+        HostingSetup: {
+            /** Error Code */
+            error_code: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "creating" | "reconciling" | "ready" | "failed";
+        };
         /** ImplementationMilestone */
         ImplementationMilestone: {
             /** Deliverables */
             deliverables: string[];
             /** Title */
             title: string;
+        };
+        /** LoginStart */
+        LoginStart: {
+            /**
+             * Intent
+             * @default sign-in
+             * @enum {string}
+             */
+            intent: "sign-in" | "sign-up";
+            /**
+             * Method
+             * @default hosted
+             * @enum {string}
+             */
+            method: "hosted" | "google" | "email";
         };
         /** PlanInput */
         PlanInput: {
@@ -1122,6 +1407,24 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** PrepareRelease */
+        PrepareRelease: {
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /**
+             * Expected Brain Revision Id
+             * Format: uuid
+             */
+            expected_brain_revision_id: string;
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+        };
         /** PreviewDescriptor */
         PreviewDescriptor: {
             /**
@@ -1170,6 +1473,35 @@ export interface components {
             /** Requirements */
             requirements: components["schemas"]["Requirement"][];
             summary: components["schemas"]["Statement"];
+        };
+        /** ProductionConfiguration */
+        ProductionConfiguration: {
+            /** Created At */
+            created_at: string;
+            /** Digest */
+            digest: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Profile
+             * @constant
+             */
+            profile: "next-static-v1";
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * Provider
+             * @constant
+             */
+            provider: "vercel";
+            /** Public Url */
+            public_url: string;
         };
         /** ProjectCreated */
         ProjectCreated: {
@@ -1257,6 +1589,33 @@ export interface components {
             /** Updated At */
             updated_at: string;
         };
+        /** PromoteRelease */
+        PromoteRelease: {
+            /**
+             * Artifact Id
+             * Format: uuid
+             */
+            artifact_id: string;
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /**
+             * Expected Brain Revision Id
+             * Format: uuid
+             */
+            expected_brain_revision_id: string;
+            /** Expected Production Release Id */
+            expected_production_release_id: string | null;
+            /** Expected Target Generation */
+            expected_target_generation: number;
+            /**
+             * Expected Version Id
+             * Format: uuid
+             */
+            expected_version_id: string;
+        };
         /** ProposalList */
         ProposalList: {
             /** Items */
@@ -1336,6 +1695,8 @@ export interface components {
         };
         /** RealPreviewDescriptor */
         RealPreviewDescriptor: {
+            /** Browser Url */
+            browser_url?: string | null;
             /** Expires At */
             expires_at: string;
             /**
@@ -1375,6 +1736,113 @@ export interface components {
             base_version_id: string | null;
             /** Text */
             text: string;
+        };
+        /** ReleaseArtifact */
+        ReleaseArtifact: {
+            /**
+             * Brain Revision Id
+             * Format: uuid
+             */
+            brain_revision_id: string;
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /** Created At */
+            created_at: string;
+            /** Digest */
+            digest: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+        };
+        /** ReleaseDetail */
+        ReleaseDetail: {
+            /**
+             * Artifact Id
+             * Format: uuid
+             */
+            artifact_id: string;
+            /** Cancel Requested */
+            cancel_requested: boolean;
+            /**
+             * Configuration Id
+             * Format: uuid
+             */
+            configuration_id: string;
+            /** Created At */
+            created_at: string;
+            /** Deployment Url */
+            deployment_url: string | null;
+            /** Error Code */
+            error_code: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Observed At */
+            last_observed_at: string | null;
+            /** Previous Release Id */
+            previous_release_id: string | null;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Public Url */
+            public_url: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "staging" | "checking" | "promoting" | "verifying" | "reconciling" | "restoring" | "succeeded" | "failed" | "canceled";
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+        };
+        /** ReleaseWorkspace */
+        ReleaseWorkspace: {
+            /** Artifacts */
+            artifacts: components["schemas"]["ReleaseArtifact"][];
+            /** Available */
+            available: boolean;
+            configuration: components["schemas"]["ProductionConfiguration"] | null;
+            /** Current Release Id */
+            current_release_id: string | null;
+            hosting_setup: components["schemas"]["HostingSetup"] | null;
+            /** Preparations */
+            preparations: components["schemas"]["ArtifactPreparation"][];
+            /** Releases */
+            releases: components["schemas"]["ReleaseDetail"][];
+            /** Setup Available */
+            setup_available: boolean;
+            /** Target Generation */
+            target_generation: number;
         };
         /** RequestList */
         RequestList: {
@@ -1513,6 +1981,19 @@ export interface components {
             expires_at?: string | null;
             principal: components["schemas"]["Principal"];
         };
+        /** SetupReleaseTarget */
+        SetupReleaseTarget: {
+            /**
+             * Expected Brain Revision Id
+             * Format: uuid
+             */
+            expected_brain_revision_id: string;
+            /**
+             * Expected Version Id
+             * Format: uuid
+             */
+            expected_version_id: string;
+        };
         /**
          * SourceArtifact
          * @description Immutable in-memory value, not a persisted or verified application version.
@@ -1603,6 +2084,11 @@ export interface components {
             provenance: components["schemas"]["Provenance"];
             /** Text */
             text: string;
+        };
+        /** UpdateAccount */
+        UpdateAccount: {
+            /** Display Name */
+            display_name: string;
         };
         /** UpdateProject */
         UpdateProject: {
@@ -1708,6 +2194,194 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    account_v1_account_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountProfile"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Precondition Failed */
+            412: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Precondition Required */
+            428: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    update_account_v1_account_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAccount"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountProfile"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Precondition Failed */
+            412: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Precondition Required */
+            428: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     access_v1_auth_access_post: {
         parameters: {
             query?: never;
@@ -1813,7 +2487,7 @@ export interface operations {
             };
         };
     };
-    start_v1_auth_start_post: {
+    options_v1_auth_options_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -1829,8 +2503,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        [key: string]: boolean;
+                    };
+                };
+            };
+        };
+    };
+    start_v1_auth_start_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["LoginStart"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -2161,6 +2870,7 @@ export interface operations {
             query?: never;
             header: {
                 "idempotency-key": string;
+                "x-f01-expected-owner"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -3741,6 +4451,712 @@ export interface operations {
             };
             /** @description Internal Server Error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    prepare_v1_projects__project_id__release_artifacts_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrepareRelease"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArtifactPreparation"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    historical_artifact_v1_projects__project_id__release_artifacts__artifact_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                artifact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseArtifact"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    retry_preparation_v1_projects__project_id__release_artifacts__preparation_id__retry_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+                preparation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrepareRelease"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArtifactPreparation"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    setup_target_v1_projects__project_id__release_target_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetupReleaseTarget"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HostingSetup"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    workspace_v1_projects__project_id__releases_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseWorkspace"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    promote_v1_projects__project_id__releases_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoteRelease"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    historical_release_v1_projects__project_id__releases__release_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                release_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    cancel_v1_projects__project_id__releases__release_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                release_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    resume_release_v1_projects__project_id__releases__release_id__resume_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                release_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    retry_release_v1_projects__project_id__releases__release_id__retry_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "idempotency-key": string;
+            };
+            path: {
+                project_id: string;
+                release_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoteRelease"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

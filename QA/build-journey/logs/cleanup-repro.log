@@ -1,0 +1,76 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_failed_update_preserves_last_good_version ________________
+
+database = <f01.db.session.Database object at 0x10a7fddc0>
+configured = Settings(app_env='test', auth_mode='development', execution_mode='real', real_execution_enabled=True, release_enabled=...=1000, simulation_runner_enabled=False, simulation_change_scenario='auto', dev_token_expires_at=None, log_level='INFO')
+project_plan = ProjectPlan(project_title='Harbor CRM', product_summary="Manage a small real estate agency's leads and sales pipeline....Identity boundary']), ImplementationMilestone(title='CRM workflows', deliverables=['Lead records', 'Pipeline views'])])
+
+    def test_failed_update_preserves_last_good_version(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+        owner,pid,body=setup_build(database,configured,project_plan)
+        service.queue(database,configured,owner,pid,body,'first');sandbox=ControlledSandbox()
+        asyncio.run(BuildWorker(database,configured,sandbox,SourceProvider()).run_once())
+        before=workspace(database,owner,pid)
+        request=record_change(database,owner,pid,RecordChange(text='Add a priority filter to the existing leads overview.',base_brain_revision_id=before.project.current_brain_revision_id,base_version_id=before.project.current_version_id),str(uuid4()))
+        plan=review_plan(database,configured,project_plan,owner,pid,request.id,'change')
+        run=service.queue(database,configured,owner,pid,plan,'failed-update')
+        source=SourceProvider(forever=True)
+        asyncio.run(BuildWorker(database,configured,sandbox,source).run_once())
+        after=workspace(database,owner,pid)
+        assert after.current_version==before.current_version and after.current_brain==before.current_brain and after.preview==before.preview
+        assert service.detail(database,owner,pid,run.id).run.error_code=='REPAIR_EXHAUSTED'
+        assert source.calls==configured.repair_attempts+1 and len(sandbox.names)==1
+        with database.session() as session:
+            job=session.scalar(select(ExecutionJob).where(ExecutionJob.run_id==run.id))
+>           assert job is not None and job.container_name is None,'Confirmed deletion must clear the failed container identity.'
+E           AssertionError: Confirmed deletion must clear the failed container identity.
+E           assert (<f01.db.models.ExecutionJob object at 0x10bc2da90> is not None and 'f01-d303e7e5120a4f958d7ce42c8688a71f-1-3' is None)
+E            +  where 'f01-d303e7e5120a4f958d7ce42c8688a71f-1-3' = <f01.db.models.ExecutionJob object at 0x10bc2da90>.container_name
+
+tests/persistence/test_phase2b.py:136: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+No new upgrade operations detected.
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0006_release_hardening -> 0005_release_target, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Running downgrade 0005_release_target -> 0004_phase2c, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running downgrade 0004_phase2c -> 0003_phase2b, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running downgrade 0003_phase2b -> 0002_phase2a, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running downgrade 0002_phase2a -> 0001_phase1, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0001_phase1 -> , Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/nguyentienthanh/Downloads/F01-local/apps/api/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/persistence/test_phase2b.py::test_failed_update_preserves_last_good_version
+1 failed, 16 deselected, 1 warning in 0.65s

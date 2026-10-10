@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-09",
+  "openai": "configured private key; separate real acceptance passed",
+  "vercel": {
+    "request": "GET /v9/projects?limit=1",
+    "credential_source": "existing private CLI login",
+    "observed_http_status": 403,
+    "credentials_validated": false,
+    "provider_mutation_attempted": false
+  },
+  "live_oidc": "issuer and Google/email connections not configured",
+  "secrets_recorded": false
+}

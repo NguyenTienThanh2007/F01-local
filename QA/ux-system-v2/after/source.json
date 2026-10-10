@@ -1,0 +1,10 @@
+{
+  "branch": "codex/f01-commercial-v1",
+  "source_commit": "ffb7aa7",
+  "source": "actual final production-browser commercial run",
+  "identity": "controlled OIDC",
+  "model": "controlled",
+  "execution": "real accepted Docker",
+  "deployment": "controlled",
+  "live_provider": "not_run"
+}

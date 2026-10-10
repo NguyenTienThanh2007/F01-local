@@ -76,8 +76,15 @@ def assemble(session: Session, project: Project, body: PlanInput, settings: Sett
         "decisions": [{"id": item.decision_id, "choice": excerpt(item.choice, 300), "reason": excerpt(item.reason, 300), "provenance": item.provenance.model_dump(mode="json")} for item in content.design_decisions[:4]],
         "relevant_history": [{"request_id": str(item.id), "kind": item.kind, **excerpt(item.text, 600)} for item in history],
         "version": {"id": str(version.id), "number": version.number, "mode": version.mode, "summary": version.summary} if version else None,
-        "source": {"available": False, "reason": "No generated source exists in Phase 2A."},
-        "execution": "All existing execution/version evidence is Simulation. Planning is proposed work.",
+        "source": {"available": False, "reason": "This project has no verified generated source."},
+        "execution": "No real build is confirmed for the current version. Planning is proposed work.",
+        "runtime_capabilities": {
+            "execution_mode": settings.execution_mode,
+            "real_build_available": settings.execution_mode == "real" and settings.real_execution_enabled,
+            "recipe": "next-web-v1",
+            "application_scope": "Next.js/React/TypeScript and plain CSS/CSS modules with browser state; no Tailwind compiler, application backend, external database or additional packages.",
+            "production_release_available": settings.release_enabled,
+        },
         "selection": {"requirements_total": len(content.product.requirements), "requirements_included": len(requirements), "history_limit": 5, "context_truncated": False}}
     if version and version.mode == "real":
         preview = session.scalar(select(IsolatedPreview).where(IsolatedPreview.project_id == project.id, IsolatedPreview.version_id == version.id))

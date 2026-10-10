@@ -1,0 +1,17 @@
+{
+  "browser_journey": "passed",
+  "docker": "real accepted image",
+  "oidc": "synthetic RSA",
+  "model": "controlled",
+  "deployment_provider": "controlled",
+  "live_provider": "not_run",
+  "project_id": "67325b2e-c7c9-40bd-82ff-16d49e8ddbb7",
+  "versions": [
+    "8de7e40b-bf15-4187-9739-fd796de8f1ca",
+    "412e0c09-50f5-41bb-925e-6c0d9f3fc064"
+  ],
+  "releases": [
+    "9e397e17-2b79-405b-8a1c-000d8fda4615",
+    "8295e04b-73b4-4bab-8311-4f17cf24550b"
+  ]
+}

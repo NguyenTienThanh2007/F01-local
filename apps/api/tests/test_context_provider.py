@@ -16,6 +16,12 @@ def test_context_adapter_strict_schema_budget_no_tools_and_usage(settings:Settin
     async def handler(request:httpx.Request) -> httpx.Response:
         body=json.loads(request.content);calls.append(body);assert body['max_output_tokens']==700;assert body['store'] is False;assert 'tools' not in body
         assert body['text']['format']['strict'] is True;assert body['input']=='authorized JSON context';assert 'OpenAI' not in str(ContextPlan.model_json_schema())
+        assert 'INTERFACE QUALITY' in body['instructions']
+        assert 'visual and interaction' in body['instructions']
+        assert 'one identical template' in body['instructions']
+        # Detailed CSS generation guidance must not consume the existing planning
+        # budget: the long Unicode context regression still reserves at defaults.
+        assert len(body['instructions'].encode()) < 2000
         return httpx.Response(200,json={**output(project_plan),'usage':{'input_tokens':12,'output_tokens':34}})
     async def run() -> None:
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:

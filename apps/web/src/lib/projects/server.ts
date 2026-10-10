@@ -38,11 +38,11 @@ export async function input(request: Request): Promise<unknown> {
   return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(result));
 }
 export const object = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
-export async function handleProjectsRequest(request: Request, target: 'projects' | 'session' | 'usage', id: string | undefined, env: Environment, send: typeof fetch = fetch): Promise<Response> {
+export async function handleProjectsRequest(request: Request, target: 'projects' | 'session' | 'usage' | 'account', id: string | undefined, env: Environment, send: typeof fetch = fetch): Promise<Response> {
   let config: ReturnType<typeof configuration>;
   try { config = configuration(env); } catch { return fail('PROJECTS_NOT_CONFIGURED', 503); }
   const method = request.method;
-  if ((target !== 'projects' && method !== 'GET') || (target === 'projects' && !['GET', id ? 'PATCH' : 'POST'].includes(method))) return fail('REQUEST_FORBIDDEN', 405);
+  if ((target !== 'projects' && target !== 'account' && method !== 'GET') || (target === 'account' && !['GET','PATCH'].includes(method)) || (target === 'projects' && !['GET', id ? 'PATCH' : 'POST'].includes(method))) return fail('REQUEST_FORBIDDEN', 405);
   if (id && !uuid.test(id)) return fail('NOT_FOUND', 404);
   if (method !== 'GET' && !sameOrigin(request, config.origin, config.local)) return fail('REQUEST_FORBIDDEN', 403);
 
@@ -51,7 +51,13 @@ export async function handleProjectsRequest(request: Request, target: 'projects'
   const actor = await backendCredentials(request,config,send);
     const client = createBackendClient({ baseUrl: config.base.origin, bearerToken: actor.token, headers: actor.headers, fetch: send });
     let result;
-    if (target === 'session') result = await client.GET('/v1/session', { signal });
+    if (target === 'account') {
+      if(method==='GET')result=await client.GET('/v1/account',{signal});
+      else {let body:unknown;try{body=await input(request);}catch{return fail('VALIDATION_ERROR',422);}
+       if(!object(body)||Object.keys(body).length!==1||typeof body.display_name!=='string'||!body.display_name.trim()||Array.from(body.display_name.trim()).length>100)return fail('VALIDATION_ERROR',422);
+       result=await client.PATCH('/v1/account',{body:{display_name:body.display_name.trim()},signal});}
+    }
+    else if (target === 'session') result = await client.GET('/v1/session', { signal });
     else if (target === 'usage') result = await client.GET('/v1/planning/usage', { signal });
     else if (method === 'GET' && id) result = await client.GET('/v1/projects/{project_id}', { params: { path: { project_id: id } }, signal });
     else if (method === 'GET') {
@@ -66,8 +72,10 @@ export async function handleProjectsRequest(request: Request, target: 'projects'
         if (Object.keys(body).some(key => !['title', 'brief'].includes(key)) || typeof body.brief !== 'string' || (body.title != null && typeof body.title !== 'string')) return fail('VALIDATION_ERROR', 422);
         const data = createInput((body.title as string | null) ?? '', body.brief);
         const key = request.headers.get('idempotency-key');
+        const expectedOwner=request.headers.get('x-f01-expected-owner');
+        if (expectedOwner&&!uuid.test(expectedOwner)) return fail('VALIDATION_ERROR',422);
         if (!data || !key || !/^[A-Za-z0-9._:-]{1,200}$/.test(key)) return fail('VALIDATION_ERROR', 422);
-        result = await client.POST('/v1/projects', { body: data, params: { header: { 'idempotency-key': key } }, signal });
+        result = await client.POST('/v1/projects', { body: data, params: { header: { 'idempotency-key': key, 'x-f01-expected-owner': expectedOwner??undefined } }, signal });
       } else {
         if (!Object.keys(body).length || Object.keys(body).some(key => !['title', 'archived'].includes(key)) || ('title' in body && (typeof body.title !== 'string' || !body.title.trim() || Array.from(body.title.trim()).length > 100)) || ('archived' in body && typeof body.archived !== 'boolean')) return fail('VALIDATION_ERROR', 422);
         const etag = request.headers.get('if-match'); if (!etag || !new RegExp(`^"project-${id}-m[1-9][0-9]*"$`).test(etag)) return fail('METADATA_CONFLICT', 428);

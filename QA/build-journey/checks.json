@@ -1,0 +1,117 @@
+{
+  "status": "UX/build/journey and dedicated Reliability Pass accepted locally and pushed; public-launch gates blocked by provider/production identity dependencies",
+  "observed_at": "2026-10-08T07:32:52.436542+00:00",
+  "repository": "NguyenTienThanh2007/F01-local",
+  "branch": "codex/f01-commercial-v1",
+  "remote_head": "2b475eb",
+  "base_sha": "449b0588e072cda102144c0c629d776049b4f2d2",
+  "latest_build_journey_changes": "committed and pushed on the existing branch",
+  "latest_local_checks": {
+    "frontend": {
+      "passed": 90,
+      "failed": 0
+    },
+    "backend_unit": {
+      "passed": 205,
+      "failed": 0,
+      "warnings": [
+        "Starlette TestClient/httpx deprecation"
+      ]
+    },
+    "strict_mypy": {
+      "passed": true,
+      "files": 107
+    },
+    "generated_client": {
+      "passed": 2
+    },
+    "openapi_and_client_drift": "passed",
+    "typecheck": "passed",
+    "production_build": "passed",
+    "component_ssr": {
+      "passed": true,
+      "states": 14,
+      "browser": false
+    },
+    "backend_regression": {
+      "passed": 343,
+      "skipped": 5,
+      "warning": "existing Starlette/httpx TestClient deprecation"
+    },
+    "actual_worker_browser": {
+      "passed": 1,
+      "states": 13,
+      "captures_and_axe_scans": 26
+    },
+    "build_state_browser": {
+      "passed": 1,
+      "states": 18,
+      "captures_and_axe_scans": 54
+    },
+    "docker_exact_image": {
+      "passed": 3
+    },
+    "commercial_real_docker_browser": {
+      "passed": 1,
+      "model_identity_publisher": "controlled"
+    },
+    "creation_browser": 7,
+    "planning_browser": 14,
+    "authenticated_planning_browser": 4,
+    "persisted_recovery_browser": 6,
+    "live_openai": {
+      "passed": 1,
+      "identity": "development test principal",
+      "docker": "real accepted"
+    },
+    "manual_runtime_cleanup": "confirmed deletion and absence of recorded runtime"
+  },
+  "latest_required_gates": {
+    "backend_regression": "passed",
+    "strict_mypy": "passed",
+    "frontend_client_contract_typecheck_build": "passed",
+    "browser": "passed",
+    "responsive_keyboard_200_percent_accessibility": "passed",
+    "docker": "passed",
+    "actual_model": "passed",
+    "actual_vercel": "failed: RELEASE_PROVIDER_AUTHENTICATION",
+    "production_oidc_topology": "unverified",
+    "commit_and_push": "implementation pushed; acceptance evidence included with this commit"
+  },
+  "earlier_completed_ux_v2_checks": {
+    "backend": {
+      "passed": 335,
+      "skipped": 5
+    },
+    "frontend": 65,
+    "generated_client": 2,
+    "planning_browser": 14,
+    "ux0_browser": 7,
+    "phase1_browser": 6,
+    "phase2a_browser": 4,
+    "real_docker_controlled_commercial_browser": 1,
+    "docker_exact_image": 3,
+    "real_openai_and_docker": 1,
+    "visual_states": 27,
+    "accessibility_passed": 52,
+    "accessibility_not_run": 2,
+    "a11y_skipped_states": [
+      "projects-loading at 1440px",
+      "projects-loading at 375px"
+    ]
+  },
+  "provider": {
+    "vercel": "failed at target setup: RELEASE_PROVIDER_AUTHENTICATION",
+    "public_health": "not_run in latest Vercel rerun",
+    "redeploy": "not_run in latest Vercel rerun",
+    "restore": "not_run in latest Vercel rerun",
+    "production_oidc": "not configured or accepted; tests use controlled OIDC/development identities"
+  },
+  "known_remaining": [
+    "Refresh private Vercel credentials and rerun actual target/staging/public-health/redeploy/restore",
+    "Production OIDC and production deployment/operations topology acceptance",
+    "Application-specific user acceptance/accessibility of generated apps beyond factory-shell checks",
+    "Known Starlette TestClient/httpx deprecation warning"
+  ],
+  "security": "Source validation, idempotency/freshness, sandbox containment, no host mounts/factory secrets, preview isolation and last-good live guarantees remain intact. The worker now classifies source rejection and clears a failed identity only after confirmed deletion; SSE flushes an authorized comment without progress evidence."
+}

@@ -1,0 +1,382 @@
+{
+  "measurements": [
+    {
+      "route": "/",
+      "state": "start",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/",
+      "state": "start",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/sign-in",
+      "state": "sign-in",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/sign-in",
+      "state": "sign-in",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects",
+      "state": "projects-empty",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects",
+      "state": "projects-empty",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/new",
+      "state": "create",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/new",
+      "state": "create",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "workspace-empty",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "workspace-empty",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/planning",
+      "state": "planning-empty",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/planning",
+      "state": "planning-empty",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/planning",
+      "state": "plan-review",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/planning",
+      "state": "plan-review",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/planning",
+      "state": "plan-approved",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/planning",
+      "state": "plan-approved",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "build-reviewed",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "build-reviewed",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "build-queued",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "build-queued",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "preview-verified",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "preview-verified",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "deploy-review",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "deploy-review",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "live",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "live",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "rebuild-reviewed",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "rebuild-reviewed",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "preview-update",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "preview-update",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/versions",
+      "state": "versions",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/versions",
+      "state": "versions",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "historical-preview",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "historical-preview",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/brief",
+      "state": "brief",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/brief",
+      "state": "brief",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/brain",
+      "state": "brain",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/brain",
+      "state": "brain",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/activity",
+      "state": "activity",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/activity",
+      "state": "activity",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/settings",
+      "state": "settings",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf/settings",
+      "state": "settings",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects",
+      "state": "projects",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects",
+      "state": "projects",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/account",
+      "state": "account",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/account",
+      "state": "account",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "build-trace",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "build-trace",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "reduced-motion",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects/82b2d78e-188d-47e4-b98c-b152ee32b9cf",
+      "state": "reduced-motion",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects",
+      "state": "projects-error",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects",
+      "state": "projects-error",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "route": "/projects",
+      "state": "projects-loading",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "not_run"
+    },
+    {
+      "route": "/projects",
+      "state": "projects-loading",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "not_run"
+    }
+  ]
+}

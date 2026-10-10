@@ -1,0 +1,26 @@
+[
+  {
+    "id": "l21nixxnzi",
+    "title": "Founder acceptance task — edited",
+    "description": "Keep this saved task across AI versions.",
+    "status": "In Progress",
+    "priority": "High",
+    "dueDate": "2026-10-17"
+  },
+  {
+    "id": "0dc9cm5wmq",
+    "title": "Overdue acceptance task",
+    "description": "Due yesterday; clear visual indicator.",
+    "status": "In Progress",
+    "priority": "High",
+    "dueDate": "2026-10-09"
+  },
+  {
+    "id": "qugjbylx9y",
+    "title": "Mobile acceptance task",
+    "description": "",
+    "status": "Done",
+    "priority": "Medium",
+    "dueDate": "2026-10-10"
+  }
+]

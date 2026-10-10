@@ -16,3 +16,5 @@ dist/
 
 # Local Docker verification receipts and reports
 phase2b-acceptance-report.json
+
+.pnpm-store/

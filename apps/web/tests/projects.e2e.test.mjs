@@ -1,3 +1,4 @@
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
@@ -5,7 +6,6 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { mkdir, readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
 const webRoot = fileURLToPath(new URL('../', import.meta.url));
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 const api = process.env.M3_API_URL, database = process.env.M3_TEST_DATABASE_URL, token = process.env.M3_TEST_TOKEN;
@@ -19,15 +19,16 @@ test('M3 real PostgreSQL project create, recover, reload, search and metadata jo
   const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', String(port)], { cwd: webRoot, env, stdio: 'ignore' }); let browser;
   try {
     await until(async () => (await fetch(base)).ok);
-    browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+    browser = await launchTestBrowser({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
     await mkdir(`${webRoot}/test-results/m3`, { recursive: true });
     let releaseList;
     await page.route('**/api/v1/projects?**', async route => { await new Promise(resolve => { releaseList = resolve; }); await route.continue(); });
     await page.goto(`${base}/projects`); await page.getByText('Loading saved projects…', { exact: true }).waitFor(); await page.screenshot({ path: `${webRoot}/test-results/m3/loading.png`, fullPage: true });
     await until(async () => Boolean(releaseList)); releaseList();
-    await page.getByRole('heading', { name: 'Give your idea a working direction.' }).waitFor(); await page.unroute('**/api/v1/projects?**'); await page.screenshot({ path: `${webRoot}/test-results/m3/empty.png`, fullPage: true });
+    await page.getByRole('heading', { name: /Start with a brief/ }).waitFor(); await page.unroute('**/api/v1/projects?**'); await page.screenshot({ path: `${webRoot}/test-results/m3/empty.png`, fullPage: true });
     await page.getByRole('link', { name: 'New project' }).click();
+    await page.locator('.creation-title-details > summary').click();
     const title = page.getByRole('textbox', { name: /Project title/ }), brief = page.getByRole('textbox', { name: 'Product brief' });
     await page.getByRole('button', { name: 'Create demo project' }).click(); await page.getByRole('main').getByRole('alert').waitFor(); assert.equal((await (await direct('/projects')).json()).items.length, 0);
     await title.fill('x'.repeat(101)); await brief.fill('Build a CRM for a small real estate agency with leads, pipeline, notes and analytics.');
@@ -58,16 +59,16 @@ test('M3 real PostgreSQL project create, recover, reload, search and metadata jo
     assert.equal(await page.getByRole('button', { name: 'Archive project', exact: true }).isDisabled(), true); assert.match(await page.getByRole('main').innerText(), /queued or running/); await page.getByRole('link', { name: /Inspect or cancel the simulation/ }).waitFor(); assert.equal((await (await direct(`/projects/${id}`)).json()).archived_at, null);
     // This setup only terminates the disposable test fixture. It adds no simulator/cancel endpoint.
     const setup = spawnSync(`${root}/apps/api/.venv/bin/python`, ['-c', `import sys,psycopg\nwith psycopg.connect(sys.argv[1]) as c:\n c.execute("UPDATE build_runs SET status='canceled',finished_at=now() WHERE project_id=%s",(sys.argv[2],))\n c.execute("UPDATE projects SET lifecycle='idle' WHERE id=%s",(sys.argv[2],))`, database.replace('postgresql+psycopg:', 'postgresql:'), id], { encoding: 'utf8' }); assert.equal(setup.status, 0, setup.stderr);
-    await page.getByRole('button', { name: 'Refresh context' }).click(); await until(async () => !(await page.getByRole('button', { name: 'Archive project', exact: true }).isDisabled()));
+    await page.locator('.workspace-context-details > summary').click(); await page.getByRole('button', { name: 'Refresh context' }).click(); await until(async () => !(await page.getByRole('button', { name: 'Archive project', exact: true }).isDisabled()));
     await page.getByRole('button', { name: 'Archive project', exact: true }).click(); await page.getByRole('button', { name: 'Unarchive project' }).waitFor(); await page.reload(); await page.getByRole('button', { name: 'Unarchive project' }).waitFor();
     assert.ok((await (await direct(`/projects/${id}`)).json()).archived_at);
-    await page.goto(`${base}/projects`); await page.getByRole('heading', { name: 'Give your idea a working direction.' }).waitFor();
-    await page.getByRole('combobox', { name: 'Archive filter' }).selectOption('true'); await page.getByRole('button', { name: 'Apply filters' }).click(); await page.getByRole('link', { name: /Harbor Operations/ }).waitFor();
+    await page.goto(`${base}/projects`); await page.getByRole('heading', { name: /Start with a brief/ }).waitFor();
+    await page.locator('.dashboard-filters > summary').click(); await page.getByRole('combobox', { name: 'Archive filter' }).selectOption('true'); await page.getByRole('button', { name: 'Apply filters' }).click(); await page.getByRole('link', { name: /Harbor Operations/ }).waitFor();
     await page.getByRole('button', { name: 'Project settings', exact: true }).click(); await page.getByRole('button', { name: 'Unarchive project' }).click(); await page.getByRole('heading', { name: 'No projects in this view.' }).waitFor();
     await page.goto(`${base}/projects`); await page.getByRole('link', { name: /Harbor Operations/ }).waitFor();
-    await page.getByRole('searchbox', { name: 'Search projects' }).fill('Harbor'); await page.getByRole('combobox', { name: 'Project state' }).selectOption('idle'); await page.getByRole('button', { name: 'Apply filters' }).click(); await page.getByRole('link', { name: /Harbor Operations/ }).waitFor();
+    await page.locator('.dashboard-filters > summary').click(); await page.getByRole('searchbox', { name: 'Search projects' }).fill('Harbor'); await page.getByRole('combobox', { name: 'Project state' }).selectOption('idle'); await page.getByRole('button', { name: 'Apply filters' }).click(); await page.getByRole('link', { name: /Harbor Operations/ }).waitFor();
     await page.reload(); await page.getByRole('link', { name: /Harbor Operations/ }).waitFor(); assert.equal(await page.getByRole('searchbox').inputValue(), 'Harbor');
-    await page.getByRole('searchbox').fill('no match'); await page.getByRole('button', { name: 'Apply filters' }).click(); await page.getByRole('heading', { name: 'No projects in this view.' }).waitFor();
+    await page.locator('.dashboard-filters > summary').click(); await page.getByRole('searchbox').fill('no match'); await page.getByRole('button', { name: 'Apply filters' }).click(); await page.getByRole('heading', { name: 'No projects in this view.' }).waitFor();
     await page.goto(`${base}/projects/${id}/settings`); await page.getByRole('heading', { name: 'Harbor Operations', exact: true }).waitFor();
     const current = await direct(`/projects/${id}`); await direct(`/projects/${id}`, { method: 'PATCH', headers: { 'If-Match': current.headers.get('etag') }, body: JSON.stringify({ title: 'Changed in another tab' }) });
     await metadata.fill('My preserved title'); await page.getByRole('button', { name: 'Review latest metadata' }).waitFor(); assert.equal(await page.getByRole('button', { name: 'Save title' }).isDisabled(), true); assert.equal(await metadata.inputValue(), 'My preserved title');
@@ -82,5 +83,5 @@ test('M3 real PostgreSQL project create, recover, reload, search and metadata jo
       await page.screenshot({ path: `${webRoot}/test-results/m3/${name}-${width}.png`, fullPage: true });
     }
     assert.equal((await (await direct('/projects')).json()).items.length, 1); assert.equal((await (await direct(`/projects/${id}`)).json()).title, 'My preserved title');
-  } finally { await browser?.close(); server.kill('SIGTERM'); }
+  } finally { await browser?.close(); await stopBrowserServer(server); }
 });

@@ -1,0 +1,7 @@
+Manual disposable review shutdown, before protection from repeated interrupts:
+KeyboardInterrupt interrupted subprocess.wait(timeout=10) inside terminate(process).
+The launcher exited 130 before reaching its recorded-runtime cleanup confirmation.
+Its exact web port was subsequently confirmed closed. No project/build had been created in that review session.
+Fix: ignore repeated SIGINT only after entering the launcher's bounded shutdown;
+Popen TERM/KILL deadlines and database/image/project/run checks remain unchanged.
+Regression: a child enters cleanup, receives two real SIGINT signals, and confirms completion with exit 0.

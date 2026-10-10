@@ -1,0 +1,18 @@
+{
+  "browser_journey": "passed",
+  "docker": "real accepted image",
+  "oidc": "synthetic RSA",
+  "model": "controlled",
+  "deployment_provider": "controlled",
+  "live_provider": "not_run",
+  "project_id": "94802f60-4617-4270-89d3-cddd0eba27fd",
+  "versions": [
+    "755fb63d-55c0-43d4-884e-9ed451f6ffef",
+    "5ebcdcd7-697a-4b79-9d5a-56e399445bff"
+  ],
+  "releases": [
+    "110bff71-e813-478e-859e-aa29fcdf6a3a",
+    "cd5d75c1-9f3f-412c-8c14-53222cd7abd0"
+  ],
+  "evidence_written_at_utc": "2026-10-07T15:41:25.773043+00:00"
+}

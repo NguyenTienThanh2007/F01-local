@@ -1,0 +1,11 @@
+{
+  "image_id": "sha256:c20b9d0f8e0691a9813f14a3fa89abbb50b135fac8fb274fbfee614fa10c9c11",
+  "docker_containment": "passed",
+  "docker_journey": "passed",
+  "model_transport": "controlled OpenAI adapter responses",
+  "live_provider": "not_run",
+  "browser_journey": "not_run",
+  "phase2c_started": true,
+  "production_packaging": "passed",
+  "duration_seconds": 228.3
+}

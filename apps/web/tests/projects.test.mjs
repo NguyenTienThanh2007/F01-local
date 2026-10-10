@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { handleProjectsRequest } from '../src/lib/projects/server.ts';
 import { createInput, projectETag } from '../src/lib/projects/contracts.ts';
-import { readAttempt, ATTEMPT_STORAGE, outcomeIsUnknown } from '../src/lib/projects/creation.ts';
+import { readAttempt, ATTEMPT_STORAGE, outcomeIsUnknown, creationTarget } from '../src/lib/projects/creation.ts';
 const token = 'synthetic-m3-private-token-1234567890123456789';
 const env = { APP_ENV: 'test', DEV_API_TOKEN: token, API_INTERNAL_URL: 'http://127.0.0.1:8000', NEXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000' };
 const id = 'ab56889d-a04c-41bb-831e-429948d34cb8', key = '30fe5cca-25e1-4f68-b80a-6b281d7b5c22';
@@ -13,6 +13,10 @@ test('generated client gateway forwards trimmed creation, stable key and private
     return Response.json({ project: { id }, execution_mode: 'simulated' }, { status: 201, headers: { 'Set-Cookie': 'private=secret' } });
   });
   assert.equal(response.status, 201); assert.equal(response.headers.get('Set-Cookie'), null); assert.equal(response.headers.get('Cache-Control'), 'no-store');
+});
+test('creation accepts the real saved-project contract and rejects unsafe navigation',()=>{
+ const result={project:{id},project_url:`/projects/${id}`,request_id:key,brain_revision_id:key,execution_mode:'real',run_id:null};
+ assert.equal(creationTarget(result),`/projects/${id}`);assert.equal(creationTarget({...result,execution_mode:'simulated',run_id:key}),`/projects/${id}`);assert.equal(creationTarget({...result,execution_mode:'invented'}),null);assert.equal(creationTarget({...result,project_url:'https://foreign.example'}),null);assert.equal(creationTarget({...result,run_id:'bad'}),null);assert.equal(outcomeIsUnknown(409,'IDEMPOTENCY_IN_PROGRESS'),true);assert.equal(outcomeIsUnknown(408,'timeout'),true);
 });
 test('list forwards validated search, lifecycle, archive and pagination', async () => {
   const response = await handleProjectsRequest(request('GET', undefined, {}, '?q=estate&status=understanding&archived=true&cursor=abc'), 'projects', undefined, env, async req => { const url = new URL(req.url); assert.equal(url.searchParams.get('q'), 'estate'); assert.equal(url.searchParams.get('status'), 'understanding'); assert.equal(url.searchParams.get('archived'), 'true'); assert.equal(url.searchParams.get('cursor'), 'abc'); assert.equal(url.searchParams.get('limit'), '20'); return Response.json({ items: [], next_cursor: null }); });
@@ -49,4 +53,45 @@ test('creation validation and unresolved-command receipt respect the recovery wi
   const attempt = { key, input: createInput('CRM', 'A CRM for estate agents.'), started: Date.now() };
   assert.deepEqual(readAttempt({ getItem: name => { assert.equal(name, ATTEMPT_STORAGE); return JSON.stringify(attempt); } }), attempt); assert.equal(readAttempt({ getItem: () => 'bad' }), null); assert.equal(readAttempt({ getItem: () => { throw new Error('blocked'); } }), null);
   assert.equal(outcomeIsUnknown(503, 'SERVICE_UNAVAILABLE'), true); assert.equal(outcomeIsUnknown(0, 'offline'), true); assert.equal(outcomeIsUnknown(409, 'IDEMPOTENCY_IN_PROGRESS'), true); assert.equal(outcomeIsUnknown(422, 'VALIDATION_ERROR'), false);
+});
+
+test('creation gateway preserves the account assertion and rejects malformed binding',async()=>{
+ const body={brief:'A CRM for estate agents and leads.'};
+ const response=await handleProjectsRequest(request('POST',body,{'Idempotency-Key':key,'X-F01-Expected-Owner':id}),'projects',undefined,env,async req=>{assert.equal(req.headers.get('X-F01-Expected-Owner'),id);return Response.json({error:{code:'CREATION_ACCOUNT_CHANGED'}},{status:409});});
+ assert.equal(response.status,409);assert.equal((await response.json()).error.code,'CREATION_ACCOUNT_CHANGED');
+ assert.equal((await handleProjectsRequest(request('POST',body,{'Idempotency-Key':key,'X-F01-Expected-Owner':'bad'}),'projects',undefined,env,()=>{throw Error('No dispatch');})).status,422);
+ const receipt={key,input:createInput('CRM',body.brief),started:Date.now(),owner:id};
+ assert.deepEqual(readAttempt({getItem:()=>JSON.stringify(receipt)}),receipt);
+ assert.equal(readAttempt({getItem:()=>JSON.stringify({...receipt,owner:'bad'})}),null);
+});
+
+test('browser harness teardown completes when a child ignores graceful shutdown',async()=>{
+ const {spawn}=await import('node:child_process'),{stopBrowserServer}=await import('./browser-process.mjs');
+ const child=spawn(process.execPath,['-e',"process.on('SIGTERM',()=>{});process.stdout.write('ready');setInterval(()=>{},1000)"],{stdio:['ignore','pipe','ignore']});
+ await new Promise(resolve=>child.stdout.once('data',resolve));
+ await stopBrowserServer(child,100);assert.equal(child.signalCode,'SIGKILL');
+ await stopBrowserServer(child,100);
+});
+
+test('unsent creation drafts survive authentication without crossing account ownership',async()=>{
+ const {readCreationDraft,saveCreationDraft,DRAFT_STORAGE}=await import('../src/lib/projects/creation.ts');
+ let value=null;const storage={getItem:()=>value,setItem:(name,next)=>{assert.equal(name,DRAFT_STORAGE);value=next;},removeItem:()=>{value=null;}};
+ const anonymous={title:'Draft',brief:'A small browser-only checklist',owner:null};
+ saveCreationDraft(storage,anonymous);assert.deepEqual(readCreationDraft(storage,id),anonymous);
+ const owned={...anonymous,owner:id};saveCreationDraft(storage,owned);assert.deepEqual(readCreationDraft(storage,id),owned);assert.equal(readCreationDraft(storage,key),null);assert.equal(readCreationDraft(storage,null),null);
+ saveCreationDraft(storage,null);assert.equal(readCreationDraft(storage,id),null);
+ assert.doesNotThrow(()=>saveCreationDraft({setItem:()=>{throw Error('blocked');},removeItem:()=>{throw Error('blocked');}},owned));
+});
+
+test('an exited test child releases inherited pipes without waiting for descendants',async()=>{
+ const {spawn}=await import('node:child_process'),{once}=await import('node:events'),{releaseExitedPipes}=await import('./browser-process.mjs');
+ const code="const c=require('node:child_process').spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{detached:true,stdio:['ignore',1,2]});process.stdout.write(String(c.pid)+'\\n');c.unref();setTimeout(()=>process.exit(0),100);";
+ const child=spawn(process.execPath,['-e',code],{stdio:['ignore','pipe','pipe']});
+ const [chunk]=await once(child.stdout,'data');const descendant=Number(String(chunk).trim());
+ assert.ok(Number.isInteger(descendant)&&descendant>0);
+ try{
+  let closed=false;const done=once(child,'close').then(()=>{closed=true;});
+  await once(child,'exit');assert.equal(closed,false,'Inherited pipes keep close pending after the process exits.');
+  releaseExitedPipes(child);await done;assert.equal(closed,true);
+ }finally{process.kill(descendant,'SIGKILL');}
 });

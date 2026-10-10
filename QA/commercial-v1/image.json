@@ -1,0 +1,7 @@
+{
+  "base_image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+  "image_id": "sha256:c20b9d0f8e0691a9813f14a3fa89abbb50b135fac8fb274fbfee614fa10c9c11",
+  "recipe_sha256": "a4e6cead9d7a507a6e75fc2fe99e3811b08b220db6ab7d9e890744948724aa5a",
+  "accepted": false,
+  "evidence_written_at_utc": "2026-10-07T14:44:11.228556+00:00"
+}
