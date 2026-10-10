@@ -154,6 +154,8 @@ def test_bounded_context_and_immutable_proposal_do_not_advance_brain_or_versions
     assert context['requirements'][0]['provenance']['source']=='user_request';assert 'synthetic-provider-credential' not in prompt
     assert context['stack']['frontend']['provenance']['source']=='template'
     assert context['current_plan'][0]['status']=='proposed'
+    assert context['runtime_capabilities']['real_build_available'] is False
+    assert 'Phase 2A' not in context['source']['reason']
     published=planning.finish(database,project_settings,uid,attempt.id,result(project_plan));assert published.proposal
     after=client.get(f'/v1/projects/{pid}/workspace').json()
     assert after['current_brain']==before['current_brain'];assert after['current_version']==before['current_version'];assert after['project']['lifecycle']==before['project']['lifecycle']
@@ -351,3 +353,25 @@ def test_account_profile_owned_update_never_changes_email_or_another_owner(proje
         other,_=login_headers(database,configured,rsa_key,'other');client.headers.update(other)
         assert client.get('/v1/account').json()['display_name']!='Mira'
         client.headers.update(headers);assert client.get('/v1/account').json()['display_name']=='Mira'
+
+
+def test_initial_real_plan_receives_current_capabilities_without_fabricating_source(
+    client: TestClient, database: Database, project_settings: Settings,
+) -> None:
+    from f01.providers.prompts import CONTEXT_INSTRUCTIONS
+    created = create(client)
+    uid = UUID(client.get('/v1/session').json()['principal']['id'])
+    configured = project_settings.model_copy(update={'execution_mode': 'real', 'real_execution_enabled': True})
+    _, prompt = planning.reserve(database, configured, uid, str(uuid4()), 'real-context',
+                                  UUID(created['project']['id']), input_for(client, created))
+    assert prompt is not None
+    context = json.loads(prompt)
+    assert context['runtime_capabilities'] == {
+        'execution_mode': 'real', 'real_build_available': True, 'recipe': 'next-web-v1',
+        'application_scope': 'Next.js/React/TypeScript and plain CSS/CSS modules with browser state; no Tailwind compiler, application backend, external database or additional packages.',
+        'production_release_available': False,
+    }
+    assert context['source']['available'] is False and context['version'] is None
+    assert 'No real build is confirmed' in context['execution']
+    assert 'historical Phase 1/2A template limitations must not override' in CONTEXT_INSTRUCTIONS
+    assert context['stack']['frontend']['provenance']['source'] == 'template'
