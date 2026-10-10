@@ -1,0 +1,14 @@
+$ node --test tests/generated-visual.test.mjs
+✔ browser metric regression reproduces vertical flex-basis growth and below-fold content (2143.066791ms)
+✔ an inert primary action fails editor acceptance instead of certifying its good-looking board (601.387125ms)
+✔ actual browser QA detects overflowing nowrap card metadata and insufficient badge contrast (364.720291ms)
+✔ responsive compact layout passes measurements without claiming subjective quality (229.621541ms)
+✔ a mobile universal width rule can overflow clipped labels despite fitting visible controls (180.53925ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3818.642458

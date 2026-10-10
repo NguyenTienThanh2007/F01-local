@@ -1,0 +1,1056 @@
+{
+  "project_id": "d8147000-9d86-42f0-8deb-4a1e174f57f1",
+  "runs": [
+    {
+      "id": "12d4de3f-2b59-4fb3-8480-006c6d2e3e67",
+      "status": "succeeded",
+      "error_code": null
+    },
+    {
+      "id": "e03e22c8-93ed-405e-a9de-abd86d7029be",
+      "status": "succeeded",
+      "error_code": null
+    },
+    {
+      "id": "3128f9cf-7de2-4c20-aba5-0d00e8668f8d",
+      "status": "succeeded",
+      "error_code": null
+    },
+    {
+      "id": "5236309e-ee62-4024-9f0f-c5ce703ff501",
+      "status": "failed",
+      "error_code": "PLANNING_RATE_LIMITED"
+    },
+    {
+      "id": "4ee6f69f-e45a-4a4c-aa65-82f7fbcc4313",
+      "status": "failed",
+      "error_code": "PROVIDER_INCOMPLETE_RESPONSE"
+    },
+    {
+      "id": "1af36eb1-88d8-4ade-a4d0-ca883f913459",
+      "status": "failed",
+      "error_code": "SOURCE_BUDGET_EXCEEDED"
+    },
+    {
+      "id": "108cb544-58db-4f09-9e64-8f14662c0b9c",
+      "status": "succeeded",
+      "error_code": null
+    },
+    {
+      "id": "5791374e-1d10-4fbd-92d4-d9971206bbcd",
+      "status": "succeeded",
+      "error_code": null
+    },
+    {
+      "id": "b9f6d513-9758-4194-b35a-f4c6ca252005",
+      "status": "succeeded",
+      "error_code": null
+    },
+    {
+      "id": "5a5de8ac-a513-4d17-a269-31357afc76ad",
+      "status": "failed",
+      "error_code": "PLANNING_BUDGET_EXCEEDED"
+    },
+    {
+      "id": "fc87934c-d2fc-4542-834f-36d379a21414",
+      "status": "succeeded",
+      "error_code": null
+    }
+  ],
+  "jobs": [
+    {
+      "id": "a05e9ed6-5c59-4e55-bc5f-39f3ee844444",
+      "phase": "preview_ready",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "007fc3d1-9065-4f63-ac72-ee072b1a56b3",
+      "phase": "preview_ready",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "3a254cd9-cd83-444d-a7f6-5e123e4c88d8",
+      "phase": "preview_ready",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "f6d1771c-7fdf-4834-86a1-cfcec294bf39",
+      "phase": "context_resolution",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "4305ecac-4ea2-49a4-b6bf-b016e9b8348d",
+      "phase": "generation_pending",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "fa5bef49-6e65-4ea3-89a8-2e1c454dbb84",
+      "phase": "typecheck",
+      "state": "done",
+      "repairs": 1
+    },
+    {
+      "id": "2e467699-f959-4664-8d80-7916a108f2ff",
+      "phase": "preview_ready",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "c8f0a33f-ab1e-4763-b1e7-cf10b3ea5c47",
+      "phase": "preview_ready",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "eedc098f-9361-4987-877d-c4b36c47d2f0",
+      "phase": "preview_ready",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "0dd472b8-909a-4844-ab91-6e3c3aa04326",
+      "phase": "context_resolution",
+      "state": "done",
+      "repairs": 0
+    },
+    {
+      "id": "5e1f092b-7607-4071-8269-a4604473c9c9",
+      "phase": "preview_ready",
+      "state": "done",
+      "repairs": 0
+    }
+  ],
+  "candidates": [
+    {
+      "id": "c0ea56b4-89b8-47f0-ba60-190326f4dc6f",
+      "digest": "ed50e5673a69bc2005635121b3faa2b910db19297440041f94f66ea393ab5a1f",
+      "parent_digest": null,
+      "attempt": 1
+    },
+    {
+      "id": "34aad1dd-ffce-4cf0-ab44-c59f4d417fb4",
+      "digest": "f1495206e6fd0f79dc9825cbcfb3c1e3c648646209c5720f0f8bb5c3aab5e8f5",
+      "parent_digest": "ed50e5673a69bc2005635121b3faa2b910db19297440041f94f66ea393ab5a1f",
+      "attempt": 1
+    },
+    {
+      "id": "1701460a-abf2-46bc-9962-7c36f770e687",
+      "digest": "3cca01e90d573ef2e789110f2b925f06440f3aa788e39a538524aa857470b232",
+      "parent_digest": "f1495206e6fd0f79dc9825cbcfb3c1e3c648646209c5720f0f8bb5c3aab5e8f5",
+      "attempt": 1
+    },
+    {
+      "id": "5bd1c49e-32eb-4b4a-a37d-f7bcb8e2ac96",
+      "digest": "f89e7a4ae708bdf8b4d14a9c3144b6a330a3c53d20003aab6deba6976e305f38",
+      "parent_digest": "3cca01e90d573ef2e789110f2b925f06440f3aa788e39a538524aa857470b232",
+      "attempt": 1
+    },
+    {
+      "id": "8d6c6f35-4619-4ed2-9376-0783ecc928aa",
+      "digest": "cc0a17c4e0e711512bf23c6948f5ddec01723a95895331e88947b5a8f0afb0a2",
+      "parent_digest": "3cca01e90d573ef2e789110f2b925f06440f3aa788e39a538524aa857470b232",
+      "attempt": 1
+    },
+    {
+      "id": "3a5ae410-06f2-4c5a-9d77-5d379be50ec2",
+      "digest": "26f19bf5782a5bdad1dd22d4a6f40686675360d846438552b2bbb4bc0f722185",
+      "parent_digest": "cc0a17c4e0e711512bf23c6948f5ddec01723a95895331e88947b5a8f0afb0a2",
+      "attempt": 1
+    },
+    {
+      "id": "6c825cd7-e426-4ad8-805f-491cbcc9f56b",
+      "digest": "de334d2f12672ffe84abbdf5e33d70fd78bd0038b258a1d17631f1d8fcd26925",
+      "parent_digest": "26f19bf5782a5bdad1dd22d4a6f40686675360d846438552b2bbb4bc0f722185",
+      "attempt": 1
+    },
+    {
+      "id": "c93c4309-d370-4f9f-97bf-438cd6412db4",
+      "digest": "0a2f3da39369828ee1226f842f21f06bd7cc025868ee6d3985f108550d76aa58",
+      "parent_digest": "de334d2f12672ffe84abbdf5e33d70fd78bd0038b258a1d17631f1d8fcd26925",
+      "attempt": 1
+    }
+  ],
+  "versions": [
+    {
+      "id": "74356dd0-99d9-4614-acb9-f78436bbe1b6",
+      "number": 1,
+      "descriptor": {
+        "kind": "isolated",
+        "expires_at": "2026-10-11T02:57:58.581825+00:00",
+        "preview_id": "ecb5f9cc-7a55-4c01-9070-9fddb21160f3",
+        "source_digest": "ed50e5673a69bc2005635121b3faa2b910db19297440041f94f66ea393ab5a1f"
+      },
+      "run_id": "12d4de3f-2b59-4fb3-8480-006c6d2e3e67",
+      "source": {
+        "schema_version": 1,
+        "recipe": "next-web-v1",
+        "lineage": {
+          "project_id": "d8147000-9d86-42f0-8deb-4a1e174f57f1",
+          "request_id": "7944c4c5-8090-43e1-9206-eec4d5055574",
+          "brain_revision_id": "f8519437-9c57-42cd-9f0f-3cd76239a5e0",
+          "plan_id": "4cf2f032-cda8-485b-a0f7-0374bbeae5eb",
+          "version_id": null
+        },
+        "parent_digest": null,
+        "digest": "ed50e5673a69bc2005635121b3faa2b910db19297440041f94f66ea393ab5a1f",
+        "files": [
+          {
+            "path": "app/layout.tsx",
+            "sha256": "0e6c76ff966345aba71bd22fa417391e1ba5f63c12ce249cbdbeb435859ff405"
+          },
+          {
+            "path": "app/page.tsx",
+            "sha256": "66dad42f6cafa18d5ca3f0f3bde650236135fc8d689112789ef9ce3c4c4d67e1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "39b7b4e9-359d-4539-b7bd-aa60efd2b4b7",
+      "number": 2,
+      "descriptor": {
+        "kind": "isolated",
+        "expires_at": "2026-10-11T03:06:55.776524+00:00",
+        "preview_id": "40cee15a-fc6a-40db-afa5-440f752a705c",
+        "source_digest": "f1495206e6fd0f79dc9825cbcfb3c1e3c648646209c5720f0f8bb5c3aab5e8f5"
+      },
+      "run_id": "e03e22c8-93ed-405e-a9de-abd86d7029be",
+      "source": {
+        "schema_version": 1,
+        "recipe": "next-web-v1",
+        "lineage": {
+          "project_id": "d8147000-9d86-42f0-8deb-4a1e174f57f1",
+          "request_id": "9a1b9a75-34b2-4d74-ae85-b74d56d310d6",
+          "brain_revision_id": "0f77168b-42a8-4091-be3a-54b50f94027e",
+          "plan_id": "2797447e-656b-4912-9174-4012c24d2431",
+          "version_id": "74356dd0-99d9-4614-acb9-f78436bbe1b6"
+        },
+        "parent_digest": "ed50e5673a69bc2005635121b3faa2b910db19297440041f94f66ea393ab5a1f",
+        "digest": "f1495206e6fd0f79dc9825cbcfb3c1e3c648646209c5720f0f8bb5c3aab5e8f5",
+        "files": [
+          {
+            "path": "app/layout.tsx",
+            "sha256": "0e6c76ff966345aba71bd22fa417391e1ba5f63c12ce249cbdbeb435859ff405"
+          },
+          {
+            "path": "app/page.tsx",
+            "sha256": "3c038caeb11d3f0ead223d66838f508561c202d5e04a35aaf3adce498637a720"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a9218b77-7987-46da-adfe-c35e9ba7e4b6",
+      "number": 3,
+      "descriptor": {
+        "kind": "isolated",
+        "expires_at": "2026-10-11T03:14:23.203468+00:00",
+        "preview_id": "4d11cc4c-07f9-4cba-a36d-63cc584cc856",
+        "source_digest": "3cca01e90d573ef2e789110f2b925f06440f3aa788e39a538524aa857470b232"
+      },
+      "run_id": "3128f9cf-7de2-4c20-aba5-0d00e8668f8d",
+      "source": {
+        "schema_version": 1,
+        "recipe": "next-web-v1",
+        "lineage": {
+          "project_id": "d8147000-9d86-42f0-8deb-4a1e174f57f1",
+          "request_id": "67b450f2-5756-4264-bf19-037fd5283328",
+          "brain_revision_id": "c729c87b-6277-4de8-8d4a-f6afae36dc88",
+          "plan_id": "e03d1198-0fbd-40bd-836e-7e3cd06e4c68",
+          "version_id": "39b7b4e9-359d-4539-b7bd-aa60efd2b4b7"
+        },
+        "parent_digest": "f1495206e6fd0f79dc9825cbcfb3c1e3c648646209c5720f0f8bb5c3aab5e8f5",
+        "digest": "3cca01e90d573ef2e789110f2b925f06440f3aa788e39a538524aa857470b232",
+        "files": [
+          {
+            "path": "app/layout.tsx",
+            "sha256": "0e6c76ff966345aba71bd22fa417391e1ba5f63c12ce249cbdbeb435859ff405"
+          },
+          {
+            "path": "app/page.tsx",
+            "sha256": "76c1b9399df350978b212082e9f07d1d489959e19bdda6e0871cd56db8e209c9"
+          }
+        ]
+      }
+    },
+    {
+      "id": "621f9901-f79a-4602-b94a-f44ceae0c71e",
+      "number": 4,
+      "descriptor": {
+        "kind": "isolated",
+        "expires_at": "2026-10-11T04:13:29.914062+00:00",
+        "preview_id": "080036d8-5453-42f4-879d-c91718a78f5c",
+        "source_digest": "cc0a17c4e0e711512bf23c6948f5ddec01723a95895331e88947b5a8f0afb0a2"
+      },
+      "run_id": "108cb544-58db-4f09-9e64-8f14662c0b9c",
+      "source": {
+        "schema_version": 1,
+        "recipe": "next-web-v1",
+        "lineage": {
+          "project_id": "d8147000-9d86-42f0-8deb-4a1e174f57f1",
+          "request_id": "f40e5f29-fc6f-47da-b5ed-fc8b92e9e69d",
+          "brain_revision_id": "08dd5f62-1cae-488e-b9dc-97d988f8d301",
+          "plan_id": "39ef8f5a-499a-47e4-ac71-3758c561e20b",
+          "version_id": "a9218b77-7987-46da-adfe-c35e9ba7e4b6"
+        },
+        "parent_digest": "3cca01e90d573ef2e789110f2b925f06440f3aa788e39a538524aa857470b232",
+        "digest": "cc0a17c4e0e711512bf23c6948f5ddec01723a95895331e88947b5a8f0afb0a2",
+        "files": [
+          {
+            "path": "app/layout.tsx",
+            "sha256": "0e6c76ff966345aba71bd22fa417391e1ba5f63c12ce249cbdbeb435859ff405"
+          },
+          {
+            "path": "app/page.tsx",
+            "sha256": "f7fe68866c0baeddfb92b09ca44e3b41770d19c2cd9e622a16ac508af0420850"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a3e0659b-f0b4-4709-9427-ad4caf8e452b",
+      "number": 5,
+      "descriptor": {
+        "kind": "isolated",
+        "expires_at": "2026-10-11T04:23:01.950755+00:00",
+        "preview_id": "9a20725d-1a04-4251-859e-6a30bb761e32",
+        "source_digest": "26f19bf5782a5bdad1dd22d4a6f40686675360d846438552b2bbb4bc0f722185"
+      },
+      "run_id": "5791374e-1d10-4fbd-92d4-d9971206bbcd",
+      "source": {
+        "schema_version": 1,
+        "recipe": "next-web-v1",
+        "lineage": {
+          "project_id": "d8147000-9d86-42f0-8deb-4a1e174f57f1",
+          "request_id": "fabe8255-1e1e-47e7-8420-70dc52a4dfc5",
+          "brain_revision_id": "d74df3df-06a3-4c8b-a8dd-b9a400d7ac72",
+          "plan_id": "011af4dd-eb7e-4ccf-a6eb-85f6df21db75",
+          "version_id": "621f9901-f79a-4602-b94a-f44ceae0c71e"
+        },
+        "parent_digest": "cc0a17c4e0e711512bf23c6948f5ddec01723a95895331e88947b5a8f0afb0a2",
+        "digest": "26f19bf5782a5bdad1dd22d4a6f40686675360d846438552b2bbb4bc0f722185",
+        "files": [
+          {
+            "path": "app/layout.tsx",
+            "sha256": "0e6c76ff966345aba71bd22fa417391e1ba5f63c12ce249cbdbeb435859ff405"
+          },
+          {
+            "path": "app/page.tsx",
+            "sha256": "35a9d0115cbf2417b7912a4f6723c5466d2c3d3716e769f6c7176ae3e74a9f13"
+          }
+        ]
+      }
+    },
+    {
+      "id": "20ad9afe-94c9-4f60-a2b7-238409ab2731",
+      "number": 6,
+      "descriptor": {
+        "kind": "isolated",
+        "expires_at": "2026-10-11T04:28:40.856082+00:00",
+        "preview_id": "8f685f7b-30f2-4af9-86e0-ac948ab7d73d",
+        "source_digest": "de334d2f12672ffe84abbdf5e33d70fd78bd0038b258a1d17631f1d8fcd26925"
+      },
+      "run_id": "b9f6d513-9758-4194-b35a-f4c6ca252005",
+      "source": {
+        "schema_version": 1,
+        "recipe": "next-web-v1",
+        "lineage": {
+          "project_id": "d8147000-9d86-42f0-8deb-4a1e174f57f1",
+          "request_id": "f202f5ee-ef94-4fcd-af55-a9495ba5b850",
+          "brain_revision_id": "73375f48-25d0-443c-a9cd-730bf59e3a99",
+          "plan_id": "4e00da69-028f-4451-b2c1-f72d7c83ed79",
+          "version_id": "a3e0659b-f0b4-4709-9427-ad4caf8e452b"
+        },
+        "parent_digest": "26f19bf5782a5bdad1dd22d4a6f40686675360d846438552b2bbb4bc0f722185",
+        "digest": "de334d2f12672ffe84abbdf5e33d70fd78bd0038b258a1d17631f1d8fcd26925",
+        "files": [
+          {
+            "path": "app/layout.tsx",
+            "sha256": "0e6c76ff966345aba71bd22fa417391e1ba5f63c12ce249cbdbeb435859ff405"
+          },
+          {
+            "path": "app/page.tsx",
+            "sha256": "48b63e4578d12235a7ed8747a7b157ce4dfa1ee24a408d1a099b00d042660dc7"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cd8b8a45-b68f-4daf-9b7c-2fc69e60cf65",
+      "number": 7,
+      "descriptor": {
+        "kind": "isolated",
+        "expires_at": "2026-10-11T04:41:11.129020+00:00",
+        "preview_id": "ef2c8cf0-47f0-4205-b54a-a6b1e8198e12",
+        "source_digest": "0a2f3da39369828ee1226f842f21f06bd7cc025868ee6d3985f108550d76aa58"
+      },
+      "run_id": "fc87934c-d2fc-4542-834f-36d379a21414",
+      "source": {
+        "schema_version": 1,
+        "recipe": "next-web-v1",
+        "lineage": {
+          "project_id": "d8147000-9d86-42f0-8deb-4a1e174f57f1",
+          "request_id": "fad4245c-01d3-4ae3-816b-f7772159fd4e",
+          "brain_revision_id": "1878e023-67d8-494e-b882-6a28fcacb085",
+          "plan_id": "1c4618cd-c8aa-4281-8b54-02294c5523a7",
+          "version_id": "20ad9afe-94c9-4f60-a2b7-238409ab2731"
+        },
+        "parent_digest": "de334d2f12672ffe84abbdf5e33d70fd78bd0038b258a1d17631f1d8fcd26925",
+        "digest": "0a2f3da39369828ee1226f842f21f06bd7cc025868ee6d3985f108550d76aa58",
+        "files": [
+          {
+            "path": "app/layout.tsx",
+            "sha256": "0e6c76ff966345aba71bd22fa417391e1ba5f63c12ce249cbdbeb435859ff405"
+          },
+          {
+            "path": "app/page.tsx",
+            "sha256": "77547385a8acd421d7e72a52be6f74e307b12e70bc6c089f412f6efbc6ff281a"
+          }
+        ]
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ec8f688d-ecd0-4c7a-a91c-c0008bdca657",
+      "candidate_id": "c0ea56b4-89b8-47f0-ba60-190326f4dc6f",
+      "phase": "materialization",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/materialize.mjs"
+        ],
+        "phase": "materialization",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "b097fe93-522e-4ea3-881f-55df66969af2",
+      "candidate_id": "c0ea56b4-89b8-47f0-ba60-190326f4dc6f",
+      "phase": "install",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/dependency-check.mjs"
+        ],
+        "phase": "install",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 91
+      }
+    },
+    {
+      "id": "ce37a4be-6088-4c45-8cd2-dc66dbada618",
+      "candidate_id": "c0ea56b4-89b8-47f0-ba60-190326f4dc6f",
+      "phase": "typecheck",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "phase": "typecheck",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 3370
+      }
+    },
+    {
+      "id": "4a982ccd-b7cc-47ef-8a74-beae0d178b03",
+      "candidate_id": "c0ea56b4-89b8-47f0-ba60-190326f4dc6f",
+      "phase": "build",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/next/dist/bin/next",
+          "build",
+          "--webpack"
+        ],
+        "phase": "build",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 8703
+      }
+    },
+    {
+      "id": "71ff45cc-43ee-4d3a-bea9-aa30c08915ac",
+      "candidate_id": "c0ea56b4-89b8-47f0-ba60-190326f4dc6f",
+      "phase": "verification",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/verify.mjs"
+        ],
+        "phase": "verification",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "e56b9052-0715-4ec3-9abe-236c3fb15c49",
+      "candidate_id": "34aad1dd-ffce-4cf0-ab44-c59f4d417fb4",
+      "phase": "materialization",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/materialize.mjs"
+        ],
+        "phase": "materialization",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "df4556a1-e9cf-4c15-a62c-b83f76791205",
+      "candidate_id": "34aad1dd-ffce-4cf0-ab44-c59f4d417fb4",
+      "phase": "install",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/dependency-check.mjs"
+        ],
+        "phase": "install",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 36
+      }
+    },
+    {
+      "id": "e18bcf8e-0216-4a2d-a6ab-dd345dae797d",
+      "candidate_id": "34aad1dd-ffce-4cf0-ab44-c59f4d417fb4",
+      "phase": "typecheck",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "phase": "typecheck",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 2585
+      }
+    },
+    {
+      "id": "887efb55-17d9-4687-828d-59955688212d",
+      "candidate_id": "34aad1dd-ffce-4cf0-ab44-c59f4d417fb4",
+      "phase": "build",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/next/dist/bin/next",
+          "build",
+          "--webpack"
+        ],
+        "phase": "build",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 8919
+      }
+    },
+    {
+      "id": "b3351933-c425-4879-bff1-3068f86a88c5",
+      "candidate_id": "34aad1dd-ffce-4cf0-ab44-c59f4d417fb4",
+      "phase": "verification",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/verify.mjs"
+        ],
+        "phase": "verification",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "80c551ec-e9bd-44f7-be09-fa2639649f44",
+      "candidate_id": "1701460a-abf2-46bc-9962-7c36f770e687",
+      "phase": "materialization",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/materialize.mjs"
+        ],
+        "phase": "materialization",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "493acf50-1e02-4e55-b993-210d905746a7",
+      "candidate_id": "1701460a-abf2-46bc-9962-7c36f770e687",
+      "phase": "install",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/dependency-check.mjs"
+        ],
+        "phase": "install",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 35
+      }
+    },
+    {
+      "id": "c6734ed7-918c-4243-8cf6-002b0fbdd12f",
+      "candidate_id": "1701460a-abf2-46bc-9962-7c36f770e687",
+      "phase": "typecheck",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "phase": "typecheck",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 2461
+      }
+    },
+    {
+      "id": "a0f4643f-5af9-47c2-81a9-a003773a61ff",
+      "candidate_id": "1701460a-abf2-46bc-9962-7c36f770e687",
+      "phase": "build",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/next/dist/bin/next",
+          "build",
+          "--webpack"
+        ],
+        "phase": "build",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 9562
+      }
+    },
+    {
+      "id": "a672621e-05b0-4802-9256-8f4551074da4",
+      "candidate_id": "1701460a-abf2-46bc-9962-7c36f770e687",
+      "phase": "verification",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/verify.mjs"
+        ],
+        "phase": "verification",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "dcf4a3b8-d859-4a77-8ca0-2577115aca45",
+      "candidate_id": "5bd1c49e-32eb-4b4a-a37d-f7bcb8e2ac96",
+      "phase": "materialization",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/materialize.mjs"
+        ],
+        "phase": "materialization",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "758f20a7-960d-4eb7-a4fc-de73dbade6be",
+      "candidate_id": "5bd1c49e-32eb-4b4a-a37d-f7bcb8e2ac96",
+      "phase": "install",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/dependency-check.mjs"
+        ],
+        "phase": "install",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 50
+      }
+    },
+    {
+      "id": "589174e0-aca8-4e50-9181-c7516b88b809",
+      "candidate_id": "5bd1c49e-32eb-4b4a-a37d-f7bcb8e2ac96",
+      "phase": "typecheck",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "phase": "typecheck",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 2,
+        "diagnostics": [
+          {
+            "code": "TS2345",
+            "line": 287,
+            "path": "app/page.tsx"
+          }
+        ],
+        "duration_ms": 2708
+      }
+    },
+    {
+      "id": "2baf195c-571f-4d5a-8e99-7d05761afeec",
+      "candidate_id": "8d6c6f35-4619-4ed2-9376-0783ecc928aa",
+      "phase": "materialization",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/materialize.mjs"
+        ],
+        "phase": "materialization",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "8c675f61-9c7b-46a3-b974-7188513b032a",
+      "candidate_id": "8d6c6f35-4619-4ed2-9376-0783ecc928aa",
+      "phase": "install",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/dependency-check.mjs"
+        ],
+        "phase": "install",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 56
+      }
+    },
+    {
+      "id": "917c5949-dc2a-4995-bcc7-55cb76f96953",
+      "candidate_id": "8d6c6f35-4619-4ed2-9376-0783ecc928aa",
+      "phase": "typecheck",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "phase": "typecheck",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 2054
+      }
+    },
+    {
+      "id": "a11007ee-e8f7-45c9-b486-b962530bf6bd",
+      "candidate_id": "8d6c6f35-4619-4ed2-9376-0783ecc928aa",
+      "phase": "build",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/next/dist/bin/next",
+          "build",
+          "--webpack"
+        ],
+        "phase": "build",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 8445
+      }
+    },
+    {
+      "id": "33d6396b-de26-45c3-87da-643be973c6c3",
+      "candidate_id": "8d6c6f35-4619-4ed2-9376-0783ecc928aa",
+      "phase": "verification",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/verify.mjs"
+        ],
+        "phase": "verification",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "c6ff8e00-c96e-4ef1-9f3a-d33a22d5b711",
+      "candidate_id": "3a5ae410-06f2-4c5a-9d77-5d379be50ec2",
+      "phase": "materialization",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/materialize.mjs"
+        ],
+        "phase": "materialization",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "3ecf7966-f988-49a1-b71c-d31b5afe5189",
+      "candidate_id": "3a5ae410-06f2-4c5a-9d77-5d379be50ec2",
+      "phase": "install",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/dependency-check.mjs"
+        ],
+        "phase": "install",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 50
+      }
+    },
+    {
+      "id": "7bb58cda-3a82-4c87-97c7-6193bcd89c4f",
+      "candidate_id": "3a5ae410-06f2-4c5a-9d77-5d379be50ec2",
+      "phase": "typecheck",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "phase": "typecheck",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 2089
+      }
+    },
+    {
+      "id": "0d3fa663-4f6b-43f9-9941-9533e88cdb1b",
+      "candidate_id": "3a5ae410-06f2-4c5a-9d77-5d379be50ec2",
+      "phase": "build",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/next/dist/bin/next",
+          "build",
+          "--webpack"
+        ],
+        "phase": "build",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 8990
+      }
+    },
+    {
+      "id": "7c1f7d5a-87a8-4d41-ae71-8ee0969b06ff",
+      "candidate_id": "3a5ae410-06f2-4c5a-9d77-5d379be50ec2",
+      "phase": "verification",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/verify.mjs"
+        ],
+        "phase": "verification",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "d0861e0c-408a-4d2e-862c-b57e0f04899e",
+      "candidate_id": "6c825cd7-e426-4ad8-805f-491cbcc9f56b",
+      "phase": "materialization",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/materialize.mjs"
+        ],
+        "phase": "materialization",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "823a4991-6d79-43ac-adae-a02a20f7125b",
+      "candidate_id": "6c825cd7-e426-4ad8-805f-491cbcc9f56b",
+      "phase": "install",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/dependency-check.mjs"
+        ],
+        "phase": "install",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 62
+      }
+    },
+    {
+      "id": "6e678e52-164b-480c-8ac2-c5b65a03e111",
+      "candidate_id": "6c825cd7-e426-4ad8-805f-491cbcc9f56b",
+      "phase": "typecheck",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "phase": "typecheck",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 2073
+      }
+    },
+    {
+      "id": "36933c67-b253-4484-ad6e-a2c6dc099824",
+      "candidate_id": "6c825cd7-e426-4ad8-805f-491cbcc9f56b",
+      "phase": "build",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/next/dist/bin/next",
+          "build",
+          "--webpack"
+        ],
+        "phase": "build",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 9692
+      }
+    },
+    {
+      "id": "d9da9c58-dc4f-445e-ace2-17286b49481b",
+      "candidate_id": "6c825cd7-e426-4ad8-805f-491cbcc9f56b",
+      "phase": "verification",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/verify.mjs"
+        ],
+        "phase": "verification",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "4357400b-55fa-4381-9220-2cd58c8e6152",
+      "candidate_id": "c93c4309-d370-4f9f-97bf-438cd6412db4",
+      "phase": "materialization",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/materialize.mjs"
+        ],
+        "phase": "materialization",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    },
+    {
+      "id": "bff06653-beae-4ac7-9155-6546167fa28c",
+      "candidate_id": "c93c4309-d370-4f9f-97bf-438cd6412db4",
+      "phase": "install",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/dependency-check.mjs"
+        ],
+        "phase": "install",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 423
+      }
+    },
+    {
+      "id": "b3cbae7a-89bd-4809-ac0f-1d8d8a864a96",
+      "candidate_id": "c93c4309-d370-4f9f-97bf-438cd6412db4",
+      "phase": "typecheck",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "phase": "typecheck",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 2765
+      }
+    },
+    {
+      "id": "8a3dc194-7b41-4233-9d03-dbdac95a9d80",
+      "candidate_id": "c93c4309-d370-4f9f-97bf-438cd6412db4",
+      "phase": "build",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/node_modules/next/dist/bin/next",
+          "build",
+          "--webpack"
+        ],
+        "phase": "build",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 26421
+      }
+    },
+    {
+      "id": "7df41c62-b1ef-4f86-a785-3d706234e1c9",
+      "candidate_id": "c93c4309-d370-4f9f-97bf-438cd6412db4",
+      "phase": "verification",
+      "evidence": {
+        "argv": [
+          "/usr/local/bin/node",
+          "/opt/f01/verify.mjs"
+        ],
+        "phase": "verification",
+        "image_id": "sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0",
+        "exit_code": 0,
+        "diagnostics": [],
+        "duration_ms": 0
+      }
+    }
+  ]
+}

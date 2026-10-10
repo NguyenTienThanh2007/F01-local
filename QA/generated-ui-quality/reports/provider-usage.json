@@ -1,0 +1,211 @@
+{
+  "limit_usd": 0.5,
+  "call_limit": 18,
+  "calls": [
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 11822,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.0111672,
+      "status": 200,
+      "input_tokens": 2419,
+      "output_tokens": 792,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0022348000000000003
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 12306,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.0113608,
+      "status": 200,
+      "input_tokens": 2504,
+      "output_tokens": 882,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0024128
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 20211,
+      "max_output_tokens": 8000,
+      "reserved_usd": 0.0225228,
+      "status": 200,
+      "input_tokens": 3919,
+      "output_tokens": 3713,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0075084
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 15484,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.012632,
+      "status": 200,
+      "input_tokens": 3604,
+      "output_tokens": 1037,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0031008000000000003
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 42375,
+      "max_output_tokens": 8000,
+      "reserved_usd": 0.0313884,
+      "status": 200,
+      "input_tokens": 9477,
+      "output_tokens": 5690,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0128948
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 15514,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.012644,
+      "status": 200,
+      "input_tokens": 3635,
+      "output_tokens": 898,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0028908000000000002
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 51873,
+      "max_output_tokens": 8000,
+      "reserved_usd": 0.0351876,
+      "status": 200,
+      "input_tokens": 12598,
+      "output_tokens": 6486,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.015416800000000001
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 20505,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.0146404,
+      "status": 200,
+      "input_tokens": 4620,
+      "output_tokens": 1280,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.003896
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 66030,
+      "max_output_tokens": 8000,
+      "reserved_usd": 0.0408504,
+      "status": 200,
+      "input_tokens": 15942,
+      "output_tokens": 8000,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0191768
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 66031,
+      "max_output_tokens": 12000,
+      "reserved_usd": 0.0472508,
+      "status": 200,
+      "input_tokens": 15942,
+      "output_tokens": 8101,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.019338400000000002
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 66538,
+      "max_output_tokens": 12000,
+      "reserved_usd": 0.0474536,
+      "status": 200,
+      "input_tokens": 16042,
+      "output_tokens": 8892,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.020644
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 22014,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.015244,
+      "status": 200,
+      "input_tokens": 4975,
+      "output_tokens": 1315,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.004094
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 81510,
+      "max_output_tokens": 12000,
+      "reserved_usd": 0.0534424,
+      "status": 200,
+      "input_tokens": 19885,
+      "output_tokens": 9245,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.022746
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 23594,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.015876,
+      "status": 200,
+      "input_tokens": 5319,
+      "output_tokens": 1578,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.004652399999999999
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 89429,
+      "max_output_tokens": 12000,
+      "reserved_usd": 0.05661,
+      "status": 200,
+      "input_tokens": 22103,
+      "output_tokens": 10121,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.025034800000000003
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 23333,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.0157716,
+      "status": 200,
+      "input_tokens": 5258,
+      "output_tokens": 1367,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.004290400000000001
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 94755,
+      "max_output_tokens": 12000,
+      "reserved_usd": 0.0587404,
+      "status": 200,
+      "input_tokens": 23692,
+      "output_tokens": 10386,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0260944
+    }
+  ],
+  "reserved_usd": 0.5027824,
+  "settlement": "Completed HTTP requests with measured usage settle at the uncached standard-price estimate. Unknown outcomes retain full pre-dispatch reservation. Dollar ceiling unchanged; historical reservations retained.",
+  "quality_pass_start_call": 8,
+  "previous_taskpilot_calls": 7,
+  "quality_pass": {
+    "calls": 10,
+    "input_tokens": 133778,
+    "output_tokens": 60285,
+    "cached_input_tokens": 0,
+    "standard_price_estimate_usd": 0.1499672
+  },
+  "cumulative": {
+    "calls": 17,
+    "input_tokens": 171934,
+    "output_tokens": 79783,
+    "cached_input_tokens": 0,
+    "standard_price_estimate_usd": 0.1964264
+  }
+}

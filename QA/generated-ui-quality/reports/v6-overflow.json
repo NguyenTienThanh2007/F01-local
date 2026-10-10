@@ -1,0 +1,34 @@
+[
+  {
+    "tag": "LABEL",
+    "id": "",
+    "class": "visually-hidden",
+    "right": 413,
+    "width": 390,
+    "position": "absolute"
+  },
+  {
+    "tag": "SPAN",
+    "id": "filterInstructions",
+    "class": "visually-hidden",
+    "right": 413,
+    "width": 390,
+    "position": "absolute"
+  },
+  {
+    "tag": "LABEL",
+    "id": "",
+    "class": "visually-hidden",
+    "right": 413,
+    "width": 390,
+    "position": "absolute"
+  },
+  {
+    "tag": "LABEL",
+    "id": "",
+    "class": "visually-hidden",
+    "right": 413,
+    "width": 390,
+    "position": "absolute"
+  }
+]
