@@ -1,0 +1,79 @@
+{
+  "version": 3,
+  "version_id": "a9218b77-7987-46da-adfe-c35e9ba7e4b6",
+  "checks": [
+    {
+      "name": "existing saved records are compatible",
+      "passed": true
+    },
+    {
+      "name": "validation still works",
+      "passed": true
+    },
+    {
+      "name": "edit existing task and set due date",
+      "passed": true
+    },
+    {
+      "name": "create overdue task with priority",
+      "passed": true
+    },
+    {
+      "name": "move to Done clears overdue; move back restores it",
+      "passed": true
+    },
+    {
+      "name": "search/filter retains existing features",
+      "passed": true
+    },
+    {
+      "name": "deletion confirmation and cancellation",
+      "passed": true
+    },
+    {
+      "name": "refresh retains due dates and old task identifiers",
+      "passed": true
+    },
+    {
+      "name": "keyboard navigation",
+      "passed": true
+    },
+    {
+      "name": "mobile create/edit/refresh",
+      "passed": true
+    }
+  ],
+  "console": [],
+  "errors": [],
+  "mobile": {
+    "viewport": 390,
+    "width": 390
+  },
+  "storage": [
+    {
+      "id": "l21nixxnzi",
+      "title": "Founder acceptance task \u2014 edited",
+      "description": "Keep this saved task across AI versions.",
+      "status": "In Progress",
+      "priority": "High",
+      "dueDate": "2026-10-17"
+    },
+    {
+      "id": "0dc9cm5wmq",
+      "title": "Overdue acceptance task",
+      "description": "Due yesterday; clear visual indicator.",
+      "status": "In Progress",
+      "priority": "High",
+      "dueDate": "2026-10-09"
+    },
+    {
+      "id": "qugjbylx9y",
+      "title": "Mobile acceptance task",
+      "description": "",
+      "status": "Done",
+      "priority": "Medium",
+      "dueDate": "2026-10-10"
+    }
+  ],
+  "passed": true
+}

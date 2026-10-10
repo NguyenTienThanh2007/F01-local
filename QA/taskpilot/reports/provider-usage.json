@@ -1,0 +1,84 @@
+{
+  "limit_usd": 0.5,
+  "call_limit": 8,
+  "calls": [
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 11822,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.0111672,
+      "status": 200,
+      "input_tokens": 2419,
+      "output_tokens": 792,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0022348000000000003
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 12306,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.0113608,
+      "status": 200,
+      "input_tokens": 2504,
+      "output_tokens": 882,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0024128
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 20211,
+      "max_output_tokens": 8000,
+      "reserved_usd": 0.0225228,
+      "status": 200,
+      "input_tokens": 3919,
+      "output_tokens": 3713,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0075084
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 15484,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.012632,
+      "status": 200,
+      "input_tokens": 3604,
+      "output_tokens": 1037,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0031008000000000003
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 42375,
+      "max_output_tokens": 8000,
+      "reserved_usd": 0.0313884,
+      "status": 200,
+      "input_tokens": 9477,
+      "output_tokens": 5690,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0128948
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 15514,
+      "max_output_tokens": 3000,
+      "reserved_usd": 0.012644,
+      "status": 200,
+      "input_tokens": 3635,
+      "output_tokens": 898,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.0028908000000000002
+    },
+    {
+      "model": "gpt-4.1-mini",
+      "request_bytes": 51873,
+      "max_output_tokens": 8000,
+      "reserved_usd": 0.0351876,
+      "status": 200,
+      "input_tokens": 12598,
+      "output_tokens": 6486,
+      "cached_input_tokens": 0,
+      "estimated_uncached_usd": 0.015416800000000001
+    }
+  ],
+  "reserved_usd": 0.13690280000000002
+}
