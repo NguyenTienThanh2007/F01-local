@@ -24,6 +24,9 @@ diagnostic, preserving the other files and using their exact prior hashes.
 The trusted scaffold uses strict TypeScript. Type layout children as ReactNode;
 browser state/hooks require a 'use client' component. Do not fix type errors by
 weakening compiler settings or suppressing checks.
+React 19 refs initialized with null have nullable current values. Helpers consuming
+DOM refs must accept RefObject<HTMLElement | null> (or the matching element type),
+check current before use, and never force a nonnullable RefObject to hide the mismatch.
 The scaffold has no Tailwind compiler or UI/icon packages. Use actual plain CSS,
 CSS modules or inline styles; utility class names alone do not provide styling.
 The embedded preview is sandboxed: forms cannot submit and native confirm/alert

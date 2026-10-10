@@ -32,4 +32,7 @@ empty/full states, keyboard interactions and contrast. This is a source review, 
 a claim that browser tests ran. During diagnostic repair preserve the established
 design and unrelated behavior; improve only the observed fault. Existing data keys,
 IDs and schema must remain compatible; gate writes on completed storage hydration.
+For date-only fields, preserve validated YYYY-MM-DD values and compare them with a
+locally constructed calendar-day string. Date.parse('YYYY-MM-DD') interprets UTC,
+so converting that instant back to local midnight can mark today's task overdue.
 """

@@ -51,6 +51,9 @@ def test_source_adapter_strict_contract_usage_and_no_tools(project_plan: Project
         assert "gate writes on completed storage hydration" in policy
         assert "claim that browser tests ran" in policy
         assert "one identical template" in policy
+        assert "RefObject<HTMLElement | null>" in policy
+        assert "check current before use" in policy
+        assert "Date.parse('YYYY-MM-DD') interprets UTC" in policy
         assert "tools" not in body and "OpenAI" not in str(SourceProposal.model_json_schema())
         return httpx.Response(200, json={**response_body(), "usage": {"input_tokens": 100, "output_tokens": 200}})
     async def run() -> None:
