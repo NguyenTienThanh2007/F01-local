@@ -22,11 +22,21 @@ Use aligned task/data cards, legible metadata and consistent buttons/menus. Conv
 priority, deadline, error and status with text as well as color. Empty, loading, error,
 no-results and storage-unavailable states should explain a useful next action; do not
 fabricate sample user records, activity, statistics or progress for visual decoration.
+Give long titles the full usable card width; put wrapping metadata on its own row
+when necessary. Never let nowrap badges shrink a title to a few characters or overflow
+a narrow card. Use minmax(0,1fr) grid tracks and min-width:0 on shrinking children;
+stack columns before they become unreadably narrow. Prefer quiet secondary card
+actions over a row of competing filled buttons. Provide a clear reset for no-results.
 Use labelled controls, semantic landmarks/headings, visible keyboard focus, sufficient
 WCAG AA contrast and usable target spacing. Dialogs need a name, initial focus, trapped
 Tab focus, Escape/close, background inertness and focus restoration; use in-app UI that
 works under the existing sandbox. Respect prefers-reduced-motion. Keep content readable
 at desktop, tablet, 390px mobile and narrow reflow widths without page overflow.
+Save the actual invoking element before opening an editor and restore focus there
+after Escape, Cancel and save (fall back to the primary action only if it no longer
+exists). Check normal-size text on its actual surface: white on a bright red button
+or red text on a pink badge often fails 4.5:1; use a sufficiently dark foreground or
+background. Do not assume an attractive accent guarantees accessible contrast.
 Before returning source, review actual CSS dimensions, flex axes, wrapping, long titles,
 empty/full states, keyboard interactions and contrast. This is a source review, not
 a claim that browser tests ran. During diagnostic repair preserve the established

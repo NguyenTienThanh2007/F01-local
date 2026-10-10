@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
-import {collectVisualMetrics,assessVisualMetrics,auditGeneratedEditor} from './generated-visual-acceptance.mjs';
+import {collectVisualMetrics,assessVisualMetrics,auditGeneratedEditor,auditGeneratedPage} from './generated-visual-acceptance.mjs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -33,6 +33,22 @@ test('an inert primary action fails editor acceptance instead of certifying its 
     assert.equal(result.deterministicPassed,false);
     assert.equal(result.accessibilityPassed,null);
     assert.ok((await fs.stat(path.join(directory,'action-failed.png'))).size>0);
+  } finally {await browser.close();await fs.rm(directory,{recursive:true,force:true});}
+});
+
+test('actual browser QA detects overflowing nowrap card metadata and insufficient badge contrast',async()=>{
+  const directory=await fs.mkdtemp(path.join(os.tmpdir(),'f01-card-visual-'));
+  const browser=await chromium.launch({headless:true});
+  try {
+    const page=await browser.newPage();
+    // Faithful sizing/contrast regression fixture, not an OpenAI application.
+    await page.setContent(`<html lang="en"><head><title>Card regression</title><style>body{margin:0;font:16px system-ui}main{padding:24px}.card{width:100%;display:flex;gap:8px}h2{margin:0;overflow-wrap:break-word}.metadata{flex-shrink:0;white-space:nowrap;color:#e53e3e;background:#fed7d7}</style></head><body><main><h1>Fixture</h1><section id="board"><div class="card"><h2>Long title</h2><span class="metadata">High priority · 2026-10-09 (Overdue)</span></div></section></main></body></html>`);
+    const result=await auditGeneratedPage(page,{directory,primarySelector:'#board',viewports:[{name:'mobile',width:320,height:800}]});
+    assert.equal(result.deterministicPassed,false);
+    assert.equal(result.states[0].checks.find(c=>c.name==='No page horizontal overflow').passed,false);
+    assert.equal(result.accessibilityPassed,false);
+    assert.ok(result.states[0].accessibility.violations.some(v=>v.id==='color-contrast'));
+    assert.ok((await fs.stat(path.join(directory,'mobile.png'))).size>0);
   } finally {await browser.close();await fs.rm(directory,{recursive:true,force:true});}
 });
 
