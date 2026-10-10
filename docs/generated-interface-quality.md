@@ -1,7 +1,8 @@
 # Generated interface quality
 
-F01 sends the reusable `providers/interface_quality.py` policy to both real context
-planning and every source-generation dispatch. It describes product-specific visual
+F01 sends a concise visual-acceptance policy to real context planning and detailed
+`providers/interface_quality.py` guidance to every source-generation dispatch.
+Planning remains bounded within its existing input budget. The guidance describes product-specific visual
 direction, compact controls, primary-content composition, CSS tokens, responsive
 behavior, semantic/keyboard access, honest empty/error states, and data-compatible
 storage hydration. It does not prescribe a brand, universal sidebar, color palette,
@@ -13,6 +14,8 @@ classes inside vertical flex parents. Flex basis measures the main axis, so the 
 rule used for filter widths became form-control height. The policy specifically
 directs width distribution to row/grid wrappers and compact sizing to controls.
 Provider transport regressions verify this guidance reaches actual request payloads.
+Further real-browser failures informed wrapping card metadata, contrast, invoking
+control focus recovery, and responsive width rules that preserve clipped labels.
 
 ## Browser evidence alongside functional acceptance
 
@@ -52,8 +55,8 @@ audit helper as needed; the CLI examines initial state and the configured editor
 not every application interaction/state.
 
 `pnpm --filter @f01/web test:generated-visual:e2e` verifies the measurement harness
-against a minimal faithful flex-basis failure and a compact responsive fixture,
-including a deliberately overflowing layout. CI runs these harness regressions
+against faithful flex-basis growth, inert editor actions, nowrap metadata/contrast,
+standards-mode clipped-label overflow and compact responsive fixtures. CI runs these harness regressions
 after installing Chromium. Those fixtures are **not** generated-app acceptance;
 real-provider acceptance reports must identify the real source/version, Docker
 evidence, actual preview screenshots, measured API usage and saved-data lineage.

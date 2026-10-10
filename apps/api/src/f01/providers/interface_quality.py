@@ -1,5 +1,15 @@
 """Reusable UI guidance, not a fixed application template or execution evidence."""
 
+INTERFACE_PLANNING_INSTRUCTIONS = """INTERFACE QUALITY
+Propose product-appropriate visual and interaction acceptance criteria: coherent
+typography/color/spacing, compact navigation and controls, primary working content
+above the fold, one clear primary action, responsive layouts without overflow,
+accessible contrast/labels/keyboard dialogs, useful empty/error/no-results states,
+and compatible saved data. Choose a direction suited to the product; never clone
+a named SaaS or use one identical template for every app. These are proposed
+criteria, never evidence of browser testing or completed implementation.
+"""
+
 INTERFACE_QUALITY_INSTRUCTIONS = """INTERFACE QUALITY
 Choose a coherent visual direction suited to this product and its users. Do not clone
 a named SaaS, use one identical template for every app, or add unrelated features.
@@ -27,6 +37,10 @@ when necessary. Never let nowrap badges shrink a title to a few characters or ov
 a narrow card. Use minmax(0,1fr) grid tracks and min-width:0 on shrinking children;
 stack columns before they become unreadably narrow. Prefer quiet secondary card
 actions over a row of competing filled buttons. Provide a clear reset for no-results.
+Scope responsive width rules to visible controls or layout wrappers, not every child:
+overriding a clipped, absolutely positioned screen-reader label to width:100% can
+cause page overflow even when visible cards fit. Keep hidden labels at 1px with
+clipping; do not mask overflow with a global overflow-x:hidden workaround.
 Use labelled controls, semantic landmarks/headings, visible keyboard focus, sufficient
 WCAG AA contrast and usable target spacing. Dialogs need a name, initial focus, trapped
 Tab focus, Escape/close, background inertness and focus restoration; use in-app UI that

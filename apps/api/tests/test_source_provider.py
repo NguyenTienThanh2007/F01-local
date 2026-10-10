@@ -60,6 +60,7 @@ def test_source_adapter_strict_contract_usage_and_no_tools(project_plan: Project
         assert "explicit" in policy and "editor-open boolean" in policy
         assert "nowrap badges" in policy and "minmax(0,1fr)" in policy
         assert "actual invoking element" in policy and "4.5:1" in policy
+        assert "screen-reader label" in policy and "not every child" in policy
         assert "tools" not in body and "OpenAI" not in str(SourceProposal.model_json_schema())
         return httpx.Response(200, json={**response_body(), "usage": {"input_tokens": 100, "output_tokens": 200}})
     async def run() -> None:

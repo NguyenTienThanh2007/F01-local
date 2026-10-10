@@ -72,3 +72,16 @@ test('responsive compact layout passes measurements without claiming subjective 
     assert.equal(bounded.checks.find(c=>c.name.startsWith('Primary')).passed,false);
   } finally {await browser.close();}
 });
+
+test('a mobile universal width rule can overflow clipped labels despite fitting visible controls',async()=>{
+  const browser=await chromium.launch({headless:true});
+  try {
+    const page=await browser.newPage({viewport:{width:390,height:844}});
+    await page.setContent(`<!DOCTYPE html><style>body{margin:8px;font:16px system-ui}main{padding:16px;box-sizing:border-box;display:flex;flex-direction:column;min-height:100vh}.hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}.filters{display:grid;grid-template-columns:1fr;gap:8px;align-items:center}.filters>*{width:100%}input{height:44px;box-sizing:border-box;font:16px system-ui}</style><main><h1>Fixture</h1><div class="filters"><label class="hidden" for="s">Search</label><input id="s"></div><section id="board">Content</section></main>`);
+    const before=assessVisualMetrics(await page.evaluate(collectVisualMetrics,{primarySelector:'#board'}));
+    assert.equal(before.checks.find(c=>c.name==='No page horizontal overflow').passed,false);
+    await page.addStyleTag({content:'.filters>.hidden{width:1px}'});
+    const after=assessVisualMetrics(await page.evaluate(collectVisualMetrics,{primarySelector:'#board'}));
+    assert.equal(after.checks.find(c=>c.name==='No page horizontal overflow').passed,true);
+  } finally {await browser.close();}
+});
