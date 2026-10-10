@@ -13,6 +13,7 @@ from f01.config import Settings, get_settings
 from f01.db.models import IsolatedPreview
 from f01.db.session import Database
 from f01.execution.docker import DockerSandbox, SandboxError
+from f01.execution.preview_origin import browser_origin
 
 
 def create_gateway(settings:Settings|None=None)->FastAPI:
@@ -33,11 +34,14 @@ def create_gateway(settings:Settings|None=None)->FastAPI:
         if not configured.real_execution_enabled or len(capability)!=43:return Response(status_code=404)
         # Strict host binding; cookies/auth headers are ignored and never forwarded.
         from urllib.parse import urlsplit
-        if request.headers.get('host')!=urlsplit(configured.preview_origin).netloc:return Response(status_code=404)
         database:Database=request.app.state.database
         with database.session() as session:
             row=session.get(IsolatedPreview,preview_id)
             if row is None or row.state!='ready' or row.expires_at<=now() or not secrets.compare_digest(row.capability_hash,digest(capability)):return Response(status_code=404)
+            standalone = browser_origin(configured, row.project_id)
+            host = request.headers.get('host')
+            native = standalone is not None and host == urlsplit(standalone).netloc
+            if not native and host != urlsplit(configured.preview_origin).netloc:return Response(status_code=404)
             name=row.container_name
         async def alive()->bool:
             with database.session() as session:
@@ -52,10 +56,12 @@ def create_gateway(settings:Settings|None=None)->FastAPI:
         except SandboxError:return Response(status_code=503)
         # No upstream headers, cookies, redirects, service workers or arbitrary destinations.
         if status not in (200,404):return Response(status_code=502)
-        origin=configured.preview_origin
+        origin=standalone if native else configured.preview_origin
+        sandbox = 'allow-scripts allow-same-origin' if native else 'allow-scripts'
+        ancestors = "'none'" if native else configured.factory_origin
         headers={'Content-Type':kind,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Access-Control-Allow-Origin':'*',
             'Permissions-Policy':'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
-            'Content-Security-Policy':f"sandbox allow-scripts; default-src 'none'; script-src {origin} 'unsafe-inline'; style-src {origin} 'unsafe-inline'; img-src {origin} data:; font-src {origin}; connect-src {origin}; frame-src 'none'; worker-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors {configured.factory_origin}; object-src 'none'"}
+            'Content-Security-Policy':f"sandbox {sandbox}; default-src 'none'; script-src {origin} 'unsafe-inline'; style-src {origin} 'unsafe-inline'; img-src {origin} data:; font-src {origin}; connect-src {origin}; frame-src 'none'; worker-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors {ancestors}; object-src 'none'"}
         return Response(body,status_code=status,headers=headers)
     return app
 

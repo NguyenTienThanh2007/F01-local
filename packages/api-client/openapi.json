@@ -2565,6 +2565,17 @@
       "RealPreviewDescriptor": {
         "additionalProperties": false,
         "properties": {
+          "browser_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Browser Url"
+          },
           "expires_at": {
             "title": "Expires At",
             "type": "string"

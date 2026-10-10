@@ -180,3 +180,14 @@ test('saved build reads remain authoritative when only the event connection is i
  assert.equal(buildReadUnavailable({...read,currentRead:false}),true);
  for(const transport of ['session expired','access unavailable'])assert.equal(buildReadUnavailable({...read,transport}),true);
 });
+
+import {isolatedBrowserPath} from '../src/lib/workspace/preview-url.ts';
+test('standalone storage previews validate project, capability, expiry and local host without changing iframe origins',()=>{
+ const expiry=new Date(Date.now()+60000).toISOString(),cap='a'.repeat(43);
+ const embedded=`http://localhost:3031/p/${id}/${cap}/`,native=`http://f01-${id.replaceAll('-','')}.localhost:3031/p/${id}/${cap}/`;
+ assert.equal(isolatedBrowserPath(native,embedded,expiry,id,'127.0.0.1'),native);
+ assert.equal(isolatedPreviewPath(native,expiry,'127.0.0.1'),null,'Storage origins must never pass iframe URL validation.');
+ for(const url of [native.replace('3031','3032'),native.replace(id.replaceAll('-',''),'b'.repeat(32)),native+'?x=1',native.replace(cap,'b'.repeat(43)),native.replace('.localhost','.evil.test'),native.replace('http:','https:'),null])assert.equal(isolatedBrowserPath(url,embedded,expiry,id,'127.0.0.1'),null);
+ assert.equal(isolatedBrowserPath(native,embedded,expiry,id,'localhost'),null);
+ assert.equal(isolatedBrowserPath(native,embedded,new Date(0).toISOString(),id,'127.0.0.1'),null);
+});

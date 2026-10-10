@@ -168,6 +168,7 @@ class RealPreviewDescriptor(Contract):
     kind: Literal["isolated"]
     preview_id: UUID
     url: str
+    browser_url: str | None = None
     source_digest: str
     expires_at: UtcDateTime
 

@@ -229,6 +229,10 @@ def publish(database: Database, settings: Settings, identifier: UUID, token: UUI
         capability = job.preview_key
         expires = now()+timedelta(seconds=settings.preview_ttl_seconds)
         descriptor = {"kind":"isolated","preview_id":str(preview_id),"url":f"{settings.preview_origin}/p/{preview_id}/{capability}/", "source_digest":source.digest,"expires_at":expires.isoformat()}
+        from f01.execution.preview_origin import browser_origin
+        standalone = browser_origin(settings, project.id)
+        if standalone is not None:
+            descriptor["browser_url"] = f"{standalone}/p/{preview_id}/{capability}/"
         sequence = emit(session, project, run, "publication", candidate=candidate_id, provenance="published")
         brain: BrainContent = read_revision(session, project).content.model_copy(deep=True)
         for stage in ("model_proposed", "generated", "verified", "published"):

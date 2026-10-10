@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     sandbox_socket: str = "/var/run/docker.sock"
     preview_origin: str = "http://127.0.0.1:3031"
     factory_origin: str = "http://localhost:3000"
+    local_browser_preview_enabled: bool = False
     build_concurrency: int = Field(default=1, ge=1, le=4)
     build_timeout_seconds: int = Field(default=600, ge=60, le=1200)
     repair_attempts: int = Field(default=2, ge=0, le=3)
@@ -74,6 +75,12 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def private_identity_only(self) -> Self:
+        if self.local_browser_preview_enabled:
+            preview, factory = urlsplit(self.preview_origin), urlsplit(self.factory_origin)
+            if not (self.real_execution_enabled and self.app_env in ("development", "test")
+                    and preview.scheme == factory.scheme == "http"
+                    and preview.hostname == "localhost" and factory.hostname == "127.0.0.1"):
+                raise ValueError("Local browser previews require real execution and separate localhost/127.0.0.1 development origins.")
         if self.release_enabled:
             import json
             import re

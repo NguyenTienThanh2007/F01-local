@@ -1695,6 +1695,8 @@ export interface components {
         };
         /** RealPreviewDescriptor */
         RealPreviewDescriptor: {
+            /** Browser Url */
+            browser_url?: string | null;
             /** Expires At */
             expires_at: string;
             /**
