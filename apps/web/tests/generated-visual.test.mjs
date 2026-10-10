@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
-import {collectVisualMetrics,assessVisualMetrics} from './generated-visual-acceptance.mjs';
+import {collectVisualMetrics,assessVisualMetrics,auditGeneratedEditor} from './generated-visual-acceptance.mjs';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 
 test('browser metric regression reproduces vertical flex-basis growth and below-fold content',async()=>{
   const browser=await chromium.launch({headless:true});
@@ -17,6 +20,20 @@ test('browser metric regression reproduces vertical flex-basis growth and below-
     assert.equal(result.checks.find(c=>c.name.startsWith('Single-line')).passed,false);
     assert.equal(result.checks.find(c=>c.name.startsWith('Primary')).passed,false);
   } finally {await browser.close();}
+});
+
+test('an inert primary action fails editor acceptance instead of certifying its good-looking board',async()=>{
+  const directory=await fs.mkdtemp(path.join(os.tmpdir(),'f01-editor-visual-'));
+  const browser=await chromium.launch({headless:true});
+  try {
+    const page=await browser.newPage();
+    await page.setContent('<main><h1>Fixture</h1><button>New Task</button></main>');
+    const result=await auditGeneratedEditor(page,{directory,actionName:'New Task',timeout:200});
+    assert.equal(result.opened,false);
+    assert.equal(result.deterministicPassed,false);
+    assert.equal(result.accessibilityPassed,null);
+    assert.ok((await fs.stat(path.join(directory,'action-failed.png'))).size>0);
+  } finally {await browser.close();await fs.rm(directory,{recursive:true,force:true});}
 });
 
 test('responsive compact layout passes measurements without claiming subjective quality',async()=>{

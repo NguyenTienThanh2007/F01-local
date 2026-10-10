@@ -22,6 +22,7 @@ After a real build has published an isolated local **browser** preview, run:
 # Set the exact private preview URL in your environment; keep capabilities out of Git.
 # Optional selector identifies the actual primary working content for this product.
 F01_PRIMARY_CONTENT_SELECTOR='[aria-label="Task board"]' \
+F01_EDITOR_ACTION='New Task' \
 F01_VISUAL_OUTPUT=.runtime/generated-visual \
 pnpm --filter @f01/web audit:generated-visual
 ```
@@ -42,9 +43,13 @@ human-review observations. Smaller touch targets, tall textareas and landmark
 structure are surfaced for review. Screenshots require human assessment of density,
 alignment, hierarchy, aesthetics and product suitability. Passing measurements does
 not certify a premium interface, exhaustive accessibility or functional behavior.
-Run the existing product-specific functional tests, including modal interactions,
+An optional `F01_EDITOR_ACTION` opens the named primary button, requires a visible
+semantic dialog within five seconds and audits desktop/mobile editor geometry and
+contrast. An inert action is recorded as failure with a real screenshot. It changes
+no form fields or task records. Run the existing product-specific functional tests, including modal interactions,
 empty/error states and persistence, separately. Inspect those states with the same
-audit helper as needed; the CLI alone examines the currently visible initial state.
+audit helper as needed; the CLI examines initial state and the configured editor,
+not every application interaction/state.
 
 `pnpm --filter @f01/web test:generated-visual:e2e` verifies the measurement harness
 against a minimal faithful flex-basis failure and a compact responsive fixture,

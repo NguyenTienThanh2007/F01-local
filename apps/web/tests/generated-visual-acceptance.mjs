@@ -82,6 +82,27 @@ export async function auditGeneratedPage(page,{directory,primarySelector,viewpor
   return report;
 }
 
+export async function auditGeneratedEditor(page,{directory,actionName,timeout=5000}={}) {
+  if(!directory || !actionName || timeout<100 || timeout>5000) throw Error('A bounded editor action is required.');
+  await page.setViewportSize({width:1440,height:900});
+  await fs.mkdir(directory,{recursive:true});
+  let opened=false;
+  try {
+    await page.getByRole('button',{name:actionName,exact:true}).click({timeout});
+    await page.getByRole('dialog').waitFor({state:'visible',timeout});
+    opened=true;
+  } catch { /* Missing action/dialog is a recorded failed check, not success. */ }
+  if(!opened) {
+    await page.screenshot({path:path.join(directory,'action-failed.png'),fullPage:false});
+    const result={opened:false,deterministicPassed:false,accessibilityPassed:null,checks:[{name:'Primary editor action opens a visible semantic dialog',passed:false}]};
+    await fs.writeFile(path.join(directory,'visual.json'),JSON.stringify(result,null,2));
+    return result;
+  }
+  const result=await auditGeneratedPage(page,{directory,viewports:VIEWPORTS.filter(v=>['desktop','mobile'].includes(v.name))});
+  await page.keyboard.press('Escape');
+  return {...result,opened:true};
+}
+
 // Exact URL comes from a private environment variable; never print its capability.
 if(process.argv[1] && fileURLToPath(import.meta.url)===path.resolve(process.argv[1])) {
   let browser;
@@ -96,8 +117,9 @@ if(process.argv[1] && fileURLToPath(import.meta.url)===path.resolve(process.argv
     const page=await browser.newPage();
     await page.goto(url,{waitUntil:'networkidle',timeout:20000});
     const report=await auditGeneratedPage(page,{directory,primarySelector:process.env.F01_PRIMARY_CONTENT_SELECTOR});
-    console.log(JSON.stringify({states:report.states.length,deterministicPassed:report.deterministicPassed,accessibilityPassed:report.accessibilityPassed,subjectiveReview:'required'}));
-    if(!report.deterministicPassed || !report.accessibilityPassed) process.exitCode=1;
+    const editor=process.env.F01_EDITOR_ACTION ? await auditGeneratedEditor(page,{directory:path.join(directory,'editor'),actionName:process.env.F01_EDITOR_ACTION}) : null;
+    console.log(JSON.stringify({states:report.states.length,deterministicPassed:report.deterministicPassed,accessibilityPassed:report.accessibilityPassed,editor:editor ? {opened:editor.opened,deterministicPassed:editor.deterministicPassed,accessibilityPassed:editor.accessibilityPassed} : 'not tested',subjectiveReview:'required'}));
+    if(!report.deterministicPassed || !report.accessibilityPassed || (editor && (!editor.deterministicPassed || !editor.accessibilityPassed))) process.exitCode=1;
   } catch {
     // Playwright navigation diagnostics can include private capability URLs.
     console.error('Visual audit could not complete. Check the private local preview URL, primary selector, readiness and installed Chromium.');

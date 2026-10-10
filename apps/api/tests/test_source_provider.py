@@ -54,6 +54,10 @@ def test_source_adapter_strict_contract_usage_and_no_tools(project_plan: Project
         assert "RefObject<HTMLElement | null>" in policy
         assert "check current before use" in policy
         assert "Date.parse('YYYY-MM-DD') interprets UTC" in policy
+        assert "When repair_evidence is nonempty" in policy
+        assert "complete approved feature or visual-change scope" in policy
+        assert "setting a ref to true" in policy
+        assert "explicit" in policy and "editor-open boolean" in policy
         assert "tools" not in body and "OpenAI" not in str(SourceProposal.model_json_schema())
         return httpx.Response(200, json={**response_body(), "usage": {"input_tokens": 100, "output_tokens": 200}})
     async def run() -> None:
