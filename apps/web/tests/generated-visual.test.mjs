@@ -1,0 +1,41 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright';
+import {collectVisualMetrics,assessVisualMetrics} from './generated-visual-acceptance.mjs';
+
+test('browser metric regression reproduces vertical flex-basis growth and below-fold content',async()=>{
+  const browser=await chromium.launch({headless:true});
+  try {
+    const page=await browser.newPage({viewport:{width:1440,height:900}});
+    // Minimal faithful regression fixture, never a generated-app acceptance substitute.
+    await page.setContent(`<style>body{font:16px system-ui}.group{display:flex;flex-direction:column}.input{flex:1 1 150px;padding:8px 12px}.form{display:flex;flex-direction:column;gap:16px}</style><main><h1>Fixture</h1><div class="form">${Array.from({length:4},(_,i)=>`<div class="group"><label for="f${i}">Field</label><input id="f${i}" class="input"></div>`).join('')}</div><section id="board">Working board</section></main>`);
+    const metrics=await page.evaluate(collectVisualMetrics,{primarySelector:'#board'});
+    assert.ok(metrics.controls.every(c=>c.height>=150));
+    assert.equal(metrics.controls[0].parentAxis,'column');
+    const result=assessVisualMetrics(metrics,{requirePrimary:true});
+    assert.equal(result.deterministicPassed,false);
+    assert.equal(result.checks.find(c=>c.name.startsWith('Single-line')).passed,false);
+    assert.equal(result.checks.find(c=>c.name.startsWith('Primary')).passed,false);
+  } finally {await browser.close();}
+});
+
+test('responsive compact layout passes measurements without claiming subjective quality',async()=>{
+  const browser=await chromium.launch({headless:true});
+  try {
+    const page=await browser.newPage();
+    await page.setContent(`<style>*{box-sizing:border-box}body{margin:0;font:16px system-ui}main{padding:16px}input{width:100%;height:40px;font:16px system-ui}.filters{display:grid;gap:8px;grid-template-columns:minmax(0,1fr)}#board{margin-top:16px}</style><main><h1>Different fixture</h1><div class="filters"><label for="search">Search</label><input id="search"></div><section id="board">Primary content</section></main>`);
+    for(const width of [1440,768,390,320]) {
+      await page.setViewportSize({width,height:844});
+      const result=assessVisualMetrics(await page.evaluate(collectVisualMetrics,{primarySelector:'#board'}),{requirePrimary:true});
+      assert.equal(result.deterministicPassed,true);
+    assert.ok(result.subjectiveReviewRequired.some(s=>s.includes('do not certify premium')));
+    }
+    await page.addStyleTag({content:'main{min-width:1500px}'});
+    const result=assessVisualMetrics(await page.evaluate(collectVisualMetrics,{primarySelector:'#board'}));
+    assert.equal(result.checks.find(c=>c.name==='No page horizontal overflow').passed,false);
+    await page.setContent(`<main>${Array.from({length:81},()=>'<input aria-label="Fixture">').join('')}</main>`);
+    const bounded=assessVisualMetrics(await page.evaluate(collectVisualMetrics,{primarySelector:'#missing'}),{requirePrimary:true});
+    assert.equal(bounded.checks.find(c=>c.name==='Bounded control coverage is complete').passed,false);
+    assert.equal(bounded.checks.find(c=>c.name.startsWith('Primary')).passed,false);
+  } finally {await browser.close();}
+});

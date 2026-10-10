@@ -63,6 +63,7 @@ jobs:
       - name: Editorial Pro themes, recovery and accessibility
         run: |
           export M5_AXE_SCRIPT="$PWD/apps/web/node_modules/axe-core/axe.min.js"
+          pnpm --filter @f01/web test:generated-visual:e2e
           pnpm --filter @f01/web test:theme:e2e
           pnpm --filter @f01/web test:conversation:e2e
           F01_EDITORIAL_AUDIT=1 pnpm --filter @f01/web test:build-experience:e2e
