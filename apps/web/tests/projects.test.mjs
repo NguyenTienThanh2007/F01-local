@@ -1,11 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { handleProjectsRequest } from '../src/lib/projects/server.ts';
-import { createInput, projectETag } from '../src/lib/projects/contracts.ts';
+import { createInput, projectETag, errorMessage } from '../src/lib/projects/contracts.ts';
 import { readAttempt, ATTEMPT_STORAGE, outcomeIsUnknown, creationTarget } from '../src/lib/projects/creation.ts';
 const token = 'synthetic-m3-private-token-1234567890123456789';
 const env = { APP_ENV: 'test', DEV_API_TOKEN: token, API_INTERNAL_URL: 'http://127.0.0.1:8000', NEXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000' };
 const id = 'ab56889d-a04c-41bb-831e-429948d34cb8', key = '30fe5cca-25e1-4f68-b80a-6b281d7b5c22';
+test('account-wide provider contention explains generation in another project and safe recovery',()=>{
+ const message=errorMessage('PLANNING_IN_PROGRESS');
+ assert.match(message,/code-generation request for your account/);
+ assert.match(message,/Wait for it to finish, then try again/);
+ assert.match(message,/Your brief is saved/);
+ assert.doesNotMatch(message,/Resolve its saved status/);
+});
 function request(method, body, headers = {}, query = '') { return new Request(`http://127.0.0.1:3000/api/v1/projects${query}`, { method, headers: { Origin: 'http://127.0.0.1:3000', 'Content-Type': 'application/json', ...headers }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) }); }
 test('generated client gateway forwards trimmed creation, stable key and private identity only', async () => {
   const response = await handleProjectsRequest(request('POST', { title: ' Test ', brief: ' A CRM for estate agents and leads. ' }, { 'Idempotency-Key': key, Authorization: 'Bearer foreign', 'X-User-ID': 'foreign' }), 'projects', undefined, env, async (req, init) => {

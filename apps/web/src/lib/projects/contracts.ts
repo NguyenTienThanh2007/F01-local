@@ -33,7 +33,7 @@ export const errors: Record<string, string> = {
   PLANNING_STALE_CONTEXT: 'Project context changed. Your request is preserved. Review the current context before making a new plan.',
   PLANNING_RATE_LIMITED: 'Your planning request allowance is temporarily exhausted. Try later.',
   PLANNING_BUDGET_EXCEEDED: 'Your planning token budget is exhausted for this UTC day.',
-  PLANNING_IN_PROGRESS: 'A planning attempt is pending. Resolve its saved status before trying again.',
+  PLANNING_IN_PROGRESS: 'Another planning or code-generation request for your account is in progress. Wait for it to finish, then try again. Your brief is saved.',
   PLANNING_CONTEXT_TOO_LARGE: 'This planning context exceeds the configured input allowance.',
   PLANNING_ABANDONED: 'The attempt passed its deadline without confirmation. Review context and start a new attempt.',
   PLANNING_CANCELED: 'The planning attempt was canceled. No proposal was published.',
