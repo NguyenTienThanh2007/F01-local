@@ -99,6 +99,35 @@ def test_atomic_publication_and_bounded_repair(database:Database,configured:Sett
     assert detail.progress_sequence == workspace(database, owner, pid).last_sequence
     with database.session() as session:assert session.scalar(select(IsolatedPreview.id))
 
+def test_generic_build_failure_gets_source_only_repair_hint_without_rewriting_evidence(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+    """Controlled orchestration regression; real missing-CSS Docker failure is recorded separately."""
+    owner,pid,body=setup_build(database,configured,project_plan)
+    run=service.queue(database,configured,owner,pid,body,'missing-css')
+    contexts:list[GenerationContext]=[]
+    class MissingCSSProvider(SourceProvider):
+        async def propose_source(self,context:GenerationContext,maximum_output_tokens:int)->GenerationResult:
+            contexts.append(context)
+            edits:tuple[PutFile,...]
+            if context.base_source is None:
+                edits=(PutFile(operation='put',path='app/layout.tsx',prior_sha256=None,content="import React from 'react';\nimport './globals.css';\nexport default function Layout(){return null}"),
+                    PutFile(operation='put',path='app/page.tsx',prior_sha256=None,content='export default function Page(){return null}'))
+            else:
+                assert json.loads(context.repair_evidence[0])['diagnostics'][0]['code']=='BUILD_FAILED'
+                assert json.loads(context.repair_evidence[1])['missing_path']=='app/globals.css'
+                edits=(PutFile(operation='put',path='app/globals.css',prior_sha256=None,content='body{margin:0}'),)
+            return GenerationResult(proposal=SourceProposal(schema_version=1,recipe='next-web-v1',base_digest=context.base_source.digest if context.base_source else None,edits=edits),input_tokens=20,output_tokens=30)
+    class MissingCSSSandbox(ControlledSandbox):
+        async def command(self,name:str,phase:CommandPhase,tests:tuple[str,...],alive:Any)->CommandEvidence:
+            if phase==CommandPhase.BUILD and not any(f.path=='app/globals.css' for f in self.sources[name].files):
+                return CommandEvidence(phase='build',argv=['controlled'],exit_code=1,duration_ms=1,diagnostics=[Diagnostic(code='BUILD_FAILED')],image_id=IMAGE)
+            return self.result(phase.value)
+    assert asyncio.run(BuildWorker(database,configured,MissingCSSSandbox(),MissingCSSProvider()).run_once())
+    detail=service.detail(database,owner,pid,run.id)
+    assert detail.run.status=='succeeded' and detail.repair_attempts==1 and len(contexts)==2
+    failed=[e for e in detail.evidence if e.phase=='build' and e.exit_code==1]
+    assert len(failed)==1 and failed[0].diagnostics==[Diagnostic(code='BUILD_FAILED')]
+    assert contexts[1].base_source and contexts[1].base_source.digest==detail.candidates[0].digest
+
 @pytest.mark.parametrize('repair',[False,True])
 def test_rejected_generation_has_actionable_code_and_never_publishes(database:Database,configured:Settings,project_plan:ProjectPlan,repair:bool)->None:
     owner,pid,body=setup_build(database,configured,project_plan)

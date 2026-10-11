@@ -42,6 +42,8 @@ def test_source_adapter_strict_contract_usage_and_no_tools(project_plan: Project
         # dispatch must receive the scaffold/browser constraints (not user data).
         policy = body["instructions"]
         assert "no Tailwind compiler" in policy and "actual plain CSS" in policy
+        assert "Never import globals.css without providing that file" in policy
+        assert "static_source_hint" in policy
         assert "never depend on onSubmit or confirm" in policy
         assert "never write" in policy and "before loading it" in policy
         assert "Preserve existing storage" in policy

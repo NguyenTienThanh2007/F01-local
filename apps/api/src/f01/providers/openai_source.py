@@ -32,6 +32,10 @@ DOM refs must accept RefObject<HTMLElement | null> (or the matching element type
 check current before use, and never force a nonnullable RefObject to hide the mismatch.
 The scaffold has no Tailwind compiler or UI/icon packages. Use actual plain CSS,
 CSS modules or inline styles; utility class names alone do not provide styling.
+Every local stylesheet import must resolve to an existing base-source file or a
+file included in this patch. Never import globals.css without providing that file.
+On a failed build, static_source_hint entries may identify missing local stylesheets;
+check them against the exact source and repair the import or provide the missing file.
 The embedded preview is sandboxed: forms cannot submit and native confirm/alert
 dialogs are blocked. Use type='button' with onClick for local form actions and
 in-application confirmation UI for deletion, never depend on onSubmit or confirm.
