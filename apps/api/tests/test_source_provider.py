@@ -44,6 +44,12 @@ def test_source_adapter_strict_contract_usage_and_no_tools(project_plan: Project
         assert "no Tailwind compiler" in policy and "actual plain CSS" in policy
         assert "Never import globals.css without providing that file" in policy
         assert "static_source_hint" in policy
+        assert "local class or ID in each selector" in policy
+        assert "still prerender on the server" in policy and "no Math.random()" in policy
+        assert "consistent UTC calendar arithmetic" in policy
+        assert "explicit locale and time zone" in policy
+        assert "never widen the whole" in policy
+        assert "width:100% shell plus padding/borders" in policy
         assert "never depend on onSubmit or confirm" in policy
         assert "never write" in policy and "before loading it" in policy
         assert "Preserve existing storage" in policy

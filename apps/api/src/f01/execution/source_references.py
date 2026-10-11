@@ -13,6 +13,7 @@ _CSS_IMPORT = re.compile(
     r"(?m)^[ \t]*import[ \t]+(?:[A-Za-z_$][\w$]*[ \t]+from[ \t]+)?"
     r"(?P<quote>['\"])(?P<reference>\.{1,2}/[A-Za-z0-9_./\[\]()-]+\.css)(?P=quote)[ \t]*;?"
 )
+_GLOBAL_SELECTOR = re.compile(r"(?m)^[ \t]*(?P<selector>:root|html|body)[ \t]*(?:\{|,)")
 
 
 def missing_stylesheet_hints(source: SourceArtifact) -> tuple[str, ...]:
@@ -37,4 +38,21 @@ def missing_stylesheet_hints(source: SourceArtifact) -> tuple[str, ...]:
             # Original command evidence occupies one of the eight context slots.
             if len(hints) == 7:
                 return tuple(hints)
+    return tuple(hints)
+
+
+def build_source_hints(source: SourceArtifact) -> tuple[str, ...]:
+    """Nonblocking literal-source hints for an observed failed production build."""
+    hints = list(missing_stylesheet_hints(source))
+    for file in source.files:
+        if len(hints) == 7:
+            break
+        if not file.path.endswith(".module.css"):
+            continue
+        for match in _GLOBAL_SELECTOR.finditer(file.content):
+            if len(hints) == 7:
+                break
+            hints.append(json.dumps({"kind": "static_source_hint", "code": "SOURCE_CSS_MODULE_GLOBAL_RULE",
+                "path": file.path, "line": file.content.count("\n", 0, match.start()) + 1,
+                "selector": match["selector"]}, separators=(",", ":")))
     return tuple(hints)

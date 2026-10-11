@@ -41,6 +41,12 @@ Scope responsive width rules to visible controls or layout wrappers, not every c
 overriding a clipped, absolutely positioned screen-reader label to width:100% can
 cause page overflow even when visible cards fit. Keep hidden labels at 1px with
 clipping; do not mask overflow with a global overflow-x:hidden workaround.
+Give responsive chart/grid children min-width:0 and bounded SVG viewBoxes. Dense
+tables may scroll inside a labelled width-limited container; never widen the whole
+page. Keep useful KPIs/charts/catalog/feed central, with compact filters above them.
+Use border-box sizing for shells/panels as well as controls, preferably a universal
+box-sizing reset including pseudo-elements. A width:100% shell plus padding/borders
+must fit its parent, not silently add width outside the viewport.
 Use labelled controls, semantic landmarks/headings, visible keyboard focus, sufficient
 WCAG AA contrast and usable target spacing. Dialogs need a name, initial focus, trapped
 Tab focus, Escape/close, background inertness and focus restoration; use in-app UI that

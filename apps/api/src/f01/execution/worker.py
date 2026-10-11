@@ -17,7 +17,7 @@ from f01.domain.execution import CommandEvidence
 from f01.domain.source import GenerationContext, GenerationResult, SourceArtifact
 from f01.execution.docker import DockerSandbox, SandboxError
 from f01.execution.sandbox import CommandPhase
-from f01.execution.source_references import missing_stylesheet_hints
+from f01.execution.source_references import build_source_hints
 from f01.providers.base import ProviderError
 from f01.providers.source import SourceGenerationProvider
 
@@ -138,7 +138,7 @@ class BuildWorker:
             # Evidence has codes, validated paths and line numbers, never unrestricted logs.
             # Supplemental hints derive only from this exact candidate's source.
             # Keep the original command first, and never rewrite persisted evidence.
-            hints = missing_stylesheet_hints(source) if issue.phase == "build" else ()
+            hints = build_source_hints(source) if issue.phase == "build" else ()
             value=context.model_copy(update={"base_source":source,"repair_evidence":(issue.model_dump_json(exclude={"argv"}), *hints)})
             return GenerationContext.model_validate_json(value.model_dump_json())
 

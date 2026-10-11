@@ -36,6 +36,18 @@ Every local stylesheet import must resolve to an existing base-source file or a
 file included in this patch. Never import globals.css without providing that file.
 On a failed build, static_source_hint entries may identify missing local stylesheets;
 check them against the exact source and repair the import or provide the missing file.
+CSS Modules require a local class or ID in each selector. Put global :root/html/body
+rules in ordinary globals.css imported by the layout, or scope tokens under a local
+root class; never put unscoped global rules in *.module.css. Static source hints may
+also identify these rules after a real failed build; inspect the exact source.
+'Use client' components still prerender on the server. Initial HTML and explicit demo
+datasets must be deterministic across server/browser and refresh: no Math.random(),
+Date.now() or locale-dependent visible values during initial render. Use fixed/seeded
+demo data when requested, or load browser-only state after a consistent hydration gate.
+Use an explicit locale and time zone for initial formatted numbers/dates; never rely
+on differing server/browser host defaults for prerendered visible text.
+Construct fixed date-only samples with consistent UTC calendar arithmetic or preserve
+YYYY-MM-DD strings. Parsing local midnight then formatting UTC shifts the date by zone.
 The embedded preview is sandboxed: forms cannot submit and native confirm/alert
 dialogs are blocked. Use type='button' with onClick for local form actions and
 in-application confirmation UI for deletion, never depend on onSubmit or confirm.

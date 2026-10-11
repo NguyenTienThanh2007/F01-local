@@ -2,7 +2,7 @@ import json
 
 from f01.application.source_artifacts import apply_proposal
 from f01.domain.source import PutFile, SourceArtifact, SourceProposal
-from f01.execution.source_references import missing_stylesheet_hints
+from f01.execution.source_references import build_source_hints, missing_stylesheet_hints
 from tests.source_fixture import lineage
 
 
@@ -37,3 +37,21 @@ def test_hints_are_deduplicated_and_bounded_to_remaining_repair_context_slots() 
     hints = missing_stylesheet_hints(source)
     assert len(hints) == 7 and all(len(hint.encode()) < 2000 for hint in hints)
     assert len({json.loads(hint)["missing_path"] for hint in hints}) == 7
+
+
+def test_global_css_module_hints_reproduce_real_storefront_build_failure() -> None:
+    source = artifact("export default function Layout(){return null}",
+        (PutFile(operation="put", path="app/page.module.css", prior_sha256=None,
+            content="/* Design tokens */\n:root {--accent:red}\nbody {margin:0}\n.card h1 {color:red}"),))
+    hints = tuple(map(json.loads, build_source_hints(source)))
+    assert hints == ({"kind":"static_source_hint","code":"SOURCE_CSS_MODULE_GLOBAL_RULE",
+        "path":"app/page.module.css","line":2,"selector":":root"},
+        {"kind":"static_source_hint","code":"SOURCE_CSS_MODULE_GLOBAL_RULE",
+        "path":"app/page.module.css","line":3,"selector":"body"})
+
+
+def test_plain_global_stylesheets_and_scoped_module_rules_are_not_flagged() -> None:
+    source = artifact("import './globals.css';",(
+        PutFile(operation="put", path="app/globals.css", prior_sha256=None, content=":root{--accent:red}body{margin:0}"),
+        PutFile(operation="put", path="app/page.module.css", prior_sha256=None, content=".page{--accent:red}\n.page h1{color:red}")))
+    assert build_source_hints(source) == ()
