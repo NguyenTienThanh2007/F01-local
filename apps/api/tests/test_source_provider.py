@@ -44,6 +44,8 @@ def test_source_adapter_strict_contract_usage_and_no_tools(project_plan: Project
         assert "no Tailwind compiler" in policy and "actual plain CSS" in policy
         assert "Never import globals.css without providing that file" in policy
         assert "static_source_hint" in policy
+        assert "Null belongs inside the RefObject generic" in policy
+        assert "globalThis.KeyboardEvent" in policy and "SOURCE_NATIVE_KEYBOARD_EVENT" in policy
         assert "local class or ID in each selector" in policy
         assert "still prerender on the server" in policy and "no Math.random()" in policy
         assert "consistent UTC calendar arithmetic" in policy

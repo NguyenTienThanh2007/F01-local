@@ -2,7 +2,7 @@ import json
 
 from f01.application.source_artifacts import apply_proposal
 from f01.domain.source import PutFile, SourceArtifact, SourceProposal
-from f01.execution.source_references import build_source_hints, missing_stylesheet_hints
+from f01.execution.source_references import build_source_hints, missing_stylesheet_hints, typecheck_source_hints
 from tests.source_fixture import lineage
 
 
@@ -55,3 +55,28 @@ def test_plain_global_stylesheets_and_scoped_module_rules_are_not_flagged() -> N
         PutFile(operation="put", path="app/globals.css", prior_sha256=None, content=":root{--accent:red}body{margin:0}"),
         PutFile(operation="put", path="app/page.module.css", prior_sha256=None, content=".page{--accent:red}\n.page h1{color:red}")))
     assert build_source_hints(source) == ()
+
+
+def test_nullable_ref_and_native_event_hints_reproduce_social_compiler_failures() -> None:
+    source = artifact("import React, { KeyboardEvent, useRef } from 'react';\n"
+        "type Props = { ref?: React.RefObject<HTMLInputElement> | null };\n"
+        "function trap(ref: React.RefObject<HTMLDivElement>){}\n"
+        "document.addEventListener('keydown', (event: KeyboardEvent)=>{});")
+    hints = tuple(map(json.loads, typecheck_source_hints(source, frozenset({"TS2345","TS2322","TS2769"}))))
+    assert [(h['code'],h['line']) for h in hints] == [("SOURCE_NULLABLE_DOM_REF",2),
+        ("SOURCE_NULLABLE_DOM_REF",3),("SOURCE_NATIVE_KEYBOARD_EVENT",1)]
+    assert typecheck_source_hints(source, frozenset({"TS2588"})) == ()
+
+
+def test_correct_nullable_refs_aliases_and_non_dom_types_are_not_flagged() -> None:
+    source = artifact("import { KeyboardEvent as ReactKeyboardEvent } from 'react';\n"
+        "type Props = { ref: React.RefObject<HTMLInputElement | null> };\n"
+        "type Data = React.RefObject<string>;\n"
+        "document.addEventListener('keydown', (event: globalThis.KeyboardEvent)=>{});")
+    assert typecheck_source_hints(source,frozenset({"TS2322","TS2769"})) == ()
+
+
+def test_typecheck_hints_stay_within_remaining_repair_slots() -> None:
+    source = artifact("\n".join(f'type Ref{i} = React.RefObject<HTMLDivElement>;' for i in range(30)))
+    hints = typecheck_source_hints(source,frozenset({"TS2345"}))
+    assert len(hints) == 7 and all(len(h.encode()) < 2000 for h in hints)

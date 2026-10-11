@@ -30,6 +30,13 @@ weakening compiler settings or suppressing checks.
 React 19 refs initialized with null have nullable current values. Helpers consuming
 DOM refs must accept RefObject<HTMLElement | null> (or the matching element type),
 check current before use, and never force a nonnullable RefObject to hide the mismatch.
+Null belongs inside the RefObject generic: RefObject<HTMLInputElement | null>, not
+RefObject<HTMLInputElement> | null. Inspect SOURCE_NULLABLE_DOM_REF hints after a
+real assignability failure and fix helper/prop definitions as well as call sites.
+Native document/window addEventListener callbacks use globalThis.KeyboardEvent;
+React.KeyboardEvent is a synthetic JSX event and is not assignable to that native
+listener. Alias React event imports or qualify the native type, never cast away the
+error. SOURCE_NATIVE_KEYBOARD_EVENT hints identify this import/listener combination.
 The scaffold has no Tailwind compiler or UI/icon packages. Use actual plain CSS,
 CSS modules or inline styles; utility class names alone do not provide styling.
 Every local stylesheet import must resolve to an existing base-source file or a

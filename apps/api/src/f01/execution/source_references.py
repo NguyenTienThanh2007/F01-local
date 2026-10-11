@@ -14,6 +14,8 @@ _CSS_IMPORT = re.compile(
     r"(?P<quote>['\"])(?P<reference>\.{1,2}/[A-Za-z0-9_./\[\]()-]+\.css)(?P=quote)[ \t]*;?"
 )
 _GLOBAL_SELECTOR = re.compile(r"(?m)^[ \t]*(?P<selector>:root|html|body)[ \t]*(?:\{|,)")
+_NONNULL_DOM_REF = re.compile(r"\b(?:React\.)?RefObject\s*<\s*(?P<element>HTML[A-Za-z]*Element)\s*>")
+_REACT_KEYBOARD_IMPORT = re.compile(r"import\s+(?:[^;]*?\{)[^}]*\bKeyboardEvent\s*(?:,|\})[^;]*?from\s*['\"]react['\"]")
 
 
 def missing_stylesheet_hints(source: SourceArtifact) -> tuple[str, ...]:
@@ -55,4 +57,27 @@ def build_source_hints(source: SourceArtifact) -> tuple[str, ...]:
             hints.append(json.dumps({"kind": "static_source_hint", "code": "SOURCE_CSS_MODULE_GLOBAL_RULE",
                 "path": file.path, "line": file.content.count("\n", 0, match.start()) + 1,
                 "selector": match["selector"]}, separators=(",", ":")))
+    return tuple(hints)
+
+
+def typecheck_source_hints(source: SourceArtifact, codes: frozenset[str]) -> tuple[str, ...]:
+    """Literal clues for observed assignability errors; never compiler-log contents."""
+    hints: list[str] = []
+    for file in source.files:
+        if not file.path.endswith((".ts", ".tsx")):
+            continue
+        if codes & {"TS2322", "TS2345"}:
+            for match in _NONNULL_DOM_REF.finditer(file.content):
+                hints.append(json.dumps({"kind":"static_source_hint", "code":"SOURCE_NULLABLE_DOM_REF",
+                    "path":file.path, "line":file.content.count("\n",0,match.start())+1,
+                    "element":match["element"]}, separators=(",", ":")))
+                if len(hints) == 7:
+                    return tuple(hints)
+        if "TS2769" in codes and "addEventListener" in file.content:
+            keyboard_match = _REACT_KEYBOARD_IMPORT.search(file.content)
+            if keyboard_match:
+                hints.append(json.dumps({"kind":"static_source_hint", "code":"SOURCE_NATIVE_KEYBOARD_EVENT",
+                    "path":file.path, "line":file.content.count("\n",0,keyboard_match.start())+1}, separators=(",", ":")))
+                if len(hints) == 7:
+                    return tuple(hints)
     return tuple(hints)
