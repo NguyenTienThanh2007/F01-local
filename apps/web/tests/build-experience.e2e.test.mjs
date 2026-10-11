@@ -16,7 +16,7 @@ test('observed build screen and persistent project journey',{timeout:180000},asy
  const base=`http://127.0.0.1:${port}`,path=`/projects/${f.ids.project}`,directory=root+'/test-results/build-journey';
  const env={...process.env,APP_ENV:'test',AUTH_MODE:'development',EXECUTION_MODE:'real',DEV_API_TOKEN:'synthetic-rendering-token-12345678901234567890',API_INTERNAL_URL:'http://127.0.0.1:9',NEXT_PUBLIC_APP_URL:base};delete env.OPENAI_API_KEY;delete env.F01_VERCEL_TOKEN;
  const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],{cwd:root,env,stdio:'ignore'});
- let browser;const commands=[],errors=[],captures=[];let d=null,v=null,live=null,revision=1,clock=Date.now(),heartbeat=true,readUnavailable=false,executionMode='real';
+ let browser;const commands=[],errors=[],captures=[];let proposal=f.proposal({reviewed:true}),d=null,v=null,live=null,revision=1,clock=Date.now(),heartbeat=true,readUnavailable=false,executionMode='real';
   const shift=value=>typeof value==='string'&&Number.isFinite(Date.parse(value))&&Date.parse(value)>=f.now-200000&&Date.parse(value)<=f.now+4000000?new Date(Date.parse(value)+clock-f.now).toISOString():Array.isArray(value)?value.map(shift):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).map(([key,item])=>[key,shift(item)])):value;
   const savedStep=()=>{d.progress_updated_at=new Date().toISOString();revision++;};
  function state(){const s=shift(f.snapshot({latest_run:d?.run??null,active_run:d&&['queued','running'].includes(d.run.status)?d.run:null,current_version:v,recent_events:[],last_sequence:revision}));s.project.current_version_id=s.current_version?.id??null;s.project.lifecycle=s.active_run?s.active_run.status==='queued'?'understanding':'building':s.current_version?'live':s.latest_run?.status==='failed'?'error':'idle';if(d?.run.status==='running'&&heartbeat)s.active_run.last_heartbeat_at=new Date(Date.now()).toISOString();return s;}
@@ -26,12 +26,12 @@ test('observed build screen and persistent project journey',{timeout:180000},asy
    const url=new URL(route.request().url()),resource=url.pathname.replace('/api/v1','');let body;
    if(resource==='/session')body={principal:{id:f.ids.brain,display_name:'Contract test owner',identity_mode:'development'},capabilities:{execution_mode:executionMode,real_generation:executionMode==='real',source_artifacts:executionMode==='real',external_deployment:executionMode==='real',simulation_runner:executionMode==='simulated'}};
    else if(resource.endsWith('/workspace'))body=state();
-   else if(resource.endsWith('/builds')&&route.request().method()==='POST'){commands.push({key:route.request().headers()['idempotency-key'],body:route.request().postData()});d=f.detail({run:f.run(),phase:'context_resolution'});revision++;body=shift(d.run);}
+   else if(resource.endsWith('/builds')&&route.request().method()==='POST'){commands.push({path:resource,key:route.request().headers()['idempotency-key'],body:route.request().postData()});d=f.detail({run:f.run({request_id:proposal.request_id}),phase:'context_resolution'});revision++;body=shift(d.run);}
    else if(resource.endsWith('/builds')){body=shift({items:d?.run.mode==='real'?[d]:[]});if(body.items.length&&d?.run.status==='running'&&heartbeat)body.items[0].run.last_heartbeat_at=new Date(Date.now()).toISOString();}
    else if(resource.endsWith('/retry')){commands.push({key:route.request().headers()['idempotency-key'],body:route.request().postData()});d=f.detail({run:f.run({id:crypto.randomUUID(),retry_of_run_id:d.run.id,attempt:2,created_at:new Date().toISOString()}),phase:'context_resolution'});savedStep();body=d.run;}
    else if(resource.endsWith('/cancel')){commands.push({key:route.request().headers()['idempotency-key'],body:route.request().postData()});d.cancel_requested=true;savedStep();body=shift(d.run);}
    else if(/\/builds\/[0-9a-f-]{36}$/.test(resource)){if(readUnavailable)return route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:{code:'SERVICE_UNAVAILABLE',message:'Synthetic interrupted read'}})});body=shift(d);if(d?.run.status==='running'&&heartbeat)body.run.last_heartbeat_at=new Date(Date.now()).toISOString();}
-   else if(resource.endsWith('/planning/proposals'))body={items:!v?[f.proposal({reviewed:true})]:[]};
+   else if(resource.endsWith('/planning/proposals'))body={items:!v?[proposal]:[]};
    else if(resource.endsWith('/releases'))body=shift(f.releases({current_release_id:live?.id??null,releases:live?[live]:[]}));
    else if(resource.endsWith('/events/stream'))return route.abort('failed');
    else if(resource.endsWith('/events'))body={items:[],next_cursor:null};
@@ -51,6 +51,18 @@ test('observed build screen and persistent project journey',{timeout:180000},asy
   d.run.error_code='SOURCE_PROPOSAL_REJECTED';savedStep();await page.reload();await page.getByText(/The proposed source failed the required source-integrity checks/).waitFor();await capture('rejected-source');
   const failedRun=d.run.id;await page.getByRole('button',{name:'Retry real build'}).evaluate(button=>{button.click();button.click();});await page.getByRole('heading',{name:'Build queued',exact:true}).waitFor();assert.equal(commands.length,2);assert.equal(d.run.retry_of_run_id,failedRun);assert.deepEqual(JSON.parse(commands.at(-1).body),{});await capture('retry-queued');
   d=f.detail({run:f.run({id:crypto.randomUUID(),status:'canceled',error_code:'BUILD_CANCELED'})});revision++;await page.reload();await page.getByRole('heading',{name:'Build canceled',exact:true}).waitFor();await capture('canceled');
+  // A newly reviewed request on the same Brain/base must start that proposal,
+  // never retry the failed first build's frozen original context.
+  d=f.detail({run:f.run({id:crypto.randomUUID(),status:'failed',error_code:'REPAIR_EXHAUSTED'})});
+  proposal=f.proposal({id:crypto.randomUUID(),request_id:crypto.randomUUID(),reviewed:true,created_at:f.stamp(1000)});revision++;
+  await page.reload();await page.getByRole('heading',{name:'Ready to build',exact:true}).waitFor();
+  assert.match(await page.getByRole('region',{name:'Current project step'}).innerText(),/Ready to build/);
+  assert.equal(await page.getByRole('button',{name:'Retry real build',exact:true}).count(),0);
+  await capture('new-plan-after-failed-first-build');await page.reload();
+  await page.getByRole('button',{name:'Build reviewed plan',exact:true}).evaluate(button=>{button.click();button.click();});
+  await page.getByRole('heading',{name:'Build queued',exact:true}).waitFor();assert.equal(commands.length,3);
+  assert.equal(commands.at(-1).path,`/projects/${f.ids.project}/builds`);
+  assert.deepEqual(JSON.parse(commands.at(-1).body),{proposal_id:proposal.id});assert.equal(d.run.retry_of_run_id,null);
   heartbeat=true;d=f.detail({run:f.run({id:crypto.randomUUID(),status:'running',started_at:new Date().toISOString(),last_heartbeat_at:new Date().toISOString()}),phase:'test',candidates:[f.candidate()],current_candidate_evidence:f.checks().slice(0,5),progress_updated_at:new Date().toISOString()});revision++;await page.reload();await until(()=>page.locator('.build-timeline li[aria-current=step] h4').getByText('Preparing preview',{exact:true}).isVisible());await capture('preparing-preview');
   d={...d,run:{...d.run,status:'succeeded'},phase:'preview_ready',current_candidate_evidence:f.checks()};v=f.version({run_id:d.run.id});revision++;await page.getByRole('link',{name:'Continue to publish'}).waitFor();await page.frameLocator('iframe[title="Verified generated application preview"]').getByRole('heading',{name:'Verified rendering fixture'}).waitFor();assert.equal(new URL(page.url()).searchParams.has('step'),false);assert.equal(await page.locator('.build-pane').getAttribute('open'),null);await capture('succeeded-auto-preview');
   live=f.release();d=f.detail({run:f.run({id:crypto.randomUUID(),status:'running',base_version_id:v.id,started_at:new Date().toISOString(),last_heartbeat_at:new Date().toISOString()}),phase:'generation_pending',progress_updated_at:new Date().toISOString()});revision++;await page.reload();await page.getByText('Last confirmed live release',{exact:true}).waitFor();assert.match(await page.getByRole('region',{name:'Current project step'}).innerText(),/Update journey/);assert.equal(await page.locator('.preserved-preview').getAttribute('open'),null);await capture('update-live-preserved');

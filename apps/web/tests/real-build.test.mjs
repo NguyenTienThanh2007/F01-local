@@ -191,3 +191,20 @@ test('standalone storage previews validate project, capability, expiry and local
  assert.equal(isolatedBrowserPath(native,embedded,expiry,id,'localhost'),null);
  assert.equal(isolatedBrowserPath(native,embedded,new Date(0).toISOString(),id,'127.0.0.1'),null);
 });
+
+const {proposalReplacesRun}=await import('../src/lib/workspace/build-direction.ts');
+test('new saved proposal supersedes old failure without assuming Brain changed',()=>{
+ const run=f.run({status:'failed'}),original=f.proposal({reviewed:true});
+ assert.equal(proposalReplacesRun(original,run),false);
+ const next=f.proposal({request_id:f.ids.release,reviewed:true});
+ assert.equal(proposalReplacesRun(next,run),true);
+ assert.equal(proposalReplacesRun({...next,current_context:false},run),false);
+ assert.equal(proposalReplacesRun({...next,project_id:f.ids.version},run),false);
+ assert.equal(proposalReplacesRun(f.proposal({created_at:f.stamp(1000)}),run),true);
+ const detail=f.detail({run}),input={snapshot:f.snapshot({latest_run:run}),releases:null,progress:observed(detail),now:f.now};
+ assert.equal(projectJourney({...input,plans:{items:[original]}}).state,'failed');
+ assert.equal(projectJourney({...input,plans:{items:[next]}}).title,'Ready to build');
+ assert.equal(projectJourney({...input,plans:{items:[{...next,reviewed:false}]}}).title,'Review your plan');
+ const queued=f.detail({run:f.run()});
+ assert.equal(projectJourney({...input,snapshot:f.snapshot({latest_run:queued.run,active_run:queued.run}),progress:observed(queued),plans:{items:[next]}}).title,'Build queued');
+});

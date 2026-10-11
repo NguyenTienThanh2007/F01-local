@@ -1,6 +1,7 @@
 import type {components} from '@f01/api-client/schema';
 import type {Snapshot} from './contracts.ts';
 import type {BuildProgress,ObservedState} from './build-progress.ts';
+import {proposalReplacesRun} from './build-direction.ts';
 export const journeySteps=['Describe','Plan','Build','Preview','Deploy','Live'] as const;
 type Plans=components['schemas']['ProposalList'];
 type Releases=components['schemas']['ReleaseWorkspace'];
@@ -15,7 +16,7 @@ export function projectJourney({snapshot,plans,releases,progress,deploySelected=
  const latest=snapshot.latest_run;
  const changedAfterLive=Boolean(release&&latest?.base_version_id&&Date.parse(latest.created_at)>Date.parse(release.created_at)&&['failed','canceled'].includes(latest.status));
  const update=Boolean(release&&(snapshot.active_run||activeRelease||releaseAttention||proposal?.kind==='change'||version?.id!==release.version_id||changedAfterLive||changeSelected));
- const currentFailure=progress&&['failed','canceled'].includes(progress.run.status)&&(!version||progress.run.base_version_id===version.id)&&(!release||changedAfterLive||!currentLive);
+ const currentFailure=progress&&['failed','canceled'].includes(progress.run.status)&&!proposalReplacesRun(proposal,progress.run)&&(!version||progress.run.base_version_id===version.id)&&(!release||changedAfterLive||!currentLive);
  const prep=releases?.preparations.find(p=>p.version_id===version?.id);
  const previewExpired=version?.mode==='real'&&version.preview_descriptor.kind==='isolated'&&(!Number.isFinite(Date.parse(version.preview_descriptor.expires_at))||Date.parse(version.preview_descriptor.expires_at)<=now);
  let step=1,state:ObservedState='waiting',next='Make a plan from your saved brief.',title='Plan your application';
