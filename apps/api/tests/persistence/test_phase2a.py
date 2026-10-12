@@ -368,7 +368,7 @@ def test_initial_real_plan_receives_current_capabilities_without_fabricating_sou
     context = json.loads(prompt)
     assert context['runtime_capabilities'] == {
         'execution_mode': 'real', 'real_build_available': True, 'recipe': 'next-web-v1',
-        'application_scope': 'Next.js/React/TypeScript and plain CSS/CSS modules with browser state; no Tailwind compiler, application backend, external database or additional packages.',
+        'application_scope': 'Next.js/React/TypeScript and plain CSS/CSS modules with browser state; no Tailwind compiler, application backend, external database, additional packages or network access at build/preview time (no remote images, fonts or APIs).',
         'production_release_available': False,
     }
     assert context['source']['available'] is False and context['version'] is None

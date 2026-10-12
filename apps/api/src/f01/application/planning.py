@@ -82,7 +82,7 @@ def assemble(session: Session, project: Project, body: PlanInput, settings: Sett
             "execution_mode": settings.execution_mode,
             "real_build_available": settings.execution_mode == "real" and settings.real_execution_enabled,
             "recipe": "next-web-v1",
-            "application_scope": "Next.js/React/TypeScript and plain CSS/CSS modules with browser state; no Tailwind compiler, application backend, external database or additional packages.",
+            "application_scope": "Next.js/React/TypeScript and plain CSS/CSS modules with browser state; no Tailwind compiler, application backend, external database, additional packages or network access at build/preview time (no remote images, fonts or APIs).",
             "production_release_available": settings.release_enabled,
         },
         "selection": {"requirements_total": len(content.product.requirements), "requirements_included": len(requirements), "history_limit": 5, "context_truncated": False}}

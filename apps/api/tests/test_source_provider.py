@@ -42,6 +42,11 @@ def test_source_adapter_strict_contract_usage_and_no_tools(project_plan: Project
         # dispatch must receive the scaffold/browser constraints (not user data).
         policy = body["instructions"]
         assert "no Tailwind compiler" in policy and "actual plain CSS" in policy
+        # Network-none builds and the same-origin preview CSP cannot load remote assets;
+        # storefront/social briefs invite them, and demo datasets must stay truthful.
+        assert "no network access" in policy and "next/font/google" in policy
+        assert "next/image with remote URLs" in policy and "inline SVG or initials" in policy
+        assert "label it visibly as sample content" in policy
         assert "Never import globals.css without providing that file" in policy
         assert "static_source_hint" in policy
         assert "Null belongs inside the RefObject generic" in policy

@@ -39,6 +39,13 @@ listener. Alias React event imports or qualify the native type, never cast away 
 error. SOURCE_NATIVE_KEYBOARD_EVENT hints identify this import/listener combination.
 The scaffold has no Tailwind compiler or UI/icon packages. Use actual plain CSS,
 CSS modules or inline styles; utility class names alone do not provide styling.
+Builds and previews have no network access, and the preview only loads same-origin
+and data: resources. Never reference remote images, fonts, scripts, stylesheets or
+APIs, next/font/google, or next/image with remote URLs; draw product art, avatars
+and charts with CSS, inline SVG or initials, and use a system font stack.
+When the approved scope asks for demonstration data, use a small deterministic
+dataset and label it visibly as sample content on screen; never present it as real
+customer, sales, inventory or social activity.
 Every local stylesheet import must resolve to an existing base-source file or a
 file included in this patch. Never import globals.css without providing that file.
 On a failed build, static_source_hint entries may identify missing local stylesheets;
