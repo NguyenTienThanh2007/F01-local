@@ -241,6 +241,55 @@ def test_source_budget_stops_before_model_dispatch(database:Database,configured:
     assert provider.calls==0 and service.detail(database,owner,pid,run.id).run.error_code=='SOURCE_BUDGET_EXCEEDED'
 
 
+def reserved_today(database:Database)->int:
+    from f01.db.models import PlanningAttempt
+    from sqlalchemy import func
+    with database.session() as session:return int(session.scalar(select(func.coalesce(func.sum(PlanningAttempt.reserved_tokens),0))) or 0)
+
+def test_factory_ceiling_stops_source_generation_before_model_dispatch(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+    owner,pid,body=setup_build(database,configured,project_plan);run=service.queue(database,configured,owner,pid,body,'factory-ceiling')
+    # The owner's own budget is ample; only the factory-wide ceiling is reached.
+    capped=configured.model_copy(update={'provider_daily_token_ceiling':reserved_today(database)+1000})
+    provider=SourceProvider();asyncio.run(BuildWorker(database,capped,ControlledSandbox(),provider).run_once())
+    assert provider.calls==0 and service.detail(database,owner,pid,run.id).run.error_code=='PROVIDER_CAPACITY_EXHAUSTED'
+    assert workspace(database,owner,pid).current_version is None
+
+def test_factory_ceiling_is_shared_across_accounts_and_resets_by_utc_day(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+    from f01.db.models import PlanningAttempt
+    first,second=resolve_principal(database,'capacity-first'),resolve_principal(database,'capacity-second')
+    idea='Build a browser-only reading list with tags and saved filters.'
+    attempt,prompt=planning.reserve(database,configured,first.id,str(uuid4()),'first',None,idea=idea);assert prompt
+    planning.finish(database,configured,first.id,attempt.id,None,'PROVIDER_TIMEOUT')
+    capped=configured.model_copy(update={'provider_daily_token_ceiling':attempt.reserved_tokens+1000})
+    with pytest.raises(ApplicationError,match='PROVIDER_CAPACITY_EXHAUSTED'):planning.reserve(database,capped,second.id,str(uuid4()),'second',None,idea=idea)
+    with database.session() as session:assert session.scalar(select(PlanningAttempt.id).where(PlanningAttempt.user_id==second.id)) is None
+    # Yesterday's reservations no longer occupy today's shared capacity.
+    with database.session() as session,session.begin():session.execute(text("UPDATE planning_attempts SET created_at=created_at-interval '1 day'"))
+    _,prompt=planning.reserve(database,capped,second.id,str(uuid4()),'second',None,idea=idea);assert prompt
+
+def test_concurrent_accounts_cannot_both_pass_the_factory_ceiling(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+    owners=[resolve_principal(database,f'capacity-race-{index}') for index in range(2)]
+    idea='Build a browser-only habit tracker with weekly streaks.'
+    probe,_=planning.reserve(database,configured,owners[0].id,str(uuid4()),'probe',None,idea=idea)
+    with database.session() as session,session.begin():session.execute(text('DELETE FROM planning_attempts'))
+    capped=configured.model_copy(update={'provider_daily_token_ceiling':probe.reserved_tokens+1000})
+    # Hold the ledger lock so both reservations are in flight before either can commit.
+    from f01.application.planning import FACTORY_LEDGER_LOCK
+    holder=database.engine.connect();holder.execute(text('SELECT pg_advisory_lock(:key)'),{'key':FACTORY_LEDGER_LOCK})
+    def attempt(owner:UUID)->str:
+        try:planning.reserve(database,capped,owner,str(uuid4()),str(owner),None,idea=idea);return 'reserved'
+        except ApplicationError as error:return error.code
+    try:
+        with ThreadPoolExecutor(2) as pool:
+            futures=[pool.submit(attempt,owner.id) for owner in owners]
+            import time;time.sleep(0.5)
+            # Both must be waiting on the ledger lock, not racing past the sum.
+            assert not any(future.done() for future in futures)
+            holder.execute(text('SELECT pg_advisory_unlock(:key)'),{'key':FACTORY_LEDGER_LOCK})
+            outcomes=sorted(future.result(timeout=30) for future in futures)
+    finally:holder.close()
+    assert outcomes==['PROVIDER_CAPACITY_EXHAUSTED','reserved']
+
 def test_deadline_and_session_revocation_block_publication(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
     owner,pid,body=setup_build(database,configured,project_plan);run=service.queue(database,configured,owner,pid,body,'deadline')
     with database.session() as session,session.begin():

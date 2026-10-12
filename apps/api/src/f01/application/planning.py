@@ -2,7 +2,7 @@
 import json
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from sqlalchemy.orm import Session
 from f01.application.identity import digest
 from f01.application.projects import owned_project, append_event
@@ -38,6 +38,19 @@ def fingerprint(session: Session, project: Project) -> dict[str, object]:
 
 def current(session: Session, project: Project, context: dict[str, object]) -> bool:
     return context.get("bases") == fingerprint(session, project)
+
+FACTORY_LEDGER_LOCK = 62002603
+
+
+def reserve_factory_capacity(session: Session, settings: Settings, tokens: int, now: datetime) -> None:
+    """Enforce the factory-wide daily provider ceiling. Call after lock_owner, before
+    inserting the PlanningAttempt; the transaction lock serializes every account."""
+    session.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": FACTORY_LEDGER_LOCK})
+    day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    used = session.scalar(select(func.coalesce(func.sum(PlanningAttempt.reserved_tokens), 0)).where(PlanningAttempt.created_at >= day)) or 0
+    if used + tokens > settings.provider_daily_token_ceiling:
+        raise ApplicationError("PROVIDER_CAPACITY_EXHAUSTED")
+
 
 def lock_owner(session: Session, user_id: UUID) -> None:
     # Serialize planning transactions without blocking FK FOR KEY SHARE checks
@@ -153,6 +166,7 @@ def reserve(database: Database, settings: Settings, user_id: UUID, key: str, req
             raise ApplicationError("PLANNING_RATE_LIMITED")
         reserved = estimated + settings.planning_output_tokens
         if used + reserved > settings.planning_daily_token_budget: raise ApplicationError("PLANNING_BUDGET_EXCEEDED")
+        reserve_factory_capacity(session, settings, reserved, now)
         for secret in (settings.openai_api_key, settings.auth_gateway_token, settings.oidc_client_secret, settings.dev_api_token, settings.session_encryption_key):
             if secret and len(secret.get_secret_value()) >= 8 and secret.get_secret_value() in prompt:
                 raise ApplicationError("VALIDATION_ERROR")

@@ -561,12 +561,13 @@ Default controls:
 | PLANNING_REQUESTS_PER_MINUTE | 5 |
 | PLANNING_REQUESTS_PER_DAY | 30 |
 | PLANNING_DAILY_TOKEN_BUDGET | 200000 reserved tokens, UTC reset |
+| PROVIDER_DAILY_TOKEN_CEILING | 2000000 reserved tokens across all accounts, UTC reset |
 | PLANNING_CONTEXT_BYTES | 24000 UTF-8 bytes |
 | PLANNING_INPUT_TOKENS | 28000 conservative input allowance |
 | PLANNING_OUTPUT_TOKENS | 3000 |
 | PLANNING_TIMEOUT_SECONDS | 30 |
 
-The Phase 2A checkpoint assembled bounded Brain summary/plan, requirements, stack/architecture/constraints/decisions/questions, recent request history and the then-current simulated version; source was unavailable at that checkpoint. Phase 2B adds persisted source manifests and exact source/version/Brain bases to real execution context. Excerpt provenance and truncation remain explicit. All project-aware calls and authenticated OIDC draft calls reserve durable usage before dispatch; one pending attempt is allowed per owner. Failures/cancellations/unknown outcomes retain reservations. Reported provider usage is nullable. These values are usage-control foundations, not billing, credits or generated-application test counts. Development DB-free draft limits are process-local and reset on restart.
+The Phase 2A checkpoint assembled bounded Brain summary/plan, requirements, stack/architecture/constraints/decisions/questions, recent request history and the then-current simulated version; source was unavailable at that checkpoint. Phase 2B adds persisted source manifests and exact source/version/Brain bases to real execution context. Excerpt provenance and truncation remain explicit. All project-aware calls and authenticated OIDC draft calls reserve durable usage before dispatch; one pending attempt is allowed per owner. Failures/cancellations/unknown outcomes retain reservations. Reported provider usage is nullable. These values are usage-control foundations, not billing, credits or generated-application test counts. Development DB-free draft limits are process-local and reset on restart. PROVIDER_DAILY_TOKEN_CEILING bounds the sum of every account's planning and source-generation reservations per UTC day, so total provider exposure does not grow with sign-ups; reaching it returns `PROVIDER_CAPACITY_EXHAUSTED` before any dispatch. Size it from your provider price and daily spending limit, and still set a hard limit in the provider console.
 
 Project planning returns a persisted pending attempt, then polls its status. An uncertain response retains a frozen input/key receipt in tab session storage; resolve it to avoid duplicate provider dispatch. Cancel prevents publication of a late result but cannot guarantee stopping provider work or cost. Restart does not resend planning calls: a lost pending task becomes abandoned after its persisted deadline. Retry is a deliberate new attempt after reviewing context. No uncontrolled automatic retries occur.
 

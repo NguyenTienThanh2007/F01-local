@@ -7,7 +7,7 @@ import httpx
 from sqlalchemy import func, select
 from f01.application import execution as service
 from f01.application.identity import digest
-from f01.application.planning import lock_owner
+from f01.application.planning import lock_owner, reserve_factory_capacity
 from f01.application.source_artifacts import SourceRejected, apply_proposal
 from f01.config import Settings, get_settings
 from f01.db.models import ExecutionJob, IsolatedPreview, PlanningAttempt, SourceCandidate, VerificationEvidence
@@ -49,6 +49,7 @@ class BuildWorker:
             minute = session.scalar(select(func.count()).select_from(PlanningAttempt).where(PlanningAttempt.user_id == owner,PlanningAttempt.created_at >= service.now()-timedelta(minutes=1))) or 0
             if count >= self.settings.planning_requests_per_day or minute >= self.settings.planning_requests_per_minute: raise ApplicationError("PLANNING_RATE_LIMITED")
             if estimate+total > self.settings.planning_daily_token_budget: raise ApplicationError("PLANNING_BUDGET_EXCEEDED")
+            reserve_factory_capacity(session, self.settings, estimate, service.now())
             identifier = uuid4()
             session.add(PlanningAttempt(id=identifier,user_id=owner,project_id=project.id,key=f"source:{job.id}:{job.epoch}:{job.repairs}",request_hash=digest(context.model_dump_json()),status="pending",context={"kind":"source","job_id":str(job.id),"repair":job.repairs},reserved_tokens=estimate,created_at=service.now(),deadline_at=service.now()+timedelta(seconds=self.settings.planning_timeout_seconds+15)))
             job.phase = "generation_pending"

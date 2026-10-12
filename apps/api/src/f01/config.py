@@ -57,6 +57,8 @@ class Settings(BaseSettings):
     planning_requests_per_minute: int = Field(default=5, ge=1, le=30)
     planning_requests_per_day: int = Field(default=30, ge=1, le=1000)
     planning_daily_token_budget: int = Field(default=200000, ge=1000, le=10000000)
+    # Factory-wide reserved provider tokens per UTC day, across every account.
+    provider_daily_token_ceiling: int = Field(default=2000000, ge=10000, le=100000000)
     planning_context_bytes: int = Field(default=24000, ge=4000, le=48000)
     planning_input_tokens: int = Field(default=28000, ge=4000, le=64000)
     planning_output_tokens: int = Field(default=3000, ge=256, le=6000)

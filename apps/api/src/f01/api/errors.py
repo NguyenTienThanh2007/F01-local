@@ -114,6 +114,7 @@ APPLICATION_ERRORS: dict[str, tuple[int, str]] = {
     "AUTH_RATE_LIMITED": (429, "Sign-in attempts are temporarily limited. Try again later."),
     "PLANNING_RATE_LIMITED": (429, "Your planning request allowance is temporarily exhausted."),
     "PLANNING_BUDGET_EXCEEDED": (429, "Your planning token budget is exhausted for this UTC day."),
+    "PROVIDER_CAPACITY_EXHAUSTED": (429, "F01's shared AI capacity for this UTC day is used up. Your input is saved; try again after 00:00 UTC."),
     "PLANNING_IN_PROGRESS": (409, "A planning attempt is still pending. Inspect its saved status."),
     "PLANNING_STALE_CONTEXT": (409, "Project context changed. Your request is preserved; review current context before making a new plan."),
     "PLANNING_CANCELED": (409, "This planning attempt was canceled. No proposal was published."),
