@@ -1,7 +1,8 @@
 """Pre-dispatch cost reservation for explicit live acceptance, never production pricing."""
 import fcntl
 import json
-from collections.abc import Callable
+import zlib
+from collections.abc import AsyncIterator, Callable
 from pathlib import Path
 from typing import Any
 
@@ -86,18 +87,24 @@ class LiveAcceptanceBudget:
         self.report['provider_calls'] = self.calls
         self.report['reserved_standard_rate_usd'] = round(self.reserved_usd, 6)
 
-    async def settle(self, response: httpx.Response) -> None:
-        """Response hook: record observed usage. Missing usage keeps the full reservation."""
-        row = self._rows.pop(id(response.request), None)
-        await response.aread()
-        try:
-            usage = response.json().get('usage') or {}
-        except ValueError:
-            usage = {}
-        model = json.loads(response.request.content)['model']
+    def transport(self, inner: httpx.AsyncBaseTransport | None = None) -> httpx.AsyncBaseTransport:
+        """Reserve before dispatch; settle from bytes the caller itself consumed."""
+        return _MeteredTransport(self, inner or httpx.AsyncHTTPTransport())
+
+    def settle(self, request: httpx.Request, status: int, body: bytes | None) -> None:
+        """Record observed usage. A missing, truncated or unparsable body keeps the full reservation."""
+        row = self._rows.pop(id(request), None)
+        usage: dict[str, Any] = {}
+        if body is not None:
+            try:
+                parsed = json.loads(body)
+                usage = (parsed.get('usage') if isinstance(parsed, dict) else None) or {}
+            except ValueError:
+                usage = {}
+        model = json.loads(request.content)['model']
         tokens_in, tokens_out = usage.get('input_tokens'), usage.get('output_tokens')
         cost: float | None = None
-        if response.status_code == 200 and type(tokens_in) is int and type(tokens_out) is int:
+        if status == 200 and type(tokens_in) is int and type(tokens_out) is int:
             cost = call_cost(model, tokens_in, tokens_out)
         usage_report = self.report.setdefault('usage', {'input_tokens': 0, 'output_tokens': 0, 'estimated_usd': 0.0, 'unsettled_calls': 0})
         assert isinstance(usage_report, dict)
@@ -109,7 +116,70 @@ class LiveAcceptanceBudget:
             usage_report['unsettled_calls'] += 1
         if row is not None:
             def finish(state: dict[str, Any]) -> None:
-                state['calls'][row]['status'] = response.status_code
+                state['calls'][row]['status'] = status
                 if cost is not None:
                     state['calls'][row].update(input_tokens=tokens_in, output_tokens=tokens_out, estimated_usd=round(cost, 8))
             self._update(finish)
+
+
+def decoded(body: bytes | None, encoding: str) -> bytes | None:
+    # The tee sees wire bytes; unsupported encodings stay unsettled rather than guessed.
+    if body is None or encoding.strip().lower() in ('', 'identity'):
+        return body
+    try:
+        if encoding.strip().lower() == 'gzip':
+            return zlib.decompress(body, 16 + zlib.MAX_WBITS)
+        if encoding.strip().lower() == 'deflate':
+            return zlib.decompress(body)
+    except zlib.error:
+        return None
+    return None
+
+
+class _MeteredStream(httpx.AsyncByteStream):
+    # Bound for teeing usage only; providers enforce their own smaller response caps.
+    limit = 4 * 1024 * 1024
+
+    def __init__(self, budget: LiveAcceptanceBudget, request: httpx.Request, status: int, encoding: str, inner: httpx.AsyncByteStream) -> None:
+        self.budget, self.request, self.status, self.encoding, self.inner = budget, request, status, encoding, inner
+        self.seen = bytearray()
+        self.complete = self.oversized = self.settled = False
+
+    async def __aiter__(self) -> AsyncIterator[bytes]:
+        async for chunk in self.inner:
+            if len(self.seen) + len(chunk) > self.limit:
+                self.oversized = True  # Never parse a truncated body as usage.
+                self.seen.clear()
+            elif not self.oversized:
+                self.seen.extend(chunk)
+            yield chunk
+        self.complete = True
+
+    async def aclose(self) -> None:
+        try:
+            await self.inner.aclose()
+        finally:
+            if not self.settled:
+                self.settled = True
+                body = bytes(self.seen) if self.complete and not self.oversized else None
+                self.budget.settle(self.request, self.status, decoded(body, self.encoding))
+
+
+class _MeteredTransport(httpx.AsyncBaseTransport):
+    def __init__(self, budget: LiveAcceptanceBudget, inner: httpx.AsyncBaseTransport) -> None:
+        self.budget, self.inner = budget, inner
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        await request.aread()
+        await self.budget.reserve(request)
+        try:
+            response = await self.inner.handle_async_request(request)
+        except BaseException:
+            self.budget.settle(request, 0, None)  # Unknown outcome: retain the reservation.
+            raise
+        assert isinstance(response.stream, httpx.AsyncByteStream)
+        return httpx.Response(response.status_code, headers=response.headers, extensions=response.extensions,
+            stream=_MeteredStream(self.budget, request, response.status_code, response.headers.get('content-encoding', ''), response.stream), request=request)
+
+    async def aclose(self) -> None:
+        await self.inner.aclose()

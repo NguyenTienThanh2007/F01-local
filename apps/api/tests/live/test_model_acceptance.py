@@ -6,8 +6,7 @@ import os
 import sys
 import threading
 from types import FrameType
-from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 from pathlib import Path
 from uuid import UUID
 import httpx
@@ -42,7 +41,6 @@ def test_live_context_plan_and_verified_source(database: Database, project_setti
     calls,usd,journal=os.environ.get('F01_LIVE_CALL_LIMIT'),os.environ.get('F01_LIVE_MAX_USD'),os.environ.get('F01_LIVE_USAGE_JOURNAL')
     budget=LiveAcceptanceBudget(report,call_limit=int(calls) if calls else None,dollar_limit=float(usd) if usd else None,
         journal=Path(journal) if journal else None,scenario=str(report['scenario']))
-    hooks: dict[str, list[Callable[..., Any]]]={'request':[budget.reserve],'response':[budget.settle]}
     image=os.environ['F01_SANDBOX_IMAGE_ID']
     settings=project_settings.model_copy(update={'execution_mode':'real','real_execution_enabled':True,
         'sandbox_image_id':image,'sandbox_socket':os.environ['F01_DOCKER_SOCKET'],
@@ -64,7 +62,7 @@ def test_live_context_plan_and_verified_source(database: Database, project_setti
             attempt,prompt=planning.reserve(database,settings,owner,'live-model-plan',digest(body.model_dump_json()),pid,body)
             assert prompt
             async def plan() -> None:
-                async with httpx.AsyncClient(trust_env=False,timeout=120,event_hooks=hooks) as http:
+                async with httpx.AsyncClient(trust_env=False,timeout=120,transport=budget.transport()) as http:
                     provider=OpenAIPlanningProvider(client=http,api_key=settings.openai_api_key,
                         model=settings.openai_model,timeout_seconds=120)
                     result=await provider.create_context_plan(prompt,settings.planning_output_tokens)
@@ -78,7 +76,7 @@ def test_live_context_plan_and_verified_source(database: Database, project_setti
             response=client.post(f'/v1/projects/{pid}/builds',json={'proposal_id':proposal['id']},headers={'Idempotency-Key':'live-model-build'})
             assert response.status_code==202
             async def build() -> None:
-                async with httpx.AsyncClient(transport=httpx.AsyncHTTPTransport(uds=settings.sandbox_socket),base_url='http://docker',trust_env=False,timeout=300) as engine, httpx.AsyncClient(trust_env=False,timeout=120,event_hooks=hooks) as models:
+                async with httpx.AsyncClient(transport=httpx.AsyncHTTPTransport(uds=settings.sandbox_socket),base_url='http://docker',trust_env=False,timeout=300) as engine, httpx.AsyncClient(trust_env=False,timeout=120,transport=budget.transport()) as models:
                     assert await BuildWorker(database,settings,DockerSandbox(engine,image),source_provider(settings,models)).run_once()
             # Record only exception class and application frame, never values/locals/logs/secrets.
             exceptions: list[dict[str, str | int]]=[]
