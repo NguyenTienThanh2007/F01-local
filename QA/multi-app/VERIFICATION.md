@@ -57,3 +57,29 @@ On the Mac with the accepted image and key, run
 `scripts/test-multi-app-live.py --max-usd 1.50 --dry-run`, then without `--dry-run`.
 Review `summary.md` and the screenshots, then decide on prompt fixes per failure
 category, and only afterwards whether to compare `--model gpt-4.1`.
+
+## Recovery and continuation — 12 October 2026 (second pass)
+
+Same cloud container: `ef1c8dd` and `2e56321` were intact locally on top of `c3d6df7`
+(remote `codex/f01-commercial-v1` still at `c3d6df7`), so recovery is a fast-forward
+with no duplication. The founder's Mac-only state (`apps/web/next-env.d.ts`, an
+uncommitted `docs/generated-interface-quality.md` edit, untracked `QA/multi-app-real/`)
+is not visible here; only the docs file overlaps these commits.
+
+- **Bug fixed (`94dfa6d`):** the live budget's response hook called `aread()` before
+  the providers' bounded streaming loop, reading entire bodies past their caps
+  (reproduced: 100/100 chunks pulled where a capped reader stops at 5). Replaced by a
+  metering transport that only tees consumed bytes, decodes gzip/deflate and keeps
+  full reservations for truncated, oversized or failed responses. 4 regressions.
+- **Milestone (`af3c479`):** factory-wide `PROVIDER_DAILY_TOKEN_CEILING` across all
+  accounts for planning and source generation, race-free under an advisory lock.
+  3 regressions; the concurrency test was verified to fail with the lock removed.
+
+| Check | Result |
+| --- | --- |
+| Backend pytest | 409 passed, 5 opt-in skips; 3 root-only tooling tests rerun unprivileged: 16/16 passed |
+| Strict mypy | 118 files, no issues |
+| Frontend unit / client / contracts / typecheck / build | 105 / 2 passed; contracts current; passed; passed |
+| Browser: planning, multi-app harness, visual harness, theme, conversation, build experience | 14, 10, 5, 1, 1, 1 passed |
+| UX0 / auth signed-in suites | Not run locally (root `initdb`); CI covers them |
+| Real OpenAI multi-app acceptance | **BLOCKED** — no `OPENAI_API_KEY`; cgroup v1 Docker refused by sandbox policy. $0 of the authorized $1.50 spent |
