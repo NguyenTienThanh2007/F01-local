@@ -22,7 +22,9 @@
     "test:theme:e2e": "node --test tests/theme-bootstrap.e2e.test.mjs",
     "test:conversation:e2e": "node --test tests/conversation-recovery.e2e.test.mjs",
     "test:generated-visual:e2e": "node --test tests/generated-visual.test.mjs",
-    "audit:generated-visual": "node tests/generated-visual-acceptance.mjs"
+    "test:generated-apps:e2e": "node --test tests/generated-app-acceptance.test.mjs",
+    "audit:generated-visual": "node tests/generated-visual-acceptance.mjs",
+    "audit:generated-app": "node tests/generated-app-acceptance.mjs"
   },
   "dependencies": {
     "@f01/api-client": "workspace:*",

@@ -9,6 +9,15 @@ storage hydration. It does not prescribe a brand, universal sidebar, color palet
 or identical application template. Source protocol/scaffold/security constraints
 remain authoritative; diagnostic repair retains unrelated design and functionality.
 
+Source instructions and planning runtime capabilities also state that builds and
+previews have no network access: containers run with `NetworkMode: none`, the scaffold
+configures no remote image hosts, and the preview CSP loads only same-origin and
+`data:` resources. Remote images/fonts/APIs, `next/font/google` and remote
+`next/image` therefore cannot work; the model is directed to CSS, inline SVG and
+initials. Requested demonstration data must be deterministic and visibly labelled as
+sample content. Cross-app browser acceptance is described in
+[multi-app acceptance](multi-app-acceptance.md).
+
 The TaskPilot v3 sizing regression came from `flex: 1 1 150px` on shared input/select
 classes inside vertical flex parents. Flex basis measures the main axis, so the same
 rule used for filter widths became form-control height. The policy specifically
