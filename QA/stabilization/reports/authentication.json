@@ -1,0 +1,512 @@
+{
+  "status": "passed",
+  "provider": "controlled RSA OIDC fixture",
+  "google_live": "not_run",
+  "magic_link_delivery": "not_run",
+  "measurements": [
+    {
+      "theme": "light",
+      "state": "signup-methods",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "signup-methods",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "signup-methods",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "signup-methods",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "signup-methods",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "signup-methods",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "signup-methods",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "signup-methods",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "account-verified",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "account-verified",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "account-verified",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "account-verified",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "account-verified",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "account-verified",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "account-verified",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "account-verified",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "profile-reloaded",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "profile-reloaded",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "profile-reloaded",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "profile-reloaded",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "profile-reloaded",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "profile-reloaded",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "profile-reloaded",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "profile-reloaded",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "session-expired",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "session-expired",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "session-expired",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "session-expired",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "session-expired",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "session-expired",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "session-expired",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "session-expired",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "signed-out",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "signed-out",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "signed-out",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "signed-out",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "signed-out",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "signed-out",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "signed-out",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "signed-out",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "verification-required",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "verification-required",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "verification-required",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "verification-required",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "verification-required",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "verification-required",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "verification-required",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "verification-required",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "separate-owner",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "separate-owner",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "separate-owner",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "separate-owner",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "separate-owner",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "separate-owner",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "separate-owner",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "separate-owner",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "expired-link",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "expired-link",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "expired-link",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "expired-link",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "expired-link",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "expired-link",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "expired-link",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "expired-link",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "canceled-login",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "canceled-login",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "canceled-login",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "light",
+      "state": "canceled-login",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "canceled-login",
+      "width": 1440,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "canceled-login",
+      "width": 375,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "canceled-login",
+      "width": 768,
+      "overflow": false,
+      "accessibility": "passed"
+    },
+    {
+      "theme": "dark",
+      "state": "canceled-login",
+      "width": 720,
+      "overflow": false,
+      "accessibility": "passed"
+    }
+  ]
+}

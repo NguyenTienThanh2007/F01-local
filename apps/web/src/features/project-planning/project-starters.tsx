@@ -1,6 +1,6 @@
 export const projectStarters = [
-  { id: 'crm', number: '01', category: 'Business tool', title: 'A clearer sales pipeline', short: 'CRM', brief: 'Build a CRM for a small real estate agency with authentication, leads, pipeline, notes and analytics.' },
-  { id: 'booking', number: '02', category: 'Operations', title: 'Fewer missed appointments', short: 'Booking', brief: 'Build a booking app for a small studio to reduce missed appointments, with availability, reservations, reminders and a daily schedule.' },
+  { id: 'crm', number: '01', category: 'Business tool', title: 'A clearer sales pipeline', short: 'CRM', brief: 'Build a browser-only CRM for a small real estate agency. Show a leads register, pipeline stages, notes and a priority filter using browser state. No server, shared database or authentication is required.' },
+  { id: 'booking', number: '02', category: 'Operations', title: 'Fewer missed appointments', short: 'Booking', brief: 'Build a browser-only studio schedule to reduce missed appointments. Show a daily agenda, appointment details and availability using browser state. No server or reminder service is required.' },
   { id: 'game', number: '03', category: 'Browser game', title: 'One more round', short: 'Game', brief: 'Build a simple browser game where players navigate a geometric maze, collect checkpoints and beat their best time, with keyboard controls and a restart button.' },
 ] as const;
 

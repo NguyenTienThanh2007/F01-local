@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "purpose": "Generalized real-model acceptance cases. Each brief is sent unchanged through F01's normal create -> plan -> approve -> build path. The interface contract inside each brief names the accessible controls that the generic browser checker exercises; it does not supply source, styling or a template.",
+  "scenarios": [
+    {
+      "id": "analytics-dashboard",
+      "title": "Pulseboard analytics",
+      "class": "data dashboard",
+      "primary_selector": "[aria-label=\"Key metrics\"]",
+      "brief": "Build Pulseboard, a browser-only analytics dashboard for a small online shop owner who wants to understand recent sales at a glance. Use a small, fixed, deterministic dataset and label it visibly on screen with the exact words \"Sample data\" so nobody mistakes it for real business results. Show meaningful KPIs (revenue, orders, average order value and conversion rate), a revenue trend chart drawn with inline SVG, and a table of the top products. Filters change every KPI, the chart and the table consistently. It must be responsive from desktop to a 320px phone, keyboard accessible and readable in light conditions. No backend, database, external APIs, remote images or fonts, authentication or secrets.\n\nAcceptance interface contract (exact accessible names):\n- A region labelled \"Key metrics\" containing at least four KPI values, each with a visible label and a number.\n- A select labelled \"Date range\" with at least the options \"Last 7 days\" and \"Last 30 days\".\n- A select labelled \"Region\" with an \"All regions\" option and at least two specific regions.\n- The chart is an SVG with role=\"img\" and an aria-label that starts with \"Revenue trend\".\n- A table labelled \"Top products\" with at least three product rows.\n- Changing Date range or Region updates the Key metrics values.",
+      "contract": {
+        "sample_label": "Sample data",
+        "metrics_region": "Key metrics",
+        "minimum_metrics": 4,
+        "date_select": "Date range",
+        "date_options": ["Last 7 days", "Last 30 days"],
+        "region_select": "Region",
+        "region_all": "All regions",
+        "chart_label_prefix": "Revenue trend",
+        "table": "Top products",
+        "minimum_table_rows": 3
+      }
+    },
+    {
+      "id": "storefront",
+      "title": "Fernwood storefront",
+      "class": "e-commerce storefront",
+      "primary_selector": "[aria-label=\"Products\"]",
+      "brief": "Build Fernwood, a browser-only storefront for an independent shop selling home plants and pots. Show a small fixed catalog of at least six products with name, category, short description and price in US dollars, using CSS or inline SVG artwork instead of photos. Visitors can search and filter by category, open product details, add items to a cart, change quantities, remove items and see an accurate subtotal. The cart is saved in the browser so it survives a page reload. Label the catalog visibly as \"Sample catalog\" because it is demonstration content and there is no real checkout or payment. Make it responsive down to a 320px phone and fully keyboard accessible. No backend, database, external APIs, remote images or fonts, payments, authentication or secrets.\n\nAcceptance interface contract (exact accessible names):\n- A list or region labelled \"Products\" whose product items each show a name and a $ price.\n- A search input labelled \"Search products\" and a select labelled \"Category\" with an \"All categories\" option.\n- Each product item has a button named \"Add to cart\" and a button named \"View details\" that opens a dialog with the product name and price; Escape closes it.\n- A button whose accessible name starts with \"Cart\" and includes the current item count, e.g. \"Cart (2)\".\n- Activating the cart button shows a dialog or region labelled \"Shopping cart\" listing items, each with a button named \"Remove\", plus the visible word \"Subtotal\" and the subtotal amount.\n- When search finds nothing, show a message containing \"No products\" and a button named \"Clear filters\".",
+      "contract": {
+        "sample_label": "Sample catalog",
+        "products": "Products",
+        "minimum_products": 6,
+        "search": "Search products",
+        "category_select": "Category",
+        "category_all": "All categories",
+        "add": "Add to cart",
+        "details": "View details",
+        "cart_prefix": "Cart",
+        "cart": "Shopping cart",
+        "remove": "Remove",
+        "subtotal": "Subtotal",
+        "no_results": "No products",
+        "clear": "Clear filters"
+      }
+    },
+    {
+      "id": "social-profile",
+      "title": "Kestrel social profile",
+      "class": "social profile",
+      "primary_selector": "[aria-label=\"Posts\"]",
+      "brief": "Build Kestrel, a browser-only social profile page for a fictional landscape photographer named Mai Tran. Show a distinctive profile header with initials avatar drawn in CSS, a short bio, location, follower and following counts, and a feed of a few existing posts. Clearly label the seeded posts and profile as \"Sample profile\" demonstration content. The visitor can follow or unfollow, write a new post, like or unlike posts and see counts change. New posts and likes are saved in the browser so they survive a reload. Give it its own visual identity rather than copying an existing social network. Make it responsive down to a 320px phone and fully keyboard accessible. No backend, database, external APIs, remote images or fonts, authentication or secrets.\n\nAcceptance interface contract (exact accessible names):\n- A level-one heading with the profile name \"Mai Tran\".\n- A toggle button named \"Follow\" using aria-pressed; when pressed the visible follower count increases by one.\n- A text area labelled \"Write a post\" and a button named \"Post\". Posting empty text must not create a post.\n- A list or region labelled \"Posts\" whose posts are article elements; the newest post appears first.\n- Each post has a toggle button whose accessible name starts with \"Like\" using aria-pressed, and its visible like count changes by one when toggled.",
+      "contract": {
+        "sample_label": "Sample profile",
+        "name": "Mai Tran",
+        "follow": "Follow",
+        "composer": "Write a post",
+        "post": "Post",
+        "posts": "Posts",
+        "like_prefix": "Like"
+      }
+    }
+  ]
+}

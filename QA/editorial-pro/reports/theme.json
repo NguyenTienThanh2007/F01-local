@@ -1,0 +1,38 @@
+{
+  "status": "passed",
+  "no_flash": [
+    {
+      "preference": "light",
+      "expected": "light",
+      "react": "blocked",
+      "body_frames": 8,
+      "selector": "correct-before-hydration"
+    },
+    {
+      "preference": "dark",
+      "expected": "dark",
+      "react": "blocked",
+      "body_frames": 8,
+      "selector": "correct-before-hydration"
+    },
+    {
+      "preference": "system",
+      "expected": "dark",
+      "react": "blocked",
+      "body_frames": 8,
+      "selector": "correct-before-hydration"
+    }
+  ],
+  "preferences": [
+    "explicit-light",
+    "explicit-dark",
+    "system-change",
+    "reload",
+    "cross-tab",
+    "account-local-preference",
+    "blocked-storage-memory"
+  ],
+  "iframe_isolation": true,
+  "draft_handoff": true,
+  "homepage_handoff": true
+}

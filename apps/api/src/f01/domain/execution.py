@@ -41,6 +41,9 @@ class BuildDetail(Contract):
     repair_attempts: int
     candidates: list[CandidateMetadata]
     evidence: list[CommandEvidence]
+    current_candidate_evidence: list[CommandEvidence] = Field(default_factory=list)
+    progress_updated_at: UtcDateTime | None = None
+    progress_sequence: int = Field(default=0, ge=0, le=2147483647)
 
 
 class BuildList(Contract):

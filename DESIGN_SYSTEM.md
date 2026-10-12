@@ -1,8 +1,8 @@
 # F01 — Design system
 
-Status: Visual identity preserved through completed Phase 2B; Phase 2C UI is a proposal only.
-Revision: 0.5 · 2026-10-04
-Related: [Product specification](PRODUCT_SPEC.md), [Architecture](ARCHITECTURE.md), [Roadmap](ROADMAP.md).
+Status: Identity preserved through commercial-v1 and the dedicated product refinement pass. Earlier phase labels below describe the design's progression.
+Revision: 0.6 · 2026-10-08
+Related: [Product specification](PRODUCT_SPEC.md), [Architecture](ARCHITECTURE.md), [Roadmap](ROADMAP.md), [Product refinement](PRODUCT_UX_REFINEMENT.md).
 
 ## 1. Design position
 

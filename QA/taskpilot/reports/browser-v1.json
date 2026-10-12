@@ -1,0 +1,67 @@
+{
+  "url": "http://f01-d81470009d8642f08deb4a1e174f57f1.localhost:57470/p/ecb5f9cc-7a55-4c01-9070-9fddb21160f3/<local-preview-capability>/",
+  "version": 1,
+  "checks": [
+    {
+      "name": "empty state",
+      "passed": true
+    },
+    {
+      "name": "validation",
+      "passed": false,
+      "error": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Title is required', { exact: true }) to be visible\u001b[22m\n"
+    },
+    {
+      "name": "create and priority",
+      "passed": false,
+      "error": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('heading', { name: 'Founder acceptance task', exact: true }) to be visible\u001b[22m\n"
+    },
+    {
+      "name": "edit",
+      "passed": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('li').filter({ has: getByRole('heading', { name: 'Founder acceptance task', exact: true }) }).getByRole('button', { name: 'Edit', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "move between columns",
+      "passed": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('li').filter({ hasText: 'Founder acceptance task \u2014 edited' }).getByTitle('Move Right', { exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "second task",
+      "passed": false,
+      "error": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('heading', { name: 'Disposable delete-check task', exact: true }) to be visible\u001b[22m\n"
+    },
+    {
+      "name": "search",
+      "passed": true
+    },
+    {
+      "name": "priority/status filters",
+      "passed": true
+    },
+    {
+      "name": "refresh persists",
+      "passed": false,
+      "error": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('heading', { name: 'Founder acceptance task \u2014 edited', exact: true }) to be visible\u001b[22m\n"
+    },
+    {
+      "name": "delete",
+      "passed": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('li').filter({ hasText: 'Disposable delete-check task' }).getByRole('button', { name: 'Delete', exact: true })\u001b[22m\n"
+    }
+  ],
+  "console": [
+    "Blocked form submission to '' because the form's frame is sandboxed and the 'allow-forms' permission is not set.",
+    "Blocked form submission to '' because the form's frame is sandboxed and the 'allow-forms' permission is not set.",
+    "Blocked form submission to '' because the form's frame is sandboxed and the 'allow-forms' permission is not set."
+  ],
+  "errors": [],
+  "storage": {
+    "taskpilot_tasks_v1": "[]"
+  },
+  "stylesheets": 0,
+  "mobile": {
+    "viewport": 390,
+    "width": 390
+  }
+}

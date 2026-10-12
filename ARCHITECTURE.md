@@ -1,8 +1,10 @@
 # F01 — System architecture
 
 Status: Phase 1 M0–M6, Phase 2A and Phase 2B complete; Phase 2C documentation/planning only, implementation not started.
-Revision: 0.15 · 2026-10-04
+Revision: 0.16 · 2026-10-05
 Related: [Product specification](PRODUCT_SPEC.md), [Design system](DESIGN_SYSTEM.md), [Roadmap](ROADMAP.md).
+
+The current commercial-v1 continuation stabilizes the existing frontend command boundary without changing backend contracts, persistence, generated client, trusted sandbox or preview gateway. Browser JSON commands retain strict gateway validation and a bounded transport deadline; uncertain receipts preserve the same key/input, and confirmed commands remain confirmed when browser storage fails. [UX0_IMPLEMENTATION.md](UX0_IMPLEMENTATION.md) records the audit, exact acceptance scope and Docker blocker. No deployment architecture or provider decision has been replaced.
 
 ## 1. Architectural decision
 

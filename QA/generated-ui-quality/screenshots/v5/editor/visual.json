@@ -1,0 +1,1055 @@
+{
+  "profile": "compact application",
+  "states": [
+    {
+      "name": "desktop",
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageWidth": 1440,
+        "primary": null,
+        "coverage": {
+          "controls": 7,
+          "buttons": 15,
+          "truncated": false
+        },
+        "controls": [
+          {
+            "tag": "input",
+            "type": "search",
+            "label": "Search tasks",
+            "top": 92,
+            "width": 832,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "select",
+            "type": null,
+            "label": "Filter by status",
+            "top": 92,
+            "width": 120,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "select",
+            "type": null,
+            "label": "Filter by priority",
+            "top": 92,
+            "width": 120,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "input",
+            "type": "text",
+            "label": "Title *",
+            "top": 154,
+            "width": 432,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "select",
+            "type": null,
+            "label": "Status",
+            "top": 368,
+            "width": 133,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "select",
+            "type": null,
+            "label": "Priority",
+            "top": 368,
+            "width": 133,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "input",
+            "type": "date",
+            "label": "Due Date",
+            "top": 368,
+            "width": 133,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          }
+        ],
+        "buttons": [
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "New Task",
+            "top": 24,
+            "width": 105,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "700",
+            "lineHeight": "16px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(76, 81, 191)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Update Task",
+            "top": 444,
+            "width": 126,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "700",
+            "lineHeight": "16px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(90, 103, 216)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Cancel",
+            "top": 444,
+            "width": 84,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "700",
+            "lineHeight": "16px",
+            "color": "rgb(55, 65, 81)",
+            "background": "rgb(226, 232, 240)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Left",
+            "top": 338,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Right",
+            "top": 338,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Edit Task",
+            "top": 338,
+            "width": 50,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(76, 81, 191)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Delete Task",
+            "top": 338,
+            "width": 66,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(229, 62, 62)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Left",
+            "top": 508,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Right",
+            "top": 508,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Edit Task",
+            "top": 508,
+            "width": 50,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(76, 81, 191)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Delete Task",
+            "top": 508,
+            "width": 66,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(229, 62, 62)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Left",
+            "top": 317,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Right",
+            "top": 317,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Edit Task",
+            "top": 317,
+            "width": 50,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(76, 81, 191)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Delete Task",
+            "top": 317,
+            "width": 66,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(229, 62, 62)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          }
+        ],
+        "textareas": [
+          {
+            "tag": "textarea",
+            "type": null,
+            "label": "Description",
+            "top": 236,
+            "width": 432,
+            "height": 94,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          }
+        ],
+        "headings": [
+          {
+            "tag": "h1",
+            "type": null,
+            "label": "TaskPilot",
+            "top": 28,
+            "width": 135,
+            "height": 35,
+            "fontSize": 32,
+            "fontWeight": "700",
+            "lineHeight": "35.2px",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "h2",
+            "type": null,
+            "label": "Edit Task",
+            "top": 68,
+            "width": 432,
+            "height": 28,
+            "fontSize": 24,
+            "fontWeight": "700",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "h3",
+            "type": null,
+            "label": "Todo (0)",
+            "top": 176,
+            "width": 320,
+            "height": 29,
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "h3",
+            "type": null,
+            "label": "In Progress (2)",
+            "top": 176,
+            "width": 320,
+            "height": 29,
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "h3",
+            "type": null,
+            "label": "Done (1)",
+            "top": 176,
+            "width": 320,
+            "height": 29,
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 0
+        },
+        "focused": "INPUT"
+      },
+      "checks": [
+        {
+          "name": "Bounded control coverage is complete",
+          "passed": true
+        },
+        {
+          "name": "No page horizontal overflow",
+          "passed": true
+        },
+        {
+          "name": "Single-line controls stay compact (maximum 72px)",
+          "passed": true
+        },
+        {
+          "name": "Readable control text (at least 14px)",
+          "passed": true
+        }
+      ],
+      "deterministicPassed": true,
+      "review": [
+        "Review smaller than 44px touch targets and surrounding spacing; WCAG minimum/exception needs context."
+      ],
+      "subjectiveReviewRequired": [
+        "Hierarchy and composition",
+        "Density and alignment",
+        "Cohesive typography/color",
+        "Useful empty/loading/error states",
+        "Product suitability; these measurements do not certify premium design"
+      ],
+      "accessibility": {
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "nodeCount": 4,
+            "nodes": [
+              {
+                "target": [
+                  ".column:nth-child(2) > ul > li:nth-child(1) > .task-actions > div:nth-child(2) > .red.small[aria-label=\"Delete Task\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.12 (foreground color: #ffffff, background color: #e53e3e, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  "span[title=\"Due Date: 2026-10-09\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #e53e3e, background color: #fed7d7, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  "li:nth-child(2) > .task-actions > div:nth-child(2) > .red.small[aria-label=\"Delete Task\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.12 (foreground color: #ffffff, background color: #e53e3e, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  ".column:nth-child(3) > ul > li > .task-actions > div:nth-child(2) > .red.small[aria-label=\"Delete Task\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.12 (foreground color: #ffffff, background color: #e53e3e, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          }
+        ],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "nodes": 1
+          },
+          {
+            "id": "color-contrast",
+            "nodes": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "mobile",
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageWidth": 413,
+        "primary": null,
+        "coverage": {
+          "controls": 7,
+          "buttons": 15,
+          "truncated": false
+        },
+        "controls": [
+          {
+            "tag": "input",
+            "type": "search",
+            "label": "Search tasks",
+            "top": 161,
+            "width": 342,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "select",
+            "type": null,
+            "label": "Filter by status",
+            "top": 213,
+            "width": 342,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "select",
+            "type": null,
+            "label": "Filter by priority",
+            "top": 265,
+            "width": 342,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "input",
+            "type": "text",
+            "label": "Title *",
+            "top": 154,
+            "width": 342,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "select",
+            "type": null,
+            "label": "Status",
+            "top": 368,
+            "width": 163,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "select",
+            "type": null,
+            "label": "Priority",
+            "top": 368,
+            "width": 163,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "input",
+            "type": "date",
+            "label": "Due Date",
+            "top": 466,
+            "width": 342,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          }
+        ],
+        "buttons": [
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "New Task",
+            "top": 93,
+            "width": 105,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "700",
+            "lineHeight": "16px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(90, 103, 216)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Update Task",
+            "top": 542,
+            "width": 126,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "700",
+            "lineHeight": "16px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(90, 103, 216)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Cancel",
+            "top": 542,
+            "width": 84,
+            "height": 44,
+            "fontSize": 16,
+            "fontWeight": "700",
+            "lineHeight": "16px",
+            "color": "rgb(55, 65, 81)",
+            "background": "rgb(226, 232, 240)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Left",
+            "top": 670,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Right",
+            "top": 670,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Edit Task",
+            "top": 670,
+            "width": 50,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(76, 81, 191)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Delete Task",
+            "top": 670,
+            "width": 66,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(229, 62, 62)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Left",
+            "top": 841,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Right",
+            "top": 841,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Edit Task",
+            "top": 841,
+            "width": 50,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(76, 81, 191)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Delete Task",
+            "top": 841,
+            "width": 66,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(229, 62, 62)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Left",
+            "top": 1096,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Move Right",
+            "top": 1096,
+            "width": 36,
+            "height": 36,
+            "fontSize": 17.6,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(74, 85, 104)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Edit Task",
+            "top": 1096,
+            "width": 50,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(76, 81, 191)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "button",
+            "type": "button",
+            "label": "Delete Task",
+            "top": 1096,
+            "width": 66,
+            "height": 36,
+            "fontSize": 14,
+            "fontWeight": "700",
+            "lineHeight": "14px",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(229, 62, 62)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          }
+        ],
+        "textareas": [
+          {
+            "tag": "textarea",
+            "type": null,
+            "label": "Description",
+            "top": 236,
+            "width": 342,
+            "height": 94,
+            "fontSize": 16,
+            "fontWeight": "400",
+            "lineHeight": "normal",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgb(255, 255, 255)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          }
+        ],
+        "headings": [
+          {
+            "tag": "h1",
+            "type": null,
+            "label": "TaskPilot",
+            "top": 24,
+            "width": 135,
+            "height": 35,
+            "fontSize": 32,
+            "fontWeight": "700",
+            "lineHeight": "35.2px",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "row"
+          },
+          {
+            "tag": "h2",
+            "type": null,
+            "label": "Edit Task",
+            "top": 68,
+            "width": 342,
+            "height": 28,
+            "fontSize": 24,
+            "fontWeight": "700",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "h3",
+            "type": null,
+            "label": "Todo (0)",
+            "top": 349,
+            "width": 310,
+            "height": 29,
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "h3",
+            "type": null,
+            "label": "In Progress (2)",
+            "top": 508,
+            "width": 310,
+            "height": 29,
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          },
+          {
+            "tag": "h3",
+            "type": null,
+            "label": "Done (1)",
+            "top": 934,
+            "width": 310,
+            "height": 29,
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": "normal",
+            "color": "rgb(26, 32, 44)",
+            "background": "rgba(0, 0, 0, 0)",
+            "flexBasis": "auto",
+            "parentAxis": "column"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 0
+        },
+        "focused": "INPUT"
+      },
+      "checks": [
+        {
+          "name": "Bounded control coverage is complete",
+          "passed": true
+        },
+        {
+          "name": "No page horizontal overflow",
+          "passed": false
+        },
+        {
+          "name": "Single-line controls stay compact (maximum 72px)",
+          "passed": true
+        },
+        {
+          "name": "Readable control text (at least 14px)",
+          "passed": true
+        }
+      ],
+      "deterministicPassed": false,
+      "review": [
+        "Review smaller than 44px touch targets and surrounding spacing; WCAG minimum/exception needs context."
+      ],
+      "subjectiveReviewRequired": [
+        "Hierarchy and composition",
+        "Density and alignment",
+        "Cohesive typography/color",
+        "Useful empty/loading/error states",
+        "Product suitability; these measurements do not certify premium design"
+      ],
+      "accessibility": {
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "nodeCount": 4,
+            "nodes": [
+              {
+                "target": [
+                  ".column:nth-child(2) > ul > li:nth-child(1) > .task-actions > div:nth-child(2) > .red.small[aria-label=\"Delete Task\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.12 (foreground color: #ffffff, background color: #e53e3e, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  "span[title=\"Due Date: 2026-10-09\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #e53e3e, background color: #fed7d7, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  "li:nth-child(2) > .task-actions > div:nth-child(2) > .red.small[aria-label=\"Delete Task\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.12 (foreground color: #ffffff, background color: #e53e3e, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "target": [
+                  ".column:nth-child(3) > ul > li > .task-actions > div:nth-child(2) > .red.small[aria-label=\"Delete Task\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.12 (foreground color: #ffffff, background color: #e53e3e, font size: 10.5pt (14px), font weight: bold). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          }
+        ],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "nodes": 1
+          },
+          {
+            "id": "color-contrast",
+            "nodes": 5
+          }
+        ]
+      }
+    }
+  ],
+  "deterministicPassed": false,
+  "accessibilityPassed": false
+}

@@ -1,0 +1,28 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+$ node --test tests/ux0.e2e.test.mjs
+▶ UX0 signed-in real-mode commands (no Docker execution)
+  ✔ first-time brief survives sign-in and reload before any creation (2883.515708ms)
+  ✔ creation resolves a lost real response with the same receipt after reload (2251.974083ms)
+  ✔ creation recovery cannot replay another account’s saved brief (3696.449209ms)
+  ✔ build submits JSON and recovers one queued run after response loss (3996.894917ms)
+  ✔ storage restrictions preserve confirmed creation planning and build results (4508.993334ms)
+Closing test browser
+  ✔ uncertain conflict retains a build receipt and expired recovery cannot redispatch (3233.236167ms)
+Stopping test server
+Teardown complete
+✔ UX0 signed-in real-mode commands (no Docker execution) (23988.438417ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24058.286709

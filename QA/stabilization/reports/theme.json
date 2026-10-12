@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "no_flash": [
+    {
+      "preference": "light",
+      "expected": "light",
+      "react": "blocked",
+      "body_frames": 8,
+      "selector": "correct-before-hydration"
+    },
+    {
+      "preference": "dark",
+      "expected": "dark",
+      "react": "blocked",
+      "body_frames": 8,
+      "selector": "correct-before-hydration"
+    },
+    {
+      "preference": "system",
+      "expected": "dark",
+      "react": "blocked",
+      "body_frames": 8,
+      "selector": "correct-before-hydration"
+    }
+  ]
+}

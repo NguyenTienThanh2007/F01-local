@@ -92,7 +92,59 @@ def test_atomic_publication_and_bounded_repair(database:Database,configured:Sett
     assert {d.provenance.source for d in saved.current_brain.content.design_decisions}>={'model_proposed','generated','verified','published'}
     assert saved.current_brain.content.product.summary.provenance.source=='user_request'
     assert any(e.exit_code==1 for e in detail.evidence)
+    # Repair history remains immutable; progress cannot reuse the old candidate's checks.
+    assert detail.current_candidate_evidence and all(e.exit_code == 0 for e in detail.current_candidate_evidence)
+    assert {e.phase for e in detail.current_candidate_evidence} >= {"materialization", "install", "typecheck", "build", "verification"}
+    assert detail.progress_updated_at and detail.progress_updated_at >= detail.candidates[-1].created_at
+    assert detail.progress_sequence == workspace(database, owner, pid).last_sequence
     with database.session() as session:assert session.scalar(select(IsolatedPreview.id))
+
+def test_generic_build_failure_gets_source_only_repair_hint_without_rewriting_evidence(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+    """Controlled orchestration regression; real missing-CSS Docker failure is recorded separately."""
+    owner,pid,body=setup_build(database,configured,project_plan)
+    run=service.queue(database,configured,owner,pid,body,'missing-css')
+    contexts:list[GenerationContext]=[]
+    class MissingCSSProvider(SourceProvider):
+        async def propose_source(self,context:GenerationContext,maximum_output_tokens:int)->GenerationResult:
+            contexts.append(context)
+            edits:tuple[PutFile,...]
+            if context.base_source is None:
+                edits=(PutFile(operation='put',path='app/layout.tsx',prior_sha256=None,content="import React from 'react';\nimport './globals.css';\nexport default function Layout(){return null}"),
+                    PutFile(operation='put',path='app/page.tsx',prior_sha256=None,content='export default function Page(){return null}'))
+            else:
+                assert json.loads(context.repair_evidence[0])['diagnostics'][0]['code']=='BUILD_FAILED'
+                assert json.loads(context.repair_evidence[1])['missing_path']=='app/globals.css'
+                edits=(PutFile(operation='put',path='app/globals.css',prior_sha256=None,content='body{margin:0}'),)
+            return GenerationResult(proposal=SourceProposal(schema_version=1,recipe='next-web-v1',base_digest=context.base_source.digest if context.base_source else None,edits=edits),input_tokens=20,output_tokens=30)
+    class MissingCSSSandbox(ControlledSandbox):
+        async def command(self,name:str,phase:CommandPhase,tests:tuple[str,...],alive:Any)->CommandEvidence:
+            if phase==CommandPhase.BUILD and not any(f.path=='app/globals.css' for f in self.sources[name].files):
+                return CommandEvidence(phase='build',argv=['controlled'],exit_code=1,duration_ms=1,diagnostics=[Diagnostic(code='BUILD_FAILED')],image_id=IMAGE)
+            return self.result(phase.value)
+    assert asyncio.run(BuildWorker(database,configured,MissingCSSSandbox(),MissingCSSProvider()).run_once())
+    detail=service.detail(database,owner,pid,run.id)
+    assert detail.run.status=='succeeded' and detail.repair_attempts==1 and len(contexts)==2
+    failed=[e for e in detail.evidence if e.phase=='build' and e.exit_code==1]
+    assert len(failed)==1 and failed[0].diagnostics==[Diagnostic(code='BUILD_FAILED')]
+    assert contexts[1].base_source and contexts[1].base_source.digest==detail.candidates[0].digest
+
+@pytest.mark.parametrize('repair',[False,True])
+def test_rejected_generation_has_actionable_code_and_never_publishes(database:Database,configured:Settings,project_plan:ProjectPlan,repair:bool)->None:
+    owner,pid,body=setup_build(database,configured,project_plan)
+    run=service.queue(database,configured,owner,pid,body,'rejected-source')
+    class RejectedSource(SourceProvider):
+        async def propose_source(self,context:GenerationContext,maximum_output_tokens:int)->GenerationResult:
+            if repair and context.base_source is None:return await super().propose_source(context,maximum_output_tokens)
+            self.calls+=1
+            edits=tuple(PutFile(operation='put',path=f.path,prior_sha256=f.sha256,content=f.content) for f in context.base_source.files) if context.base_source else (PutFile(operation='put',path='app/page.tsx',prior_sha256=None,content='export default function Page(){return <main>Missing layout</main>}'),)
+            return GenerationResult(proposal=SourceProposal(schema_version=1,recipe='next-web-v1',base_digest=context.base_source.digest if context.base_source else None,edits=edits),input_tokens=100,output_tokens=200)
+    provider=RejectedSource(broken=repair);sandbox=ControlledSandbox()
+    assert asyncio.run(BuildWorker(database,configured,sandbox,provider).run_once())
+    detail=service.detail(database,owner,pid,run.id)
+    assert detail.run.status=='failed' and detail.run.error_code=='SOURCE_PROPOSAL_REJECTED'
+    assert workspace(database,owner,pid).current_version is None and not sandbox.names
+    assert len(detail.candidates)==(1 if repair else 0)
+    if repair:assert any(e.exit_code!=0 for e in detail.evidence)
 
 def test_failed_update_preserves_last_good_version(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
     owner,pid,body=setup_build(database,configured,project_plan)
@@ -108,6 +160,11 @@ def test_failed_update_preserves_last_good_version(database:Database,configured:
     assert after.current_version==before.current_version and after.current_brain==before.current_brain and after.preview==before.preview
     assert service.detail(database,owner,pid,run.id).run.error_code=='REPAIR_EXHAUSTED'
     assert source.calls==configured.repair_attempts+1 and len(sandbox.names)==1
+    with database.session() as session:
+        job=session.scalar(select(ExecutionJob).where(ExecutionJob.run_id==run.id))
+        assert job is not None and job.container_name is None,'Confirmed deletion must clear the failed container identity.'
+    retry=service.queue(database,configured,owner,pid,plan,'after-confirmed-cleanup',retry_id=run.id)
+    assert retry.retry_of_run_id==run.id and retry.status=='queued'
 
 def test_duplicate_workers_fenced_and_concurrency_bounded(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
     owner,pid,body=setup_build(database,configured,project_plan);service.queue(database,configured,owner,pid,body,'workers')
@@ -183,6 +240,55 @@ def test_source_budget_stops_before_model_dispatch(database:Database,configured:
     provider=SourceProvider();asyncio.run(BuildWorker(database,low,ControlledSandbox(),provider).run_once())
     assert provider.calls==0 and service.detail(database,owner,pid,run.id).run.error_code=='SOURCE_BUDGET_EXCEEDED'
 
+
+def reserved_today(database:Database)->int:
+    from f01.db.models import PlanningAttempt
+    from sqlalchemy import func
+    with database.session() as session:return int(session.scalar(select(func.coalesce(func.sum(PlanningAttempt.reserved_tokens),0))) or 0)
+
+def test_factory_ceiling_stops_source_generation_before_model_dispatch(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+    owner,pid,body=setup_build(database,configured,project_plan);run=service.queue(database,configured,owner,pid,body,'factory-ceiling')
+    # The owner's own budget is ample; only the factory-wide ceiling is reached.
+    capped=configured.model_copy(update={'provider_daily_token_ceiling':reserved_today(database)+1000})
+    provider=SourceProvider();asyncio.run(BuildWorker(database,capped,ControlledSandbox(),provider).run_once())
+    assert provider.calls==0 and service.detail(database,owner,pid,run.id).run.error_code=='PROVIDER_CAPACITY_EXHAUSTED'
+    assert workspace(database,owner,pid).current_version is None
+
+def test_factory_ceiling_is_shared_across_accounts_and_resets_by_utc_day(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+    from f01.db.models import PlanningAttempt
+    first,second=resolve_principal(database,'capacity-first'),resolve_principal(database,'capacity-second')
+    idea='Build a browser-only reading list with tags and saved filters.'
+    attempt,prompt=planning.reserve(database,configured,first.id,str(uuid4()),'first',None,idea=idea);assert prompt
+    planning.finish(database,configured,first.id,attempt.id,None,'PROVIDER_TIMEOUT')
+    capped=configured.model_copy(update={'provider_daily_token_ceiling':attempt.reserved_tokens+1000})
+    with pytest.raises(ApplicationError,match='PROVIDER_CAPACITY_EXHAUSTED'):planning.reserve(database,capped,second.id,str(uuid4()),'second',None,idea=idea)
+    with database.session() as session:assert session.scalar(select(PlanningAttempt.id).where(PlanningAttempt.user_id==second.id)) is None
+    # Yesterday's reservations no longer occupy today's shared capacity.
+    with database.session() as session,session.begin():session.execute(text("UPDATE planning_attempts SET created_at=created_at-interval '1 day'"))
+    _,prompt=planning.reserve(database,capped,second.id,str(uuid4()),'second',None,idea=idea);assert prompt
+
+def test_concurrent_accounts_cannot_both_pass_the_factory_ceiling(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
+    owners=[resolve_principal(database,f'capacity-race-{index}') for index in range(2)]
+    idea='Build a browser-only habit tracker with weekly streaks.'
+    probe,_=planning.reserve(database,configured,owners[0].id,str(uuid4()),'probe',None,idea=idea)
+    with database.session() as session,session.begin():session.execute(text('DELETE FROM planning_attempts'))
+    capped=configured.model_copy(update={'provider_daily_token_ceiling':probe.reserved_tokens+1000})
+    # Hold the ledger lock so both reservations are in flight before either can commit.
+    from f01.application.planning import FACTORY_LEDGER_LOCK
+    holder=database.engine.connect();holder.execute(text('SELECT pg_advisory_lock(:key)'),{'key':FACTORY_LEDGER_LOCK})
+    def attempt(owner:UUID)->str:
+        try:planning.reserve(database,capped,owner,str(uuid4()),str(owner),None,idea=idea);return 'reserved'
+        except ApplicationError as error:return error.code
+    try:
+        with ThreadPoolExecutor(2) as pool:
+            futures=[pool.submit(attempt,owner.id) for owner in owners]
+            import time;time.sleep(0.5)
+            # Both must be waiting on the ledger lock, not racing past the sum.
+            assert not any(future.done() for future in futures)
+            holder.execute(text('SELECT pg_advisory_unlock(:key)'),{'key':FACTORY_LEDGER_LOCK})
+            outcomes=sorted(future.result(timeout=30) for future in futures)
+    finally:holder.close()
+    assert outcomes==['PROVIDER_CAPACITY_EXHAUSTED','reserved']
 
 def test_deadline_and_session_revocation_block_publication(database:Database,configured:Settings,project_plan:ProjectPlan)->None:
     owner,pid,body=setup_build(database,configured,project_plan);run=service.queue(database,configured,owner,pid,body,'deadline')

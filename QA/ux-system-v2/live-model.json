@@ -1,0 +1,21 @@
+{
+  "planning": "passed",
+  "source_generation": "passed",
+  "docker": "passed",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "identity": "development test principal",
+  "repair_attempts": 1,
+  "source_digest": "saved in immutable artifact",
+  "evidence_phases": [
+    "materialization",
+    "install",
+    "typecheck",
+    "build",
+    "materialization",
+    "install",
+    "typecheck",
+    "build",
+    "verification"
+  ]
+}

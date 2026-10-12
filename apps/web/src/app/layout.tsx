@@ -8,5 +8,8 @@ import '@/styles/experience.css';
 import '@/styles/operating-entry.css';
 import '@/styles/project-management.css';
 import '@/styles/workspace.css';
-export const metadata: Metadata = { title: { default: 'F01 — Software, with a next chapter', template: '%s · F01' }, description: 'Start with a product plan. A workspace built toward creating, running, managing and evolving software.', icons: { icon: '/favicon.svg' } };
-export default function RootLayout({ children }: { children: React.ReactNode }) { return <html lang="en"><body>{children}</body></html>; }
+import '@/styles/refinement.css';
+import '@/styles/premium.css';
+import '@/styles/editorial.css';
+export const metadata: Metadata = { title: { default: 'F01 — Your idea, a real application', template: '%s · F01' }, description: 'Describe your app, approve the plan, build and preview it. Publish when you are ready, then keep improving it.', icons: { icon: '/favicon.svg' } };
+export default function RootLayout({ children }: { children: React.ReactNode }) { return <html lang="en" data-theme="light" suppressHydrationWarning><head><script src="/theme-init.js" /></head><body>{children}</body></html>; }

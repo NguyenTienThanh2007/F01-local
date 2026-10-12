@@ -1,0 +1,10 @@
+{
+  "provider": "vercel",
+  "live_provider": "not_run",
+  "model": "controlled",
+  "public_health": "not_run",
+  "redeploy": "not_run",
+  "restore": "not_run",
+  "docker_image_id": "sha256:c20b9d0f8e0691a9813f14a3fa89abbb50b135fac8fb274fbfee614fa10c9c11",
+  "acceptance": "failed"
+}

@@ -258,6 +258,7 @@ def test_database_ready_checks_migration_compatibility(
 ) -> None:
     assert client.get("/v1/health/ready").status_code == 200
     with database.engine.begin() as connection:
+        original_revision = connection.scalar(text("SELECT version_num FROM alembic_version"))
         connection.execute(
             text("UPDATE alembic_version SET version_num='incompatible'")
         )
@@ -269,8 +270,9 @@ def test_database_ready_checks_migration_compatibility(
     finally:
         with database.engine.begin() as connection:
             connection.execute(
-                text("UPDATE alembic_version SET version_num='0002_phase2a'")
+                text("UPDATE alembic_version SET version_num=:revision"), {"revision": original_revision}
             )
+    assert client.get("/v1/health/ready").status_code == 200
 
 
 def test_etags_rename_archive_unarchive_and_atomic_patch(
@@ -432,3 +434,26 @@ def test_snapshot_is_repeatable_during_concurrent_metadata_write(
     assert len(snapshot["recent_events"]) == 1
     assert snapshot["project"]["title"] != "After snapshot"
     assert client.get(path).json()["event_sequence"] == 2
+
+
+def test_creation_receipt_owner_assertion_prevents_session_switch_replay(
+    client: TestClient, project_settings: Settings, database: Database
+) -> None:
+    owner = client.get("/v1/session").json()["principal"]["id"]
+    headers = {"Idempotency-Key": "account-bound-create", "X-F01-Expected-Owner": owner}
+    body = {"brief": BRIEF, "title": "Private recovery"}
+    first = client.post("/v1/projects", json=body, headers=headers)
+    assert first.status_code == 201
+    foreign_settings = project_settings.model_copy(update={"dev_auth_subject": "switched-account"})
+    with TestClient(create_app(foreign_settings)) as foreign:
+        foreign.headers.update(client.headers)
+        denied = foreign.post("/v1/projects", json=body, headers=headers)
+        assert denied.status_code == 409
+        assert denied.json()["error"]["code"] == "CREATION_ACCOUNT_CHANGED"
+        assert foreign.get("/v1/projects").json()["items"] == []
+    replay = client.post("/v1/projects", json=body, headers=headers)
+    assert replay.json() == first.json()
+    invalid = client.post("/v1/projects", json=body, headers={**headers, "X-F01-Expected-Owner": "bad"})
+    assert invalid.status_code == 422
+    with database.session() as session:
+        assert session.scalar(select(func.count()).select_from(Project)) == 1

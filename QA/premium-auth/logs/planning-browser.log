@@ -1,0 +1,37 @@
+$ node --test tests/planning.e2e.test.mjs
+✖ production frontend submits, displays, recovers and protects the browser boundary (1130.886708ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1190.4535
+
+✖ failing tests:
+
+test at tests/planning.e2e.test.mjs:33:1
+✖ production frontend submits, displays, recovers and protects the browser boundary (1130.886708ms)
+  Error: Executable doesn't exist at /Users/nguyentienthanh/Library/Caches/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-mac-arm64/chrome-headless-shell
+  ╔═════════════════════════════════════════════════════════════════════════╗
+  ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+  ║ Please run the following command to download new browsers:              ║
+  ║                                                                         ║
+  ║     pnpm exec playwright install                                        ║
+  ║                                                                         ║
+  ║ <3 Playwright Team                                                      ║
+  ╚═════════════════════════════════════════════════════════════════════════╝ Failed to launch browser.
+      at executablePathOrDie (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/server/registry/index.js:558:15)
+      at Object.executablePathOrDie (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/server/registry/index.js:589:45)
+      at Chromium._prepareToLaunch (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/server/browserType.js:184:39)
+      at async Chromium._launchProcess (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/server/browserType.js:196:22)
+      at async Chromium._innerLaunch (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/server/browserType.js:112:70)
+      at async Chromium._innerLaunchWithRetries (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/server/browserType.js:99:14)
+      at async /Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/browserServerImpl.js:77:18
+      at async ProgressController.run (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/server/progress.js:98:22)
+      at async BrowserServerLauncherImpl.launchServer (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/browserServerImpl.js:68:17)
+      at async BrowserType.launchServer (/Users/nguyentienthanh/Downloads/F01-local/node_modules/.pnpm/playwright-core@1.58.2/node_modules/playwright-core/lib/client/browserType.js:73:12)
+/Users/nguyentienthanh/Downloads/F01-local/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @f01/web@ test:e2e: `node --test tests/planning.e2e.test.mjs`
+Exit status 1

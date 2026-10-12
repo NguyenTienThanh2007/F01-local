@@ -1,3 +1,4 @@
+import {stopBrowserServer,launchTestBrowser} from './browser-process.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
@@ -5,7 +6,6 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { mkdir, readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
 const webRoot=fileURLToPath(new URL('../',import.meta.url));
 const root=fileURLToPath(new URL('../../../',import.meta.url));
 const api=process.env.M5_API_URL, token=process.env.M5_TEST_TOKEN;
@@ -20,12 +20,12 @@ test('M5 real PostgreSQL/API simulation journey, replay, fallback and workspace 
  const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],{cwd:webRoot,env,stdio:'ignore'});let browser;
  async function scenario(name,fn){let failure;await t.test(name,async()=>{try{await fn();}catch(e){failure=e;throw e;}});if(failure)throw failure;}
  try{
-  await until(async()=>(await fetch(base)).ok);browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
+  await until(async()=>(await fetch(base)).ok);browser=await launchTestBrowser({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
   const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await mkdir(`${webRoot}/test-results/m5`,{recursive:true});
   let id,firstVersion,failedRun,secondVersion;
   await scenario('create → simulated success → change → failed update → replay-safe retry → success',async()=>{
-   await page.goto(`${base}/projects/new`);await page.getByRole('textbox',{name:/Project title/}).fill('Harbor M5');await page.getByRole('textbox',{name:'Product brief'}).fill('Build a CRM with property leads, notes and a sales pipeline.');
+   await page.goto(`${base}/projects/new`);await page.locator('.creation-title-details > summary').click();await page.getByRole('textbox',{name:/Project title/}).fill('Harbor M5');await page.getByRole('textbox',{name:'Product brief'}).fill('Build a CRM with property leads, notes and a sales pipeline.');
    await page.getByRole('button',{name:'Create demo project'}).click();await page.waitForURL(/\/projects\/[0-9a-f-]{36}$/);id=new URL(page.url()).pathname.split('/').at(-1);
    await page.getByRole('heading',{name:'Harbor M5',exact:true}).waitFor();await until(async()=>(await saved(id)).latest_run.status==='succeeded');await page.getByRole('heading',{name:'Demo version 1',exact:true}).waitFor();
    const initial=await saved(id);firstVersion=initial.current_version.id;assert.equal(initial.current_brain.revision,2);assert.equal(initial.project.lifecycle,'live');
@@ -35,7 +35,7 @@ test('M5 real PostgreSQL/API simulation journey, replay, fallback and workspace 
    await page.getByRole('button',{name:'Requests',exact:true}).first().click();await page.getByRole('textbox',{name:'Change request'}).fill('Add a saved priority filter for high value property leads.');await page.getByRole('checkbox',{name:'Run an optional demonstration after saving'}).check();await page.getByRole('button',{name:'Record and simulate',exact:true}).click();
    await until(async()=>(await saved(id)).latest_run.request_id!==initial.latest_run.request_id);await page.getByRole('button',{name:'Build Trace',exact:true}).click();await page.getByRole('button',{name:'Pause following',exact:true}).click();
    const trace=page.getByLabel('Ordered Build Trace',{exact:true});await trace.evaluate(element=>element.scrollTop=0);const before=await trace.locator('li[data-sequence]').count();
-   await until(async()=>(await saved(id)).latest_run.status==='failed');await page.getByText(/Latest simulated update needs attention/).waitFor();assert.equal(await trace.evaluate(element=>element.scrollTop),0);assert.ok(await trace.locator('li[data-sequence]').count()>before);await page.getByRole('button',{name:/Jump to latest/}).click();
+   await until(async()=>(await saved(id)).latest_run.status==='failed');await page.getByText(/Latest update needs attention/).waitFor();assert.equal(await trace.evaluate(element=>element.scrollTop),0);assert.ok(await trace.locator('li[data-sequence]').count()>before);await page.getByRole('button',{name:/Jump to latest/}).click();
    await until(async()=>await trace.evaluate(element=>element.scrollHeight-element.clientHeight-element.scrollTop<24));
    const latestBox=await trace.locator('li[data-sequence]').last().boundingBox();assert.ok(latestBox && latestBox.y+latestBox.height<=1000,'Latest followed event stays inside viewport');
    const failed=await saved(id);failedRun=failed.latest_run.id;assert.equal(failed.current_version.id,firstVersion);assert.equal(failed.current_brain.id,initial.current_brain.id);assert.equal(await page.locator('iframe').getAttribute('sandbox'),'allow-scripts');
@@ -94,7 +94,7 @@ test('M5 real PostgreSQL/API simulation journey, replay, fallback and workspace 
   });
   await scenario('responsive Trace, run details and preview isolation at four widths',async()=>{
    for(const width of [375,768,1280,1440]){
-    await page.setViewportSize({width,height:1000});await page.goto(`${base}/projects/${id}?panel=trace`);await page.getByRole('heading',{name:'Saved demonstration timeline',exact:true}).waitFor();await page.evaluate(()=>document.fonts.ready);
+    await page.setViewportSize({width,height:1000});await page.goto(`${base}/projects/${id}?panel=trace`);await page.getByRole('heading',{name:'Saved execution timeline',exact:true}).waitFor();await page.evaluate(()=>document.fonts.ready);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`${width}px overflow`);
     if(process.env.M5_AXE_SCRIPT){await page.addScriptTag({content:await readFile(process.env.M5_AXE_SCRIPT,'utf8')});assert.deepEqual(await page.evaluate(async()=>(await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}})).violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}))),[],`${width}px accessibility`);}
     await page.screenshot({path:`${webRoot}/test-results/m5/trace-${width}.png`,fullPage:true});await page.getByRole('button',{name:'Run details',exact:true}).click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
@@ -103,5 +103,5 @@ test('M5 real PostgreSQL/API simulation journey, replay, fallback and workspace 
    const child=page.frames().find(frame=>frame.url().includes('/demo-preview/crm-v1'));assert.ok(child);
    const blocked=await child.evaluate(async()=>{const result={};for(const [name,fn] of [['parent',()=>parent.document],['storage',()=>localStorage.getItem('x')],['cookies',()=>document.cookie]]){try{fn();result[name]=false;}catch{result[name]=true;}}try{await fetch('/api/v1/projects');result.fetch=false;}catch{result.fetch=true;}return result;});assert.deepEqual(blocked,{parent:true,storage:true,cookies:true,fetch:true});assert.deepEqual(errors,[]);
   });
- }finally{await browser?.close();server.kill('SIGTERM');}
+ }finally{await browser?.close();await stopBrowserServer(server);}
 });

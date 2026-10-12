@@ -1,0 +1,19 @@
+{
+  "provider": "vercel",
+  "live_provider": "passed",
+  "model": "controlled",
+  "public_health": "passed",
+  "redeploy": "passed",
+  "restore": "passed",
+  "docker_image_id": "sha256:c20b9d0f8e0691a9813f14a3fa89abbb50b135fac8fb274fbfee614fa10c9c11",
+  "provider_project_id": "prj_KmlQnlz7Asi9Dbkrfb7vQOMBvZRg",
+  "public_url": "https://f01-20a1d970bc7b4940a906507ceaea5bd.vercel.app",
+  "release_v1": "09f394d5-69e4-44bf-9625-1775e81217b0",
+  "artifact_v1": "a73431b02d05539b4955509b123c21d3c09443c1a64b2eab29b71cadc81c21b7",
+  "release_v2": "57341e65-9c9e-4613-bce8-b5f2cc344399",
+  "artifact_v2": "e7b613826cc43ebc285e875ce13742e8b887ab5ee9108a0dd616b5d3256bd4d2",
+  "public_browser": "passed",
+  "versions_history": "passed",
+  "disposable_provider_cleanup": "passed",
+  "evidence_written_at_utc": "2026-10-07T15:45:35.928739+00:00"
+}

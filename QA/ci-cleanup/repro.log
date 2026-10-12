@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_terminal_interrupt_keeps_disposable_database_available_for_cleanup ____
+
+    def test_terminal_interrupt_keeps_disposable_database_available_for_cleanup() -> None:
+        import os
+        import signal
+        import subprocess
+        import sys
+        from pathlib import Path
+        script = """from pathlib import Path
+    import signal,time,psycopg
+    from scripts.test_database import test_database
+    with test_database(Path.cwd()) as url:
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        print('database-ready',flush=True)
+        time.sleep(.5)
+        with psycopg.connect(url.replace('postgresql+psycopg://','postgresql://')) as connection:
+            assert connection.execute('SELECT 1').fetchone() == (1,)
+        print('database-available-for-cleanup',flush=True)
+    """
+        process = subprocess.Popen([sys.executable, '-c', script], cwd=Path(__file__).resolve().parents[3], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
+        try:
+            assert process.stdout is not None
+>           assert process.stdout.readline().strip() == 'database-ready'
+E           AssertionError: assert '' == 'database-ready'
+E             
+E             - database-ready
+
+apps/api/tests/test_disposable_cleanup.py:77: AssertionError
+=========================== short test summary info ============================
+FAILED apps/api/tests/test_disposable_cleanup.py::test_terminal_interrupt_keeps_disposable_database_available_for_cleanup
+1 failed, 7 deselected in 0.43s

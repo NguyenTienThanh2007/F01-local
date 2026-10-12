@@ -10,6 +10,8 @@
     "api:check": "cd apps/api && uv run --locked python scripts/export_openapi.py --check && cd ../.. && pnpm --filter @f01/api-client check",
     "test:client": "pnpm --filter @f01/api-client test",
     "test:web": "pnpm --filter @f01/web test",
-    "test:e2e": "pnpm --filter @f01/web test:e2e"
+    "test:e2e": "pnpm --filter @f01/web test:e2e",
+    "test:commercial": "apps/api/.venv/bin/python scripts/test-m5.py --commercial",
+    "open:commercial": "apps/api/.venv/bin/python scripts/open-commercial-local.py"
   }
 }

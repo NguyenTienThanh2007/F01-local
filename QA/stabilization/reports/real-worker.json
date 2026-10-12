@@ -1,0 +1,115 @@
+{
+  "browser": "passed",
+  "postgres": "real disposable",
+  "docker": "real accepted image",
+  "worker_process_loss": "actually terminated owned worker",
+  "model": "controlled",
+  "public_provider": "not_run",
+  "source_calls": 4,
+  "captures": [
+    {
+      "name": "queued",
+      "width": 1440
+    },
+    {
+      "name": "queued",
+      "width": 375
+    },
+    {
+      "name": "generating",
+      "width": 1440
+    },
+    {
+      "name": "generating",
+      "width": 375
+    },
+    {
+      "name": "generation-reload",
+      "width": 1440
+    },
+    {
+      "name": "generation-reload",
+      "width": 375
+    },
+    {
+      "name": "building",
+      "width": 1440
+    },
+    {
+      "name": "building",
+      "width": 375
+    },
+    {
+      "name": "verifying",
+      "width": 1440
+    },
+    {
+      "name": "verifying",
+      "width": 375
+    },
+    {
+      "name": "preparing-preview",
+      "width": 1440
+    },
+    {
+      "name": "preparing-preview",
+      "width": 375
+    },
+    {
+      "name": "succeeded",
+      "width": 1440
+    },
+    {
+      "name": "succeeded",
+      "width": 375
+    },
+    {
+      "name": "repairing",
+      "width": 1440
+    },
+    {
+      "name": "repairing",
+      "width": 375
+    },
+    {
+      "name": "failed",
+      "width": 1440
+    },
+    {
+      "name": "failed",
+      "width": 375
+    },
+    {
+      "name": "canceled",
+      "width": 1440
+    },
+    {
+      "name": "canceled",
+      "width": 375
+    },
+    {
+      "name": "quiet-generation",
+      "width": 1440
+    },
+    {
+      "name": "quiet-generation",
+      "width": 375
+    },
+    {
+      "name": "worker-stall-reload",
+      "width": 1440
+    },
+    {
+      "name": "worker-stall-reload",
+      "width": 375
+    },
+    {
+      "name": "recovered-without-replay",
+      "width": 1440
+    },
+    {
+      "name": "recovered-without-replay",
+      "width": 375
+    }
+  ]
+}

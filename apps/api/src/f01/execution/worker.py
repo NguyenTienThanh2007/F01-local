@@ -7,8 +7,8 @@ import httpx
 from sqlalchemy import func, select
 from f01.application import execution as service
 from f01.application.identity import digest
-from f01.application.planning import lock_owner
-from f01.application.source_artifacts import apply_proposal
+from f01.application.planning import lock_owner, reserve_factory_capacity
+from f01.application.source_artifacts import SourceRejected, apply_proposal
 from f01.config import Settings, get_settings
 from f01.db.models import ExecutionJob, IsolatedPreview, PlanningAttempt, SourceCandidate, VerificationEvidence
 from f01.db.session import Database
@@ -17,6 +17,7 @@ from f01.domain.execution import CommandEvidence
 from f01.domain.source import GenerationContext, GenerationResult, SourceArtifact
 from f01.execution.docker import DockerSandbox, SandboxError
 from f01.execution.sandbox import CommandPhase
+from f01.execution.source_references import build_source_hints, typecheck_source_hints
 from f01.providers.base import ProviderError
 from f01.providers.source import SourceGenerationProvider
 
@@ -48,6 +49,7 @@ class BuildWorker:
             minute = session.scalar(select(func.count()).select_from(PlanningAttempt).where(PlanningAttempt.user_id == owner,PlanningAttempt.created_at >= service.now()-timedelta(minutes=1))) or 0
             if count >= self.settings.planning_requests_per_day or minute >= self.settings.planning_requests_per_minute: raise ApplicationError("PLANNING_RATE_LIMITED")
             if estimate+total > self.settings.planning_daily_token_budget: raise ApplicationError("PLANNING_BUDGET_EXCEEDED")
+            reserve_factory_capacity(session, self.settings, estimate, service.now())
             identifier = uuid4()
             session.add(PlanningAttempt(id=identifier,user_id=owner,project_id=project.id,key=f"source:{job.id}:{job.epoch}:{job.repairs}",request_hash=digest(context.model_dump_json()),status="pending",context={"kind":"source","job_id":str(job.id),"repair":job.repairs},reserved_tokens=estimate,created_at=service.now(),deadline_at=service.now()+timedelta(seconds=self.settings.planning_timeout_seconds+15)))
             job.phase = "generation_pending"
@@ -77,7 +79,10 @@ class BuildWorker:
                 result = GenerationResult.model_validate_json((await task).model_dump_json())
             if result.output_tokens is not None and result.output_tokens>self.settings.source_output_tokens or result.input_tokens is not None and result.input_tokens>131072: raise ApplicationError("SOURCE_BUDGET_EXCEEDED")
             service.reject_secrets(self.settings,result.model_dump_json())
-            artifact=apply_proposal(result.proposal,context.lineage,base=context.base_source,forbidden_secrets=service.forbidden(self.settings),candidate_base=bool(context.repair_evidence))
+            try:
+                artifact=apply_proposal(result.proposal,context.lineage,base=context.base_source,forbidden_secrets=service.forbidden(self.settings),candidate_base=bool(context.repair_evidence))
+            except SourceRejected:
+                raise ApplicationError('SOURCE_PROPOSAL_REJECTED') from None
             successful=True
             return artifact
         finally:
@@ -132,7 +137,12 @@ class BuildWorker:
             service.emit(session,project,run,"issue_detection",failed=True)
             context=GenerationContext.model_validate_json(json.dumps(job.context))
             # Evidence has codes, validated paths and line numbers, never unrestricted logs.
-            value=context.model_copy(update={"base_source":source,"repair_evidence":(issue.model_dump_json(exclude={"argv"}),)})
+            # Supplemental hints derive only from this exact candidate's source.
+            # Keep the original command first, and never rewrite persisted evidence.
+            hints = build_source_hints(source) if issue.phase == "build" else ()
+            if issue.phase == "typecheck":
+                hints = typecheck_source_hints(source, frozenset(d.code for d in issue.diagnostics))
+            value=context.model_copy(update={"base_source":source,"repair_evidence":(issue.model_dump_json(exclude={"argv"}), *hints)})
             return GenerationContext.model_validate_json(value.model_dump_json())
 
     def initial(self, identifier: UUID) -> tuple[GenerationContext, SourceArtifact | None]:
@@ -166,7 +176,9 @@ class BuildWorker:
                     await asyncio.to_thread(self.record,identifier,token,candidate,evidence)
                     if evidence.exit_code: failed=evidence;break
                 if failed:
-                    await self.sandbox.remove(name);name=None
+                    await self.sandbox.remove(name)
+                    await asyncio.to_thread(self.clear_container,identifier,name)
+                    name=None
                     repair=await asyncio.to_thread(self.prepare_repair,identifier,token,source,failed)
                     source=await self.generate(identifier,token,repair)
                     continue

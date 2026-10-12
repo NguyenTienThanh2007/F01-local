@@ -1,0 +1,12 @@
+$ pnpm --filter @f01/api-client test
+$ node --conditions=react-server --test tests/server.test.mjs
+✔ generated client uses the private fixed-origin transport and preserves metadata headers (23.8905ms)
+✔ private transport rejects browser/default imports and non-origin URLs (117.931375ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 316.818083

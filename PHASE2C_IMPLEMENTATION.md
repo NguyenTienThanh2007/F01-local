@@ -1,5 +1,6 @@
 # Phase 2C implementation plan — proposal only
 
+Historical checkpoint/proposal. The commercial-v1 implementation, selected Vercel/static profile and final runtime evidence are documented in [COMMERCIAL_V1.md](COMMERCIAL_V1.md). The earlier status and blockers below are preserved as historical records, not the current continuation status.
 Status: Phase 1 M0–M6, Phase 2A and Phase 2B complete. Phase 2C implementation has **not started**. This document proposes seven bounded milestones; it authorizes no code, migration, provider resource, credential setup or deployment.
 Revision: 0.1 · 2026-10-04
 Related: [Product](PRODUCT_SPEC.md), [Architecture](ARCHITECTURE.md), [Roadmap](ROADMAP.md), [Phase 2B completion](PHASE2B_IMPLEMENTATION.md), [Design system](DESIGN_SYSTEM.md).

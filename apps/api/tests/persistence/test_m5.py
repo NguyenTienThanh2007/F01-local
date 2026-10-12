@@ -270,6 +270,7 @@ def test_sse_replay_authorization_expiry_and_cursor_validation(database: Databas
     async def connected() -> bool: return False
     async def inspect() -> None:
         generator=stream_events(database,uid,pid,0,project_settings,token,connected,poll_seconds=0)
+        assert await anext(generator)==': connected\n\n'
         first=await anext(generator); second=await anext(generator)
         assert 'id: 1\n' in first and 'id: 2\n' in second
         project_settings.dev_token_expires_at=datetime.now(UTC)-timedelta(seconds=1)
@@ -281,6 +282,7 @@ def test_sse_replay_authorization_expiry_and_cursor_validation(database: Databas
         assert 'access_revoked' in await anext(invalid)
         await invalid.aclose()
         resumed=stream_events(database,uid,pid,2,project_settings,token,connected,poll_seconds=0)
+        assert await anext(resumed)==': connected\n\n'
         assert 'id: 3\n' in await anext(resumed)
         await resumed.aclose()
     asyncio.run(inspect())
@@ -341,7 +343,19 @@ def test_lifespan_loop_restart_and_read_only_heartbeat(database: Database, proje
     async def connected() -> bool: return False
     async def heartbeat() -> None:
         generator=stream_events(database,uid,pid,sequence,configured,configured.dev_api_token.get_secret_value(),connected,poll_seconds=0,heartbeat_seconds=0)
+        assert await anext(generator)==': connected\n\n'
         assert await anext(generator)==': heartbeat\n\n'
         await generator.aclose()
     asyncio.run(heartbeat())
     assert workspace(database,uid,pid).last_sequence==sequence
+
+def test_quiet_event_stream_confirms_transport_promptly_without_progress(database:Database,client:TestClient,project_settings:Settings)->None:
+    created=create(client);pid=UUID(created['project']['id']);uid=owner(database,created)
+    before=workspace(database,uid,pid)
+    async def connected()->bool:return False
+    async def check()->None:
+        generator=stream_events(database,uid,pid,before.last_sequence,project_settings,project_settings.dev_api_token.get_secret_value(),connected)
+        try:assert await asyncio.wait_for(anext(generator),timeout=1)==': connected\n\n'
+        finally:await generator.aclose()
+    asyncio.run(check())
+    assert workspace(database,uid,pid)==before

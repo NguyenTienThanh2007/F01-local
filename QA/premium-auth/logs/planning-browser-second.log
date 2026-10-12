@@ -1,0 +1,52 @@
+$ node --test tests/planning.e2e.test.mjs
+▶ production frontend submits, displays, recovers and protects the browser boundary
+  ✔ blank and oversized ideas are validated without network access (458.826459ms)
+  ✔ pending state prevents duplicate submissions and cancellation preserves the brief (351.759708ms)
+  ✔ successful request renders all structured plan fields and keeps credentials server-side (564.322458ms)
+  ✔ provider failures preserve input and a retry renders a new successful plan (1063.689917ms)
+  ✔ HTML-like provider text is displayed as text (82.889167ms)
+  ✔ the real route rejects cross-site requests and unsupported methods (29.722458ms)
+  ✖ homepage starters change the brief and labeled sample without making a backend request (682.408125ms)
+✖ production frontend submits, displays, recovers and protects the browser boundary (9990.59025ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 6
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10114.174875
+
+✖ failing tests:
+
+test at tests/planning.e2e.test.mjs:36:13
+✖ homepage starters change the brief and labeled sample without making a backend request (682.408125ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Your idea\.\s*Working software\./. Input:
+  
+  'Big idea.\nReal application.'
+  
+      at file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/planning.e2e.test.mjs:188:14
+      at async TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/planning.e2e.test.mjs:37:13)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async run (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/planning.e2e.test.mjs:36:5)
+      at async TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/planning.e2e.test.mjs:185:5)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Big idea.\nReal application.',
+    expected: /Your idea\.\s*Working software\./,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/planning.e2e.test.mjs:33:1
+✖ production frontend submits, displays, recovers and protects the browser boundary (9990.59025ms)
+  Error: Browser scenario failed: homepage starters change the brief and labeled sample without making a backend request
+      at run (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/planning.e2e.test.mjs:39:24)
+      at async TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/planning.e2e.test.mjs:185:5)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+/Users/nguyentienthanh/Downloads/F01-local/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @f01/web@ test:e2e: `node --test tests/planning.e2e.test.mjs`
+Exit status 1

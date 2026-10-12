@@ -33,6 +33,7 @@ async def stream_events(database: Database, owner: UUID, project_id: UUID, curso
     async def valid() -> bool:
         return await asyncio.to_thread(authorized) if authorized else credentials_valid(settings, token)
     heartbeat = time.monotonic()
+    connected_sent = False
     while not await disconnected():
         if not await valid():
             yield 'event: session_expired\ndata: {"code":"AUTHENTICATION_REQUIRED"}\n\n'
@@ -48,6 +49,11 @@ async def stream_events(database: Database, owner: UUID, project_id: UUID, curso
         if not await valid():
             yield 'event: session_expired\ndata: {"code":"AUTHENTICATION_REQUIRED"}\n\n'
             return
+        if not connected_sent:
+            # Flush authenticated transport headers even when the replay cursor is current.
+            # A comment carries no application event, activity or progress evidence.
+            yield ': connected\n\n'
+            connected_sent = True
         for event in page.items:
             if not await valid():
                 yield 'event: session_expired\ndata: {"code":"AUTHENTICATION_REQUIRED"}\n\n'

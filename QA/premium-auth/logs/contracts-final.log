@@ -1,0 +1,3 @@
+OpenAPI contract is current.
+$ node scripts/generate.mjs --check
+Generated TypeScript contract is current.

@@ -1,0 +1,46 @@
+{
+  "verified_at_utc": "2026-10-07T15:49:21.816115+00:00",
+  "implementation_commit": "601574660b556fc04002bf854df5cc7dea900170",
+  "backend": {
+    "passed": 334,
+    "skipped_opt_in": 4,
+    "docker_run_separately": 3,
+    "live_provider_run_separately": 1
+  },
+  "strict_mypy": {
+    "status": "passed",
+    "files": 102
+  },
+  "frontend": {
+    "status": "passed",
+    "tests": 61
+  },
+  "generated_client": {
+    "status": "passed",
+    "tests": 2,
+    "drift": "passed"
+  },
+  "typecheck": "passed",
+  "production_build": "passed",
+  "browser": {
+    "planning": 14,
+    "phase1": 6,
+    "phase2a": 4,
+    "ux0": 5,
+    "commercial_docker": 1,
+    "public_vercel_browser": "passed",
+    "wcag_four_widths": "passed"
+  },
+  "docker_acceptance": "passed",
+  "vercel_acceptance": "passed",
+  "metadata_package_backup_restore": "passed",
+  "dedicated_reliability_pass": "passed",
+  "model_transport": "controlled; live OpenAI not run",
+  "oidc_browser": "synthetic RSA fixture; real signature/session validation",
+  "provider_test_resources": "disposable Vercel project removed after success",
+  "harness_sha256": {
+    "apps/api/tests/live/test_vercel_acceptance.py": "996456a9673920e2756a7a0df00daffc15dfbaf9e269b1502bb379f96d0e1816",
+    "apps/web/tests/public-release-probe.mjs": "419107b2eb8336c3fbcec3b59860e7ee822810d1170fb95f00a5be244dfa9e51",
+    "apps/web/tests/commercial.e2e.test.mjs": "f4d2a42cb7e4262173101b65870f24c032ae3f078ce3fc2305acfeb5bb854ad0"
+  }
+}

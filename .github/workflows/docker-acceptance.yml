@@ -1,0 +1,40 @@
+name: Exact-image Docker acceptance
+on:
+  workflow_dispatch:
+    inputs:
+      base_image:
+        description: Reviewed official Node 24 image at node@sha256 digest
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.8.22'
+      - run: uv sync --locked --python 3.12
+        working-directory: apps/api
+      - name: Provision trusted Phase 2B and production images
+        env:
+          REVIEWED_BASE: ${{ inputs.base_image }}
+        run: |
+          apps/api/.venv/bin/python scripts/provision-sandbox.py --base-image "$REVIEWED_BASE"
+          ACCEPTED_BASE=$(docker image inspect f01-sandbox:next-web-v1 --format '{{.Id}}')
+          apps/api/.venv/bin/python scripts/provision-production.py --base-image-id "$ACCEPTED_BASE"
+      - name: Containment, execution journey and production packaging
+        run: |
+          PRODUCTION_IMAGE=$(docker image inspect f01-sandbox:next-static-v1 --format '{{.Id}}')
+          F01_TEST_PG_BIN="$(pg_config --bindir)" apps/api/.venv/bin/python scripts/test-backend.py --docker --production --image-id "$PRODUCTION_IMAGE" --socket /var/run/docker.sock
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: exact-image-acceptance
+          path: |
+            .runtime/production-image.json
+            .runtime/production-acceptance-report.json
+            .runtime/docker-acceptance.xml

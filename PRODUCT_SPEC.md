@@ -1,8 +1,10 @@
 # F01 — Product specification
 
 Status: Phase 1 M0–M6, Phase 2A and Phase 2B complete; Phase 2C documentation/planning only, implementation not started.
-Revision: 0.15 · 2026-10-04
+Revision: 0.16 · 2026-10-05
 Scope: Single-owner persisted projects, verified identity/context planning, real source generation, isolated build/test/repair and verified preview. Production release is proposed in [PHASE2C_IMPLEMENTATION.md](PHASE2C_IMPLEMENTATION.md), not implemented. F01 remains a temporary internal codename.
+
+Core stabilization on the commercial-v1 continuation branch accepts real saved-project responses, presents saved/queued build status and recovery, and makes planning review lead back to Build. Existing demonstration history remains labeled; no public deployment is implied. [UX0_IMPLEMENTATION.md](UX0_IMPLEMENTATION.md) records acceptance and the missing fresh Docker gate. Commercial v1 and Phase 2C remain unfinished.
 
 The Phase 2B completion record supplied by the founder identifies `f9c2a69`, exact trusted image `sha256:bf55945a66450b4d747196aed159eba926ca377b66e41400da70c0a54e3363c0`, passing Docker containment and signed-in build/repair/change/failure journey, 289 backend tests passed/2 skipped, and passing frontend typecheck/build. Evidence provenance and historical check counts are in [PHASE2B_IMPLEMENTATION.md](PHASE2B_IMPLEMENTATION.md). Phase 1 sections below preserve the demonstration contract; they do not limit current real-run capabilities.
 

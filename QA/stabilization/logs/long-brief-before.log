@@ -1,0 +1,94 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+$ node --test tests/phase1.e2e.test.mjs
+Phase 1 scenario: one persisted journey covers lifecycle, Brain, history, cancel and metadata
+Phase 1 scenario: long content, all workspace surfaces and compact navigation remain accessible
+▶ M6 final Phase 1 acceptance and product quality
+  ✔ one persisted journey covers lifecycle, Brain, history, cancel and metadata (16771.940125ms)
+  ✖ long content, all workspace surfaces and compact navigation remain accessible (9277.963167ms)
+✖ M6 final Phase 1 acceptance and product quality (28407.541458ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 1
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28474.380375
+
+✖ failing tests:
+
+test at tests/phase1.e2e.test.mjs:34:68
+✖ long content, all workspace surfaces and compact navigation remain accessible (9277.963167ms)
+  AssertionError [ERR_ASSERTION]: 1280px preview long content
+  + actual - expected
+  
+  + [
+  +   {
+  +     id: 'scrollable-region-focusable',
+  +     targets: [
+  +       [
+  +         '.user-message > p'
+  +       ]
+  +     ]
+  +   }
+  + ]
+  - []
+  
+      at scan (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:43:14)
+      at async file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:130:11
+      at async TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:34:99)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async scenario (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:34:60)
+      at async TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:119:5)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ { id: 'scrollable-region-focusable', targets: [Array] } ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/phase1.e2e.test.mjs:25:1
+✖ M6 final Phase 1 acceptance and product quality (28407.541458ms)
+  AssertionError [ERR_ASSERTION]: 1280px preview long content
+  + actual - expected
+  
+  + [
+  +   {
+  +     id: 'scrollable-region-focusable',
+  +     targets: [
+  +       [
+  +         '.user-message > p'
+  +       ]
+  +     ]
+  +   }
+  + ]
+  - []
+  
+      at scan (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:43:14)
+      at async file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:130:11
+      at async TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:34:99)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async scenario (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:34:60)
+      at async TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/phase1.e2e.test.mjs:119:5)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ { id: 'scrollable-region-focusable', targets: [Array] } ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+/Users/nguyentienthanh/Downloads/F01-local/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @f01/web@ test:phase1:e2e: `node --test tests/phase1.e2e.test.mjs`
+Exit status 1

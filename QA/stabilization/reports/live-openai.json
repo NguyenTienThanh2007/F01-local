@@ -1,0 +1,43 @@
+{
+  "planning": "passed",
+  "source_generation": "passed",
+  "docker": "passed",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "identity": "development test principal",
+  "scenario": "agency-task-tracker",
+  "provider_call_limit": 4,
+  "reserved_standard_rate_limit_usd": 0.5,
+  "provider_calls": 3,
+  "reserved_standard_rate_usd": 0.059852,
+  "observed_build": {
+    "phase": "preview_ready",
+    "error_code": null,
+    "candidate_count": 2,
+    "evidence_phases": [
+      "materialization",
+      "install",
+      "typecheck",
+      "materialization",
+      "install",
+      "typecheck",
+      "build",
+      "verification"
+    ]
+  },
+  "repair_attempts": 1,
+  "source_digest": "db29207195e60760410c63366f76f10b48bad07e78867807820ccfd5dec0dd50",
+  "run_id": "799e857b-7f2b-4388-9948-2a24e0e4caa7",
+  "version_id": "218f54dc-c62e-406d-8efa-434d408d2820",
+  "input_brain_revision_id": "9547ed93-5e26-416a-8088-1596a43e83c0",
+  "evidence_phases": [
+    "materialization",
+    "install",
+    "typecheck",
+    "materialization",
+    "install",
+    "typecheck",
+    "build",
+    "verification"
+  ]
+}

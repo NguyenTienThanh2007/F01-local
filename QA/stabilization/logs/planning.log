@@ -1,0 +1,24 @@
+$ node --test tests/planning.e2e.test.mjs
+▶ production frontend submits, displays, recovers and protects the browser boundary
+  ✔ blank and oversized ideas are validated without network access (183.844667ms)
+  ✔ pending state prevents duplicate submissions and cancellation preserves the brief (272.555958ms)
+  ✔ successful request renders all structured plan fields and keeps credentials server-side (294.487291ms)
+  ✔ provider failures preserve input and a retry renders a new successful plan (579.857417ms)
+  ✔ HTML-like provider text is displayed as text (62.79475ms)
+  ✔ the real route rejects cross-site requests and unsupported methods (9.156583ms)
+  ✔ homepage starters change the brief and labeled sample without making a backend request (241.984333ms)
+  ✔ global navigation exposes real starter briefs, planned connections and documentation (151.278541ms)
+  ✔ sample workspace views and evidence inspection are interactive without executing work (454.294625ms)
+  ✔ demo can pause and replay and is static by default with reduced motion (16382.736542ms)
+  ✔ dashboard exposes a retryable connection error and starters prefill creation (236.636708ms)
+  ✔ all redesigned surfaces fit target widths and mobile navigation restores keyboard focus (1236.162416ms)
+  ✔ production browser JavaScript contains no credential environment references (20.753584ms)
+✔ production frontend submits, displays, recovers and protects the browser boundary (22734.731834ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 22802.616041

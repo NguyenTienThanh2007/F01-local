@@ -1,0 +1,6 @@
+{
+  "source_commit": "3227ef5947da4b03b38d673dac98d67074ceb832",
+  "original_evidence": "QA/product-refinement",
+  "provider": "controlled fixture",
+  "captures": "real rendered browser captures on this unchanged baseline"
+}

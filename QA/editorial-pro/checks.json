@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-09",
+  "implementation_commit": "d3ad86e7e738d17a943721f70b6316768e94ad39",
+  "backend": {
+    "passed": 363,
+    "skipped": 5,
+    "warnings": 2
+  },
+  "strict_mypy": {
+    "passed": true,
+    "files": 108
+  },
+  "frontend": {
+    "passed": 102
+  },
+  "generated_client": {
+    "passed": 2,
+    "drift": "current"
+  },
+  "typecheck": "passed",
+  "production_build": "passed",
+  "planning_browser": 14,
+  "creation_browser": 7,
+  "workspace_browser": 9,
+  "commercial_browser": "passed",
+  "authentication": "controlled OIDC passed, live not_run",
+  "both_theme_axe": 332,
+  "actual_worker_axe": 26,
+  "transient_loading_axe_skips": 4,
+  "no_flash": {
+    "preferences": [
+      "light",
+      "dark",
+      "system"
+    ],
+    "body_frames_each": 8,
+    "React": "blocked",
+    "selector": "correct"
+  },
+  "docker": "3 passed on exact accepted image",
+  "live_google": "not_run",
+  "live_magic_link": "not_run",
+  "live_vercel": "not_run",
+  "live_ai_this_pass": "not_run",
+  "account_theme_sync": "browser-local, API unsupported",
+  "CI": "Historical design evidence; final stabilization commit CI is linked on PR #1."
+}

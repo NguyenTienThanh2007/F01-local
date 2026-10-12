@@ -1,8 +1,12 @@
 # F01 — Implementation roadmap
 
 Status: Phase 1 M0–M6, Phase 2A and Phase 2B complete; Phase 2C documentation/planning only, implementation not started.
-Revision: 0.15 · 2026-10-04
+Revision: 0.16 · 2026-10-05
 Related: [Product specification](PRODUCT_SPEC.md), [Architecture](ARCHITECTURE.md), [Design system](DESIGN_SYSTEM.md).
+
+## Commercial v1 continuation — 2026-10-05
+
+The founder authorized incremental commercial-v1 work from GitHub main `449b058`: core stabilization → existing UX refinement → existing Phase 2C design → incremental redeployment → commercial hardening. [UX0_IMPLEMENTATION.md](UX0_IMPLEMENTATION.md) records the repository audit, branch, actual fixes, acceptance and remaining gates. Core command fixes are implemented; fresh Docker execution acceptance is blocked in the current workspace, so the milestone is not complete and Phase 2C code has not begun. Historical milestones and accepted security/lineage boundaries below remain authoritative and preserved.
 
 ## 1. Current checkpoint
 

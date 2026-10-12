@@ -1,0 +1,16 @@
+PASS v3 saved records and IDs survive v7 without initial empty write
+PASS New Task opens; initial focus, Tab trap, Escape and Cancel restore invoking control
+PASS Required validation prevents blank task; create task with priority and overdue date
+PASS Edit preserves ID, changes priority/due date, restores Edit invoker
+PASS Move task Todo → In Progress → Done and back with real persisted status
+PASS Search/status/priority filtering and no-results Reset work
+PASS Refresh keeps exact tasks and does not write empty initial state
+PASS Delete confirmation can cancel; confirmed delete removes only the disposable task
+PASS Mobile create/edit/reload/delete with preserved original records
+PASS Actual board visual measurements and axe at four responsive widths
+PASS Actual New Task editor opens and passes compact sizing/axe desktop and mobile
+PASS Malformed storage is preserved with a truthful warning and no writes
+PASS Local calendar-day overdue boundaries and unknown-field compatibility
+PASS Empty and no-results actual views remain usable
+PASS No critical console errors or uncaught page exceptions
+{"version":7,"passed":true,"checks":15,"failed":[]}

@@ -1,0 +1,33 @@
+✖ owned conversation restores before editing, retains unsent text and preserves historical readonly (4799.273042ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4959.450709
+
+✖ failing tests:
+
+test at tests/conversation-recovery.e2e.test.mjs:11:1
+✖ owned conversation restores before editing, retains unsent text and preserves historical readonly (4799.273042ms)
+  AssertionError [ERR_ASSERTION]: Do not accept typing until the owned saved draft is restored.
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///Users/nguyentienthanh/Downloads/F01-local/apps/web/tests/conversation-recovery.e2e.test.mjs:30:137)
+      at runNextTicks (node:internal/process/task_queues:65:5)
+      at process.processImmediate (node:internal/timers:472:9)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+undefined
+/Users/nguyentienthanh/Downloads/F01-local/apps/web:
+[ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL] Command failed with exit code 1: node --test tests/conversation-recovery.e2e.test.mjs

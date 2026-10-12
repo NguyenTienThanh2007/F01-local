@@ -1063,3 +1063,9 @@
     padding: 12px 16px;
   }
 }
+
+.production-release { min-width: 0; overflow-wrap: anywhere; }
+.release-review { display: flex; align-items: flex-start; gap: 10px; margin-block: 16px; }
+.release-review input { flex: 0 0 auto; margin-top: 4px; accent-color: var(--accent); }
+.release-record { border-top: 1px solid var(--line); padding-block: 16px; }
+.production-release details { margin-top: 16px; }

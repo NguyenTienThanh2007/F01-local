@@ -1,0 +1,56 @@
+{
+  "url": "http://f01-d81470009d8642f08deb4a1e174f57f1.localhost:57470/p/40cee15a-fc6a-40db-afa5-440f752a705c/<local-preview-capability>/",
+  "version": 2,
+  "checks": [
+    {
+      "name": "empty state",
+      "passed": true
+    },
+    {
+      "name": "validation",
+      "passed": true
+    },
+    {
+      "name": "create and priority",
+      "passed": true
+    },
+    {
+      "name": "edit",
+      "passed": true
+    },
+    {
+      "name": "move between columns",
+      "passed": true
+    },
+    {
+      "name": "second task",
+      "passed": true
+    },
+    {
+      "name": "search",
+      "passed": true
+    },
+    {
+      "name": "priority/status filters",
+      "passed": true
+    },
+    {
+      "name": "refresh persists",
+      "passed": true
+    },
+    {
+      "name": "delete",
+      "passed": true
+    }
+  ],
+  "console": [],
+  "errors": [],
+  "storage": {
+    "taskpilot_tasks_v1": "[{\"id\":\"l21nixxnzi\",\"title\":\"Founder acceptance task \u2014 edited\",\"description\":\"Keep this saved task across AI versions.\",\"status\":\"In Progress\",\"priority\":\"High\"}]"
+  },
+  "stylesheets": 1,
+  "mobile": {
+    "viewport": 390,
+    "width": 390
+  }
+}

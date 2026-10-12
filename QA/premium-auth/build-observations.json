@@ -1,0 +1,224 @@
+{
+  "browser": "passed",
+  "data": "generated-contract fixtures",
+  "docker": "not_run",
+  "provider": "not_run",
+  "captures": [
+    {
+      "name": "queued",
+      "width": 1440
+    },
+    {
+      "name": "queued",
+      "width": 375
+    },
+    {
+      "name": "queued",
+      "width": 720
+    },
+    {
+      "name": "generation-pending",
+      "width": 1440
+    },
+    {
+      "name": "generation-pending",
+      "width": 375
+    },
+    {
+      "name": "generation-pending",
+      "width": 720
+    },
+    {
+      "name": "generating-reload",
+      "width": 1440
+    },
+    {
+      "name": "generating-reload",
+      "width": 375
+    },
+    {
+      "name": "generating-reload",
+      "width": 720
+    },
+    {
+      "name": "interrupted-read",
+      "width": 1440
+    },
+    {
+      "name": "interrupted-read",
+      "width": 375
+    },
+    {
+      "name": "interrupted-read",
+      "width": 720
+    },
+    {
+      "name": "building",
+      "width": 1440
+    },
+    {
+      "name": "building",
+      "width": 375
+    },
+    {
+      "name": "building",
+      "width": 720
+    },
+    {
+      "name": "verifying",
+      "width": 1440
+    },
+    {
+      "name": "verifying",
+      "width": 375
+    },
+    {
+      "name": "verifying",
+      "width": 720
+    },
+    {
+      "name": "repairing",
+      "width": 1440
+    },
+    {
+      "name": "repairing",
+      "width": 375
+    },
+    {
+      "name": "repairing",
+      "width": 720
+    },
+    {
+      "name": "worker-stall",
+      "width": 1440
+    },
+    {
+      "name": "worker-stall",
+      "width": 375
+    },
+    {
+      "name": "worker-stall",
+      "width": 720
+    },
+    {
+      "name": "failed",
+      "width": 1440
+    },
+    {
+      "name": "failed",
+      "width": 375
+    },
+    {
+      "name": "failed",
+      "width": 720
+    },
+    {
+      "name": "rejected-source",
+      "width": 1440
+    },
+    {
+      "name": "rejected-source",
+      "width": 375
+    },
+    {
+      "name": "rejected-source",
+      "width": 720
+    },
+    {
+      "name": "retry-queued",
+      "width": 1440
+    },
+    {
+      "name": "retry-queued",
+      "width": 375
+    },
+    {
+      "name": "retry-queued",
+      "width": 720
+    },
+    {
+      "name": "canceled",
+      "width": 1440
+    },
+    {
+      "name": "canceled",
+      "width": 375
+    },
+    {
+      "name": "canceled",
+      "width": 720
+    },
+    {
+      "name": "preparing-preview",
+      "width": 1440
+    },
+    {
+      "name": "preparing-preview",
+      "width": 375
+    },
+    {
+      "name": "preparing-preview",
+      "width": 720
+    },
+    {
+      "name": "succeeded-auto-preview",
+      "width": 1440
+    },
+    {
+      "name": "succeeded-auto-preview",
+      "width": 375
+    },
+    {
+      "name": "succeeded-auto-preview",
+      "width": 720
+    },
+    {
+      "name": "update-live-preserved",
+      "width": 1440
+    },
+    {
+      "name": "update-live-preserved",
+      "width": 375
+    },
+    {
+      "name": "update-live-preserved",
+      "width": 720
+    },
+    {
+      "name": "cancellation-requested",
+      "width": 1440
+    },
+    {
+      "name": "cancellation-requested",
+      "width": 375
+    },
+    {
+      "name": "cancellation-requested",
+      "width": 720
+    },
+    {
+      "name": "update-canceled",
+      "width": 1440
+    },
+    {
+      "name": "update-canceled",
+      "width": 375
+    },
+    {
+      "name": "update-canceled",
+      "width": 720
+    },
+    {
+      "name": "demonstration-keeps-provenance",
+      "width": 1440
+    },
+    {
+      "name": "demonstration-keeps-provenance",
+      "width": 375
+    },
+    {
+      "name": "demonstration-keeps-provenance",
+      "width": 720
+    }
+  ]
+}

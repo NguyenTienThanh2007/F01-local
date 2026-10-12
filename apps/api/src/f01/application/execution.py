@@ -180,12 +180,16 @@ def detail(database: Database, owner: UUID, project_id: UUID, run_id: UUID) -> B
         job = session.scalar(select(ExecutionJob).where(ExecutionJob.project_id == project_id, ExecutionJob.run_id == run_id))
         if job is None: raise ApplicationError("NOT_FOUND")
         run = session.get(BuildRun, run_id)
+        assert run is not None
         candidates = session.scalars(select(SourceCandidate).where(SourceCandidate.job_id == job.id).order_by(SourceCandidate.attempt)).all()
         evidence = session.scalars(select(VerificationEvidence).where(VerificationEvidence.candidate_id.in_([c.id for c in candidates])).order_by(VerificationEvidence.created_at)).all()
+        observed_at, progress_sequence = session.execute(select(func.max(BuildEvent.occurred_at), func.max(BuildEvent.sequence)).where(BuildEvent.project_id == project_id, BuildEvent.run_id == run_id, BuildEvent.mode == "real")).one()
         return BuildDetail(run=RunRecord.model_validate(run), phase=job.phase, cancel_requested=job.cancel_requested, repair_attempts=job.repairs,
             candidates=[CandidateMetadata(id=c.id, attempt=c.attempt, digest=c.digest, parent_digest=c.parent_digest,
                 files=[{"path":f.path,"sha256":f.sha256,"bytes":len(f.content.encode())} for f in SourceArtifact.model_validate_json(json.dumps(c.source)).files], created_at=c.created_at) for c in candidates],
-            evidence=[CommandEvidence.model_validate(e.content) for e in evidence])
+            evidence=[CommandEvidence.model_validate(e.content) for e in evidence],
+            current_candidate_evidence=[CommandEvidence.model_validate(e.content) for e in evidence if candidates and e.candidate_id == candidates[-1].id],
+            progress_updated_at=observed_at or run.created_at, progress_sequence=progress_sequence or 0)
 
 
 def cancel(database: Database, owner: UUID, project_id: UUID, run_id: UUID) -> RunRecord:
@@ -225,6 +229,10 @@ def publish(database: Database, settings: Settings, identifier: UUID, token: UUI
         capability = job.preview_key
         expires = now()+timedelta(seconds=settings.preview_ttl_seconds)
         descriptor = {"kind":"isolated","preview_id":str(preview_id),"url":f"{settings.preview_origin}/p/{preview_id}/{capability}/", "source_digest":source.digest,"expires_at":expires.isoformat()}
+        from f01.execution.preview_origin import browser_origin
+        standalone = browser_origin(settings, project.id)
+        if standalone is not None:
+            descriptor["browser_url"] = f"{standalone}/p/{preview_id}/{capability}/"
         sequence = emit(session, project, run, "publication", candidate=candidate_id, provenance="published")
         brain: BrainContent = read_revision(session, project).content.model_copy(deep=True)
         for stage in ("model_proposed", "generated", "verified", "published"):

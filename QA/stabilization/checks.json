@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-09",
+  "baseline_remote_commit": "d3ad86e7e738d17a943721f70b6316768e94ad39",
+  "product_commit": "073881165a5db5fc3e20b21355c79a39f283dc8e",
+  "branch": "codex/f01-commercial-v1",
+  "main_commit": "449b0588e072cda102144c0c629d776049b4f2d2",
+  "backend": {
+    "passed": 368,
+    "skipped": 5,
+    "warnings": 2
+  },
+  "strict_mypy": {
+    "files": 110,
+    "result": "passed"
+  },
+  "frontend": 102,
+  "client": 2,
+  "contract_drift": "current",
+  "typecheck": "passed",
+  "production_build": "passed",
+  "planning_browser": 14,
+  "creation_browser": 7,
+  "workspace_browser": 9,
+  "phase1_browser": 6,
+  "phase2a_browser": 4,
+  "simulation_browser": 9,
+  "conversation_default_chromium": "passed; owned restore, partial reload, history readonly, foreign owner, long-brief keyboard and four both-theme axe checks",
+  "theme_bootstrap": "passed; Light/Dark/System before hydration",
+  "build_states": {
+    "states": 18,
+    "both_theme_checks": 144,
+    "data": "contract fixtures"
+  },
+  "auth": {
+    "checks": 72,
+    "data": "controlled RSA issuer"
+  },
+  "commercial": "passed final production build after keyboard fix: real disposable DB/Docker; controlled identity/model/publisher",
+  "product_a11y": {
+    "measurements": 120,
+    "passed": 116,
+    "loading_axe_skips": 4
+  },
+  "worker": {
+    "states": 13,
+    "captures": 26,
+    "process_loss": "actually killed owned worker",
+    "source": "controlled model"
+  },
+  "docker": {
+    "checks": 3,
+    "image_id": "sha256:c20b9d0f8e0691a9813f14a3fa89abbb50b135fac8fb274fbfee614fa10c9c11",
+    "result": "passed"
+  },
+  "openai": {
+    "result": "real acceptance passed",
+    "scenario": "agency task tracker",
+    "model": "gpt-4.1-mini",
+    "provider_calls": 3,
+    "repair_attempts": 1,
+    "reserved_usd": 0.059852,
+    "reservation_is_not_actual_billing": true
+  },
+  "vercel": "blocked HTTP403; no live mutation",
+  "google_email": "not configured; real login/email delivery unverified",
+  "CI": "exact evidence-commit result will be linked on PR #1; no merge",
+  "user_work_preserved": "pre-existing next-env generated dev imports remain local"
+}

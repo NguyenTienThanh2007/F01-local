@@ -1,0 +1,28 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+$ node --test tests/phase2a.e2e.test.mjs
+Phase 2A scenario: sign in → create → plan → reopen → context-aware change plan
+Phase 2A scenario: provider failure, cancellation and lost-response recovery preserve intent
+▶ Phase 2A verified sign-in and persisted contextual planning
+  ✔ sign in → create → plan → reopen → context-aware change plan (34292.777542ms)
+Phase 2A scenario: sign out and a second signed-in owner cannot access the first project
+  ✔ provider failure, cancellation and lost-response recovery preserve intent (13483.962583ms)
+Closing test browser
+  ✔ sign out and a second signed-in owner cannot access the first project (8249.80375ms)
+Stopping test server
+Teardown complete
+✔ Phase 2A verified sign-in and persisted contextual planning (70620.650041ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 71289.858625

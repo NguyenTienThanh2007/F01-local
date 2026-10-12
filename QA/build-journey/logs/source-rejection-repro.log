@@ -1,0 +1,107 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_rejected_generation_has_actionable_code_and_never_publishes[False] ____
+
+database = <f01.db.session.Database object at 0x10aa36c60>
+configured = Settings(app_env='test', auth_mode='development', execution_mode='real', real_execution_enabled=True, release_enabled=...=1000, simulation_runner_enabled=False, simulation_change_scenario='auto', dev_token_expires_at=None, log_level='INFO')
+project_plan = ProjectPlan(project_title='Harbor CRM', product_summary="Manage a small real estate agency's leads and sales pipeline....Identity boundary']), ImplementationMilestone(title='CRM workflows', deliverables=['Lead records', 'Pipeline views'])])
+repair = False
+
+    @pytest.mark.parametrize('repair',[False,True])
+    def test_rejected_generation_has_actionable_code_and_never_publishes(database:Database,configured:Settings,project_plan:ProjectPlan,repair:bool)->None:
+        owner,pid,body=setup_build(database,configured,project_plan)
+        run=service.queue(database,configured,owner,pid,body,'rejected-source')
+        class RejectedSource(SourceProvider):
+            async def propose_source(self,context:GenerationContext,maximum_output_tokens:int)->GenerationResult:
+                if repair and context.base_source is None:return await super().propose_source(context,maximum_output_tokens)
+                self.calls+=1
+                edits=tuple(PutFile(operation='put',path=f.path,prior_sha256=f.sha256,content=f.content) for f in context.base_source.files) if context.base_source else (PutFile(operation='put',path='app/page.tsx',prior_sha256=None,content='export default function Page(){return <main>Missing layout</main>}'),)
+                return GenerationResult(proposal=SourceProposal(schema_version=1,recipe='next-web-v1',base_digest=context.base_source.digest if context.base_source else None,edits=edits),input_tokens=100,output_tokens=200)
+        provider=RejectedSource(broken=repair);sandbox=ControlledSandbox()
+        assert asyncio.run(BuildWorker(database,configured,sandbox,provider).run_once())
+        detail=service.detail(database,owner,pid,run.id)
+>       assert detail.run.status=='failed' and detail.run.error_code=='SOURCE_PROPOSAL_REJECTED'
+E       AssertionError: assert ('failed' == 'failed'
+E
+E           failed and 'EXECUTION_FAILED' == 'SOURCE_PROPOSAL_REJECTED'
+E
+E         - SOURCE_PROPOSAL_REJECTED
+E         + EXECUTION_FAILED)
+
+tests/persistence/test_phase2b.py:115: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+No new upgrade operations detected.
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0006_release_hardening -> 0005_release_target, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Running downgrade 0005_release_target -> 0004_phase2c, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running downgrade 0004_phase2c -> 0003_phase2b, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running downgrade 0003_phase2b -> 0002_phase2a, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running downgrade 0002_phase2a -> 0001_phase1, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0001_phase1 -> , Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_phase1, Phase 1 domain. Frozen DDL; never import evolving ORM metadata here.
+INFO  [alembic.runtime.migration] Running upgrade 0001_phase1 -> 0002_phase2a, Phase 2A identity, sessions and planning. Frozen additive DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002_phase2a -> 0003_phase2b, Frozen additive Phase 2B execution persistence.
+INFO  [alembic.runtime.migration] Running upgrade 0003_phase2b -> 0004_phase2c, Frozen additive production release records; preserve all Phase 2B history.
+INFO  [alembic.runtime.migration] Running upgrade 0004_phase2c -> 0005_release_target, Add explicit, durable production target provisioning.
+INFO  [alembic.runtime.migration] Running upgrade 0005_release_target -> 0006_release_hardening, Retain immutable successful and failed production preparation evidence.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+____ test_rejected_generation_has_actionable_code_and_never_publishes[True] ____
+
+database = <f01.db.session.Database object at 0x10bb4f410>
+configured = Settings(app_env='test', auth_mode='development', execution_mode='real', real_execution_enabled=True, release_enabled=...=1000, simulation_runner_enabled=False, simulation_change_scenario='auto', dev_token_expires_at=None, log_level='INFO')
+project_plan = ProjectPlan(project_title='Harbor CRM', product_summary="Manage a small real estate agency's leads and sales pipeline....Identity boundary']), ImplementationMilestone(title='CRM workflows', deliverables=['Lead records', 'Pipeline views'])])
+repair = True
+
+    @pytest.mark.parametrize('repair',[False,True])
+    def test_rejected_generation_has_actionable_code_and_never_publishes(database:Database,configured:Settings,project_plan:ProjectPlan,repair:bool)->None:
+        owner,pid,body=setup_build(database,configured,project_plan)
+        run=service.queue(database,configured,owner,pid,body,'rejected-source')
+        class RejectedSource(SourceProvider):
+            async def propose_source(self,context:GenerationContext,maximum_output_tokens:int)->GenerationResult:
+                if repair and context.base_source is None:return await super().propose_source(context,maximum_output_tokens)
+                self.calls+=1
+                edits=tuple(PutFile(operation='put',path=f.path,prior_sha256=f.sha256,content=f.content) for f in context.base_source.files) if context.base_source else (PutFile(operation='put',path='app/page.tsx',prior_sha256=None,content='export default function Page(){return <main>Missing layout</main>}'),)
+                return GenerationResult(proposal=SourceProposal(schema_version=1,recipe='next-web-v1',base_digest=context.base_source.digest if context.base_source else None,edits=edits),input_tokens=100,output_tokens=200)
+        provider=RejectedSource(broken=repair);sandbox=ControlledSandbox()
+        assert asyncio.run(BuildWorker(database,configured,sandbox,provider).run_once())
+        detail=service.detail(database,owner,pid,run.id)
+>       assert detail.run.status=='failed' and detail.run.error_code=='SOURCE_PROPOSAL_REJECTED'
+E       AssertionError: assert ('failed' == 'failed'
+E
+E           failed and 'EXECUTION_FAILED' == 'SOURCE_PROPOSAL_REJECTED'
+E
+E         - SOURCE_PROPOSAL_REJECTED
+E         + EXECUTION_FAILED)
+
+tests/persistence/test_phase2b.py:115: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/nguyentienthanh/Downloads/F01-local/apps/api/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/persistence/test_phase2b.py::test_rejected_generation_has_actionable_code_and_never_publishes[False]
+FAILED tests/persistence/test_phase2b.py::test_rejected_generation_has_actionable_code_and_never_publishes[True]
+2 failed, 15 deselected, 1 warning in 0.64s
